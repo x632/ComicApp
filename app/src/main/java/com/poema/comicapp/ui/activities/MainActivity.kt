@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +22,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var comicAdapter: ComicListAdapter
-    private lateinit var tempSearchList : MutableList<ComicListItem>
+    private lateinit var tempSearchList: MutableList<ComicListItem>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,66 +51,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu,menu)
+        menuInflater.inflate(R.menu.menu, menu)
         val menuItem = menu?.findItem(R.id.search)
         val searchView = menuItem?.actionView as SearchView
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                println("!!! TEST!!!!!  ${newText?.lowercase(Locale.getDefault())}")
+
                 tempSearchList = mutableListOf()
                 val searchText = newText?.lowercase(Locale.getDefault())
-                if(searchText!!.isNotEmpty()){
-                    GlobalList.globalList.forEach {
-                        println("TITLE: ${it.title}")
-                        if(it.title.lowercase(Locale.getDefault()).contains(searchText!!)){
-                            tempSearchList.add(it)
-                            comicAdapter.submitList(tempSearchList)
+                searchText?.let { numb ->
+                    if (numb.isNotEmpty() && numb.isDigitsOnly()) {
+                        GlobalList.globalList.forEach { item ->
+                            if (item.id == numb) {
+                                tempSearchList.add(item)
+                                comicAdapter.submitList(tempSearchList)
+                            }
                         }
                     }
-
-                } else {
+                        else if (numb.isNotEmpty()) {
+                                GlobalList.globalList.forEach { item2 ->
+                                    if (item2.title.lowercase(Locale.getDefault())
+                                            .contains(numb)
+                                    ) {
+                                        tempSearchList.add(item2)
+                                        comicAdapter.submitList(tempSearchList)
+                                    }
+                                }
+                        }
+                    else {
                         comicAdapter.submitList(GlobalList.globalList)
+                    }
                 }
                 return false
             }
         })
         return super.onCreateOptionsMenu(menu)
     }
-
-
-
-    //findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-    /*    //val scrapedStr = viewModel.getAllPosts()
-        //viewModel.getAllPosts()
-        viewModel.start()
-        binding.buttonNext.setOnClickListener {
-            binding.progressBar.visibility = View.VISIBLE
-            viewModel.increaseOrDecreasePostNumber(true)
-          findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-        }
-
-        binding.buttonBack.setOnClickListener {
-            viewModel.increaseOrDecreasePostNumber(false)
-            // findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-        }
-
-        //viewModel.getComicPost(5)
-        viewModel.myResponse.observe(viewLifecycleOwner, Observer {
-           if (it.isSuccessful) {
-
-               println("!!! Title : ${it.body()?.title}")
-               println("!!! Transcript : ${it.body()?.transcript}")
-                binding.tvTitle.text= it.body()?.num.toString()
-               Glide.with(this)
-                   .load(it.body()?.img)
-                   .into(binding.imageView)
-               binding.progressBar.visibility= View.GONE
-           }
-        })*/
 
 
 }

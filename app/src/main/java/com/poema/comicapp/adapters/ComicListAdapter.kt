@@ -53,6 +53,7 @@ class ComicListAdapter(private val context: Context) :
 
     fun submitList(list: MutableList<ComicListItem>) {
         comicList = list
+        notifyDataSetChanged()
     }
 
 
