@@ -27,7 +27,7 @@ constructor(private val repository: Repository) : ViewModel() {
             startOrderScrape(it)
         }
 
-    fun start() {
+    fun getArchive() {
         repository.getArchiveAsString()
     }
 
@@ -149,7 +149,7 @@ constructor(private val repository: Repository) : ViewModel() {
         }
         // add scraped material to comicList, then go back and return it to LiveData
         for (index in 0 until finalTitles.size){
-            val listItem = ComicListItem(finalDates[index],finalNumbers[index],finalTitles[index],false)
+            val listItem = ComicListItem(finalTitles[index],finalNumbers[index],finalDates[index],false)
             comicList.add(listItem)
         }
     }

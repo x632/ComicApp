@@ -4,5 +4,5 @@ class ComicListItem (
     val title: String,
     val id: String,
     val date: String,
-    val isFavourite: Boolean
+    var isFavourite: Boolean
 )

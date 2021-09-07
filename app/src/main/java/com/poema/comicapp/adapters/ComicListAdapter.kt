@@ -9,12 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.poema.comicapp.R
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.ui.activities.DetailActivity
-import android.graphics.drawable.Drawable
 import com.poema.comicapp.R.*
 
 
@@ -34,13 +31,13 @@ class ComicListAdapter(private val context: Context) :
 
     override fun onBindViewHolder(holder: ComicItemViewHolder, position: Int) {
         val comicListItem = comicList[position]
-        holder.tv1.text = comicListItem.date
-        holder.tv2.text = comicListItem.title
+        holder.tv1.text = comicListItem.title
+        holder.tv2.text = comicListItem.date
         holder.tv3.text = comicListItem.id
         holder.itemView.setOnClickListener {
-            println("!!! Har klickat på ${comicList[position].date}")
+
             val intent = Intent(context, DetailActivity::class.java)
-            intent.putExtra("pos", comicListItem.id.toInt())
+            intent.putExtra("id", comicListItem.id.toInt())
             context.startActivity(intent)
         }
         if (!comicListItem.isFavourite) {
