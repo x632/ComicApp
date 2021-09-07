@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ComicApp">
         <activity
+            android:name=".ui.activities.ExplanationActivity"
+            android:exported="true" />
+        <activity
             android:name=".ui.activities.DetailActivity"
             android:exported="true" />
         <activity

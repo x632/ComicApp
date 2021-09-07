@@ -71,18 +71,24 @@ class MainActivity : AppCompatActivity() {
                                 comicAdapter.submitList(tempSearchList)
                             }
                         }
-                    }
-                        else if (numb.isNotEmpty()) {
-                                GlobalList.globalList.forEach { item2 ->
-                                    if (item2.title.lowercase(Locale.getDefault())
-                                            .contains(numb)
-                                    ) {
-                                        tempSearchList.add(item2)
-                                        comicAdapter.submitList(tempSearchList)
-                                    }
-                                }
+                    } else if (numb.isNotEmpty() && numb=="fav") {
+                        GlobalList.globalList.forEach { item3 ->
+                            if (item3.isFavourite == true) {
+                                tempSearchList.add(item3)
+                                comicAdapter.submitList(tempSearchList)
+                            }
                         }
-                    else {
+
+                    } else if (numb.isNotEmpty()) {
+                        GlobalList.globalList.forEach { item2 ->
+                            if (item2.title.lowercase(Locale.getDefault())
+                                    .contains(numb)
+                            ) {
+                                tempSearchList.add(item2)
+                                comicAdapter.submitList(tempSearchList)
+                            }
+                        }
+                    } else {
                         comicAdapter.submitList(GlobalList.globalList)
                     }
                 }

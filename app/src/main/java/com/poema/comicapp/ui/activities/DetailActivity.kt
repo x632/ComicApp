@@ -1,5 +1,6 @@
 package com.poema.comicapp.ui.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
@@ -25,7 +26,7 @@ class DetailActivity : AppCompatActivity() {
         val tvTitle = findViewById<TextView>(R.id.textView)
         val imageHolder = findViewById<ImageView>(R.id.imageView)
         val favButton = findViewById<Button>(R.id.btnAddFav)
-
+        val explBtn = findViewById<Button>(R.id.btnWeb)
         val spinnerHolder = findViewById<ProgressBar>(R.id.progressBar2)
         val number = intent.getIntExtra("id", 0)
         val strNum = number.toString()
@@ -35,9 +36,6 @@ class DetailActivity : AppCompatActivity() {
         viewModel.getResponse().observe(this, {
 
             if (it.isSuccessful) {
-
-                println("!!! Title : ${it.body()?.title}")
-                println("!!! Transcript : ${it.body()?.transcript}")
                 tvTitle.text = it.body()?.title
                 Glide.with(this)
                     .load(it.body()?.img)
@@ -53,6 +51,11 @@ class DetailActivity : AppCompatActivity() {
                 }
             }
 
+        }
+        explBtn.setOnClickListener{
+            val intent = Intent(this, ExplanationActivity::class.java)
+            intent.putExtra("id", number)
+            this.startActivity(intent)
         }
 
     }
