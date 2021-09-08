@@ -33,11 +33,11 @@ class ComicListAdapter(private val context: Context) :
         val comicListItem = comicList[position]
         holder.tv1.text = comicListItem.title
         holder.tv2.text = comicListItem.date
-        holder.tv3.text = comicListItem.id
+        holder.tv3.text = comicListItem.id.toString()
         holder.itemView.setOnClickListener {
 
             val intent = Intent(context, DetailActivity::class.java)
-            intent.putExtra("id", comicListItem.id.toInt())
+            intent.putExtra("id", comicListItem.id)
             context.startActivity(intent)
         }
         if (!comicListItem.isFavourite) {

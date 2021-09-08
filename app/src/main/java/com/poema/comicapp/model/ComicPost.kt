@@ -1,5 +1,8 @@
 package com.poema.comicapp.model
 
+
+
+
 data class ComicPost (
     val month: String,
     val num: Int,

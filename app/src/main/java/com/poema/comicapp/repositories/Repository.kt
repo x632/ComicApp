@@ -1,36 +1,46 @@
 package com.poema.comicapp.repositories
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.BitmapFactory.decodeFile
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import androidx.room.Query
 import com.poema.comicapp.api.PostApi
+import com.poema.comicapp.db.ComicDao
+import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.ComicPost
+import com.poema.comicapp.model.ComicPostCache
 import com.poema.comicapp.other.Constants.ARCHIVE_URL
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Response
-import java.io.IOException
+import java.io.*
+import java.lang.Exception
+import java.net.HttpURLConnection
+import java.net.URL
 import javax.inject.Inject
 
 
 class Repository @Inject constructor(
-    private val api: PostApi
-){
+    private val api: PostApi,
+    private val comicDao: ComicDao
+) {
 
     private val liveString = MutableLiveData<String>()
+    val bitmap = MutableLiveData<Bitmap>()
 
-    suspend fun getComicPost(id:Int): Response<ComicPost> {
+    suspend fun getComicPost(id: Int): Response<ComicPost> {
         return api.getComicPost(id)
     }
 
 
     fun getArchiveAsString() {
-        println("!!! FROM REPO : EXECUTED STRING GET ${System.currentTimeMillis()/100}")
 
-
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(IO).launch {
 
             val request = Request.Builder()
                 .url(ARCHIVE_URL)
@@ -40,8 +50,7 @@ class Repository @Inject constructor(
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
                 val str = response.body!!.string()
 
-                withContext(Dispatchers.Main) {
-                    println("!!! FROM REPO ${System.currentTimeMillis()/100}")
+                withContext(Main) {
                     liveString.value = str
 
                 }
@@ -49,7 +58,33 @@ class Repository @Inject constructor(
         }
 
     }
+
+    fun getBitMap(url: String) {
+
+        val job1 = Job()
+        CoroutineScope(IO + job1).launch {
+
+            val imageS = URL(url).openConnection().getInputStream()
+            val themap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageS))
+            withContext(Main) {
+                bitmap.value = themap
+            }
+            imageS.close()
+        }
+    }
+
+
+    suspend fun getFavorites(): List<ComicListItem> = comicDao.getAllComicListItems()
+
+    suspend fun saveComicPostCache(comicPostCache: ComicPostCache) = comicDao.insert(comicPostCache)
+
+    suspend fun saveComicListItem(comicListItem: ComicListItem) = comicDao.insert(comicListItem)
+
+    suspend fun findComicPostById(id: Int) = comicDao.findComicPostCacheById(id)
+
     fun getLiveString(): MutableLiveData<String> {
         return liveString
     }
+
+
 }

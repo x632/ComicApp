@@ -2,6 +2,7 @@ package com.poema.comicapp.ui.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Menu
 import android.view.View
 import android.widget.ProgressBar
@@ -13,7 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.model.ComicListItem
+import com.poema.comicapp.model.GlobalCacheList
 import com.poema.comicapp.model.GlobalList
+import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -23,18 +26,53 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var comicAdapter: ComicListAdapter
     private lateinit var tempSearchList: MutableList<ComicListItem>
+    private lateinit var viewModel: MainViewModel
+    private lateinit var recycler : RecyclerView
+    private lateinit var progBar : ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        val recycler = findViewById<RecyclerView>(R.id.recycler)
-        viewModel.getArchive()
+        val internetConnection = this.isInternetAvailable()
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        recycler = findViewById<RecyclerView>(R.id.recycler)
+        progBar = findViewById<ProgressBar>(R.id.progressBar)
 
+        viewModel.getArchive(internetConnection)
+
+        subscribeToScrapeData()
+        subscribeToCache()
+    }
+
+    private fun subscribeToCache() {
+        viewModel.offlineComicList.observe(this,{
+            GlobalList.globalList = it as MutableList<ComicListItem>
+            GlobalCacheList.globalCacheList = it as MutableList<ComicListItem>
+            recycler.apply {
+                layoutManager = LinearLayoutManager(this@MainActivity)
+                comicAdapter = ComicListAdapter(context)
+                adapter = comicAdapter
+            }
+            comicAdapter.submitList(GlobalList.globalList)
+            progBar.visibility = View.GONE
+        })
+    }
+
+    private fun subscribeToScrapeData() {
         viewModel.toUiFromViewModel.observe(this, {
-
             GlobalList.globalList = it
+            tempSearchList = it
+            for(index in 0 until GlobalCacheList.globalCacheList.size){
+                if( GlobalCacheList.globalCacheList[index].isFavourite){
+                    for(item in GlobalList.globalList){
+                        if (item.id==GlobalCacheList.globalCacheList[index].id){
+                            item.isFavourite=true
+                        }
+                    }
+                }
+            }
+
             tempSearchList = it
             recycler.apply {
                 layoutManager = LinearLayoutManager(this@MainActivity)
@@ -43,11 +81,9 @@ class MainActivity : AppCompatActivity() {
             }
             comicAdapter.submitList(GlobalList.globalList)
 
-            val spinner = findViewById<ProgressBar>(R.id.progressBar)
-            spinner.visibility = View.GONE
+
+            progBar.visibility = View.GONE
         })
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -66,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                 searchText?.let { numb ->
                     if (numb.isNotEmpty() && numb.isDigitsOnly()) {
                         GlobalList.globalList.forEach { item ->
-                            if (item.id == numb) {
+                            if (item.id == numb.toInt()) {
                                 tempSearchList.add(item)
                                 comicAdapter.submitList(tempSearchList)
                             }
