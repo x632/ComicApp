@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                                 comicAdapter.submitList(tempSearchList)
                             }
                         }
-                    } else if (numb.isNotEmpty() && numb=="fav") {
+                    } else if (numb.isNotEmpty() && numb=="favo") {
                         GlobalList.globalList.forEach { item3 ->
                             if (item3.isFavourite == true) {
                                 tempSearchList.add(item3)

@@ -16,8 +16,11 @@ interface ComicDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(comicLisItem: ComicListItem):Long
 
-    @Delete
-    suspend fun delete(comicListItem: ComicListItem)
+    @Query("DELETE FROM comics WHERE num = :id")
+    suspend fun deleteComicPostCachedById(id: Long)
+
+    @Query("DELETE FROM comicListItems WHERE id = :id")
+    suspend fun deleteComicListItemById(id: Long)
 
     @Query("SELECT * FROM comics")
     suspend fun getAllCachedComicPosts(): List<ComicPostCache>

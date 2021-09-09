@@ -55,6 +55,20 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         }
     }
 
+    fun deleteComicPostCacheById(item:ComicPostCache){
+        viewModelScope.launch {
+            repository.deleteComicPostCacheById(item.num)
+        }
+
+    }
+
+    fun deleteComicListItemById(item: ComicListItem){
+        viewModelScope.launch{
+            repository.deleteComicListItemById(item.id)
+        }
+
+    }
+
     fun getResponse(): MutableLiveData<Response<ComicPost>> {
         return theResponse
     }

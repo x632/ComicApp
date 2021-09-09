@@ -7,7 +7,7 @@ import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.ComicPost
 import com.poema.comicapp.model.ComicPostCache
 
-@Database(entities = [ComicPostCache::class,ComicListItem::class], version = 9)
+@Database(entities = [ComicPostCache::class,ComicListItem::class], version = 11)
 @TypeConverters(Converters::class)
 abstract class ComicDatabase: RoomDatabase(){
 

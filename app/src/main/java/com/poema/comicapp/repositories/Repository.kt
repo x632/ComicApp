@@ -73,6 +73,9 @@ class Repository @Inject constructor(
         }
     }
 
+    suspend fun deleteComicPostCacheById(id:Int) = comicDao.deleteComicPostCachedById(id.toLong())
+
+    suspend fun deleteComicListItemById(id:Int) = comicDao.deleteComicListItemById(id.toLong())
 
     suspend fun getFavorites(): List<ComicListItem> = comicDao.getAllComicListItems()
 
