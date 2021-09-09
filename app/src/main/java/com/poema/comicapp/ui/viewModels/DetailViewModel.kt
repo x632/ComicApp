@@ -55,16 +55,16 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         }
     }
 
-    fun deleteComicPostCacheById(item:ComicPostCache){
+    fun deleteComicPostCacheById(number:Int){
         viewModelScope.launch {
-            repository.deleteComicPostCacheById(item.num)
+            repository.deleteComicPostCacheById(number)
         }
 
     }
 
-    fun deleteComicListItemById(item: ComicListItem){
+    fun deleteComicListItemById(number:Int){
         viewModelScope.launch{
-            repository.deleteComicListItemById(item.id)
+            repository.deleteComicListItemById(number)
         }
 
     }

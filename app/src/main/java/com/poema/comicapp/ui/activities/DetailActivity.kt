@@ -71,11 +71,11 @@ class DetailActivity : AppCompatActivity() {
 
         SubscibeToFinishedBitmap()
 
-
         favButton.setOnClickListener {
+
             if (!inCache) {
                 for (index in 0 until GlobalList.globalList.size) {
-                    if (GlobalList.globalList[index].id == strNum.toInt()) {
+                    if (GlobalList.globalList[index].id == number) {
                         GlobalList.globalList[index].isFavourite = true
                         comicListItem = GlobalList.globalList[index]
 
@@ -84,6 +84,7 @@ class DetailActivity : AppCompatActivity() {
                 favButton.text = "remove from favs"
                 viewModel.saveComicPostCache(cachedPost)
                 viewModel.saveComicListItem(comicListItem)
+
             }   else{
                 for (index in 0 until GlobalList.globalList.size) {
                     if (GlobalList.globalList[index].id == number) {
@@ -92,10 +93,11 @@ class DetailActivity : AppCompatActivity() {
                     }
                 }
                 favButton.text = "add to favorites"
-                viewModel.deleteComicPostCacheById(cachedPost)
-                viewModel.deleteComicListItemById(comicListItem)
+                viewModel.deleteComicPostCacheById(number)
+                viewModel.deleteComicListItemById(number)
             }
         }
+
         explBtn.setOnClickListener {
             val intent = Intent(this, ExplanationActivity::class.java)
             intent.putExtra("id", number)
