@@ -17,6 +17,8 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.jsoup.Jsoup
+import org.jsoup.select.Elements
 import retrofit2.Response
 import java.io.*
 import java.lang.Exception
@@ -31,7 +33,9 @@ class Repository @Inject constructor(
 ) {
 
     private val liveString = MutableLiveData<String>()
+
     val bitmap = MutableLiveData<Bitmap>()
+
 
     suspend fun getComicPost(id: Int): Response<ComicPost> {
         return api.getComicPost(id)
@@ -52,17 +56,15 @@ class Repository @Inject constructor(
 
                 withContext(Main) {
                     liveString.value = str
-
                 }
             }
         }
-
     }
+
 
     fun getBitMap(url: String) {
 
-        val job1 = Job()
-        CoroutineScope(IO + job1).launch {
+        CoroutineScope(IO).launch {
 
             val imageS = URL(url).openConnection().getInputStream()
             val themap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageS))
@@ -88,6 +90,7 @@ class Repository @Inject constructor(
     fun getLiveString(): MutableLiveData<String> {
         return liveString
     }
+
 
 
 }

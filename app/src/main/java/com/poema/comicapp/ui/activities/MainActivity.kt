@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     private fun subscribeToCache() {
         viewModel.offlineComicList.observe(this,{
             GlobalList.globalList = it as MutableList<ComicListItem>
-            GlobalCacheList.globalCacheList = it as MutableList<ComicListItem>
+            GlobalCacheList.globalCacheList = it
             recycler.apply {
                 layoutManager = LinearLayoutManager(this@MainActivity)
                 comicAdapter = ComicListAdapter(context)
@@ -107,9 +107,9 @@ class MainActivity : AppCompatActivity() {
                                 comicAdapter.submitList(tempSearchList)
                             }
                         }
-                    } else if (numb.isNotEmpty() && numb=="favo") {
+                    } else if (numb.isNotEmpty() && numb=="fav") {
                         GlobalList.globalList.forEach { item3 ->
-                            if (item3.isFavourite == true) {
+                            if (item3.isFavourite) {
                                 tempSearchList.add(item3)
                                 comicAdapter.submitList(tempSearchList)
                             }

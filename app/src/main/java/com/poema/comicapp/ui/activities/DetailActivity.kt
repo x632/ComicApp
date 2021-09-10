@@ -32,7 +32,7 @@ class DetailActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
 
-        titleHolder = findViewById<TextView>(R.id.textView)
+        titleHolder = findViewById(R.id.textView)
         imageHolder = findViewById<ImageView>(R.id.imageView)
         progBarHolder = findViewById<ProgressBar>(R.id.progressBar2)
 
@@ -40,7 +40,6 @@ class DetailActivity : AppCompatActivity() {
         val explBtn = findViewById<Button>(R.id.btnWeb)
 
         val number = intent.getIntExtra("id", 0)
-        val strNum = number.toString()
 
         if (internetConnection) {
             inCache = isInCache(number)
@@ -52,7 +51,7 @@ class DetailActivity : AppCompatActivity() {
                 subscribeToComicPostCache()
             }
         }
-        if (inCache) favButton.text = "remove from cache"
+        if (inCache) favButton.text = "remove from fav"
 
         viewModel.getResponse().observe(this, {
 
@@ -69,7 +68,7 @@ class DetailActivity : AppCompatActivity() {
             }
         })
 
-        SubscibeToFinishedBitmap()
+        subscibeToFinishedBitmap()
 
         favButton.setOnClickListener {
 
@@ -77,8 +76,6 @@ class DetailActivity : AppCompatActivity() {
                 for (index in 0 until GlobalList.globalList.size) {
                     if (GlobalList.globalList[index].id == number) {
                         GlobalList.globalList[index].isFavourite = true
-                        comicListItem = GlobalList.globalList[index]
-
                     }
                 }
                 favButton.text = "remove from favs"
@@ -89,7 +86,6 @@ class DetailActivity : AppCompatActivity() {
                 for (index in 0 until GlobalList.globalList.size) {
                     if (GlobalList.globalList[index].id == number) {
                         GlobalList.globalList[index].isFavourite = false
-                        comicListItem = GlobalList.globalList[index]
                     }
                 }
                 favButton.text = "add to favorites"
@@ -99,8 +95,10 @@ class DetailActivity : AppCompatActivity() {
         }
 
         explBtn.setOnClickListener {
+
             val intent = Intent(this, ExplanationActivity::class.java)
             intent.putExtra("id", number)
+            intent.putExtra("title", comicListItem.title)
             this.startActivity(intent)
         }
 
@@ -108,8 +106,9 @@ class DetailActivity : AppCompatActivity() {
 
     private fun isInCache(number: Int):Boolean {
         var temp = false
-       val comicListItem = GlobalList.globalList.find{number == it.id}
-        temp = comicListItem?.isFavourite == true
+       val comicListIt = GlobalList.globalList.find{number == it.id}
+        temp = comicListIt?.isFavourite == true
+        comicListItem=comicListIt!!
         return temp
     }
 
@@ -122,7 +121,7 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun SubscibeToFinishedBitmap() {
+    private fun subscibeToFinishedBitmap() {
         viewModel.getLiveBitMap().observe(this) {
             cachedPost = ComicPostCache(
                 postFromInternet.month,
@@ -144,7 +143,7 @@ class DetailActivity : AppCompatActivity() {
     private fun showToast(message: String) {
         Toast.makeText(
             this, message,
-            Toast.LENGTH_LONG
+            Toast.LENGTH_SHORT
         ).show()
     }
 

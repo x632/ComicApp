@@ -20,7 +20,7 @@ constructor(private val repository: Repository) : ViewModel() {
     private val comicList: MutableList<ComicListItem> = mutableListOf()
     private val myResponse: MutableLiveData<Response<ComicPost>> = MutableLiveData()
 
-    //order webscrape in viewmodel first, then send to UI
+    //ordering webscrape in viewmodel first, then sending to UI
     var stringFromRepo = repository.getLiveString()
     var toUiFromViewModel: LiveData<MutableList<ComicListItem>> =
         Transformations.switchMap(stringFromRepo) {
@@ -40,13 +40,6 @@ constructor(private val repository: Repository) : ViewModel() {
                 val cachedList = repository.getFavorites()
                offlineComicList.value = cachedList
             }
-        }
-    }
-
-    fun getComicPost(postNumber: Int) {
-        viewModelScope.launch {
-            val response = repository.getComicPost(postNumber)
-            myResponse.value = response
         }
     }
 

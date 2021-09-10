@@ -35,15 +35,13 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun saveComicPostCache(comicPostCache: ComicPostCache) {
         viewModelScope.launch {
-            val id = repository.saveComicPostCache(comicPostCache)
-            println("!!! id of saved comicPost is: $id")
+          repository.saveComicPostCache(comicPostCache)
         }
     }
 
     fun saveComicListItem(comicListItem: ComicListItem) {
         viewModelScope.launch {
-            val id = repository.saveComicListItem(comicListItem)
-            println("!!! Id of saved ComicListItem is $id")
+           repository.saveComicListItem(comicListItem)
         }
     }
 

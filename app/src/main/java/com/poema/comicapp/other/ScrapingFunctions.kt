@@ -18,4 +18,5 @@ object ScrapingFunctions {
         val actualStartingIndex = indexBeforeString + lengthOfWhatToFind
         return actualStartingIndex
     }
+
 }
