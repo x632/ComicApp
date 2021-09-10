@@ -10,7 +10,7 @@ and then regain it again (please try that out:) etc. I think I have all scenario
 in the recyclerview it takes you to the detail-view - there you see the comic itself plus the title ofcourse. I did not include anything else in the detailview since you can probably 
 see that, that wouldn't really be an issue. There is - however - a button which takes you to a wepview-page that shows the explantion for the comic in question. I started scraping 
 this also for a few hours, but then I decided to opt for the simple webview instead. Its probably the part of the app that´s the least pretty! But it was really a question of 
-time running out. Also in the detail view you have an option to save to favorites and a button that changes it's text to "remove from favs" as soon as it has changed. Well, I 
+time running out. Also in the detail view you have an option to save to favorites and a button that changes it's text to "remove from favs" as soon as it has saved. Well, I 
 think that is pretty much it. I used an MVVM-architechture, so all fetching from the internet and database happens in the repository, most of the businesslogic is in viewmodels 
 and then I have 3 activities that handle the explicit ui-stuff. This was pretty much the same structure that I have used before so it didn't pose any major issues. I found out 
 now, though, that the "viewmodelScope" coroutine apperentely is only running on the main thread. Therefore I used IO dispathcer for all the heavy and even "blocking" fetchings 
