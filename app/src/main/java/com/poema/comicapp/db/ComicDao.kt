@@ -17,13 +17,10 @@ interface ComicDao {
     suspend fun insert(comicLisItem: ComicListItem):Long
 
     @Query("DELETE FROM comics WHERE num = :id")
-    suspend fun deleteComicPostCachedById(id: Long)
+    suspend fun deleteComicPostCachedById(id: Int)
 
     @Query("DELETE FROM comicListItems WHERE id = :id")
-    suspend fun deleteComicListItemById(id: Long)
-
-    @Query("SELECT * FROM comics")
-    suspend fun getAllCachedComicPosts(): List<ComicPostCache>
+    suspend fun deleteComicListItemById(id: Int)
 
     @Query("SELECT * FROM comics WHERE num = :id" )
     suspend fun findComicPostCacheById(id: Int) : ComicPostCache

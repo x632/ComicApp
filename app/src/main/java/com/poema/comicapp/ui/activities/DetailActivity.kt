@@ -6,12 +6,15 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.poema.comicapp.R
 import com.poema.comicapp.model.*
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
@@ -23,6 +26,7 @@ class DetailActivity : AppCompatActivity() {
     lateinit var titleHolder: TextView
     lateinit var imageHolder: ImageView
     lateinit var progBarHolder: ProgressBar
+    private var index : Int? = null
     private var inCache: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,23 +39,23 @@ class DetailActivity : AppCompatActivity() {
         titleHolder = findViewById(R.id.textView)
         imageHolder = findViewById<ImageView>(R.id.imageView)
         progBarHolder = findViewById<ProgressBar>(R.id.progressBar2)
+        val heartHolder = findViewById<ImageView>(R.id.heartHolder)
 
-        val favButton = findViewById<Button>(R.id.btnAddFav)
         val explBtn = findViewById<Button>(R.id.btnWeb)
 
         val number = intent.getIntExtra("id", 0)
-
+        index = indexInList(number)
         if (internetConnection) {
-            inCache = isInCache(number)
             viewModel.getComicPost(number)
         } else {
-            inCache = isInCache(number)
-            if (inCache) {
+            if (isInCache(number)) {
                 viewModel.getComicPostCache(number)
                 subscribeToComicPostCache()
             }
         }
-        if (inCache) favButton.text = "remove from fav"
+        val heart = resources.getDrawable(R.drawable.ic_baseline_favorite_48)
+        val emptyHeart = resources.getDrawable(R.drawable.ic_baseline_favorite_border_48)
+        if (isInCache(number)) heartHolder.setImageDrawable(heart)
 
         viewModel.getResponse().observe(this, {
 
@@ -70,45 +74,53 @@ class DetailActivity : AppCompatActivity() {
 
         subscibeToFinishedBitmap()
 
-        favButton.setOnClickListener {
-
-            if (!inCache) {
-                for (index in 0 until GlobalList.globalList.size) {
-                    if (GlobalList.globalList[index].id == number) {
-                        GlobalList.globalList[index].isFavourite = true
-                    }
-                }
-                favButton.text = "remove from favs"
+        heartHolder.setOnClickListener {
+            if (!isInCache(number)) {
+                GlobalList.globalList[index!!].isFavourite = true
                 viewModel.saveComicPostCache(cachedPost)
                 viewModel.saveComicListItem(comicListItem)
-
-            }   else{
-                for (index in 0 until GlobalList.globalList.size) {
-                    if (GlobalList.globalList[index].id == number) {
-                        GlobalList.globalList[index].isFavourite = false
-                    }
-                }
-                favButton.text = "add to favorites"
+                heartHolder.setImageDrawable(heart)
+                showToast("has been saved to favorites!")
+            } else {
+                GlobalList.globalList[index!!].isFavourite = false
+                heartHolder.setImageDrawable(emptyHeart)
                 viewModel.deleteComicPostCacheById(number)
                 viewModel.deleteComicListItemById(number)
+
+                showToast("has been deleted from favorites!")
             }
         }
 
         explBtn.setOnClickListener {
-
-            val intent = Intent(this, ExplanationActivity::class.java)
-            intent.putExtra("id", number)
-            intent.putExtra("title", comicListItem.title)
-            this.startActivity(intent)
+            if(internetConnection) {
+                val intent = Intent(this, ExplanationActivity::class.java)
+                intent.putExtra("id", number)
+                intent.putExtra("title", comicListItem.title)
+                this.startActivity(intent)
+            }else {
+                showToast("You cannot see explanations without internet-connection. Please check your connection!")
+            }
         }
-
     }
 
-    private fun isInCache(number: Int):Boolean {
-        var temp = false
-       val comicListIt = GlobalList.globalList.find{number == it.id}
-        temp = comicListIt?.isFavourite == true
-        comicListItem=comicListIt!!
+    private fun indexInList(number: Int): Int {
+        var placeInGlobalList = 0
+        for (index in 0 until GlobalList.globalList.size) {
+            if (GlobalList.globalList[index].id == number) {
+                placeInGlobalList = index
+                comicListItem=GlobalList.globalList[index]
+            }
+        }
+        return placeInGlobalList
+    }
+
+    private fun isInCache(number: Int): Boolean {
+
+        val comicListIt = GlobalList.globalList.find { number == it.id }
+        val temp = comicListIt?.isFavourite == true
+        comicListIt?.let {
+            comicListItem = it
+        }
         return temp
     }
 
@@ -147,10 +159,10 @@ class DetailActivity : AppCompatActivity() {
         ).show()
     }
 
-    override fun onBackPressed() {
+   /* override fun onBackPressed() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         super.onBackPressed()
-    }
+    }*/
 
 }

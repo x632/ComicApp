@@ -8,11 +8,13 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
+import com.poema.comicapp.databinding.ActivityMainBinding
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.GlobalCacheList
 import com.poema.comicapp.model.GlobalList
@@ -29,10 +31,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
     private lateinit var recycler : RecyclerView
     private lateinit var progBar : ProgressBar
+    lateinit var binding : ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
 
         val internetConnection = this.isInternetAvailable()
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)

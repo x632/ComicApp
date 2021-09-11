@@ -67,17 +67,17 @@ class Repository @Inject constructor(
         CoroutineScope(IO).launch {
 
             val imageS = URL(url).openConnection().getInputStream()
-            val themap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageS))
+            val theMap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageS))
             withContext(Main) {
-                bitmap.value = themap
+                bitmap.value = theMap
             }
             imageS.close()
         }
     }
 
-    suspend fun deleteComicPostCacheById(id:Int) = comicDao.deleteComicPostCachedById(id.toLong())
+    suspend fun deleteComicPostCacheById(id:Int) = comicDao.deleteComicPostCachedById(id)
 
-    suspend fun deleteComicListItemById(id:Int) = comicDao.deleteComicListItemById(id.toLong())
+    suspend fun deleteComicListItemById(id:Int) = comicDao.deleteComicListItemById(id)
 
     suspend fun getFavorites(): List<ComicListItem> = comicDao.getAllComicListItems()
 

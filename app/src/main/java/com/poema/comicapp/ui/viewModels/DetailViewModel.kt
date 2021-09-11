@@ -26,6 +26,13 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     private val theResponse: MutableLiveData<Response<ComicPost>> = MutableLiveData()
     val comicPostCache: MutableLiveData<ComicPostCache> = MutableLiveData()
 
+    // denna är den nya
+    fun getOnlyCachedList(){
+        viewModelScope.launch {
+            repository.getFavorites()
+        }
+    }
+
     fun getComicPost(postNumber: Int) {
         viewModelScope.launch {
             val response = repository.getComicPost(postNumber)
