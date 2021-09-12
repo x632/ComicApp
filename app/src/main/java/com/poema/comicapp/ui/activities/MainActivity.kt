@@ -18,6 +18,7 @@ import com.poema.comicapp.databinding.ActivityMainBinding
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.GlobalCacheList
 import com.poema.comicapp.model.GlobalList
+import com.poema.comicapp.model.GlobalList.globalList
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,7 +27,7 @@ import java.util.*
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var comicAdapter: ComicListAdapter
+    private var comicAdapter: ComicListAdapter? = null
     private lateinit var tempSearchList: MutableList<ComicListItem>
     private lateinit var viewModel: MainViewModel
     private lateinit var recycler : RecyclerView
@@ -59,18 +60,18 @@ class MainActivity : AppCompatActivity() {
                 comicAdapter = ComicListAdapter(context)
                 adapter = comicAdapter
             }
-            comicAdapter.submitList(GlobalList.globalList)
+            comicAdapter?.let{ it.submitList(GlobalList.globalList)}
             progBar.visibility = View.GONE
         })
     }
 
     private fun subscribeToScrapeData() {
         viewModel.toUiFromViewModel.observe(this, {
-            GlobalList.globalList = it
+            globalList = it
             tempSearchList = it
             for(index in 0 until GlobalCacheList.globalCacheList.size){
                 if( GlobalCacheList.globalCacheList[index].isFavourite){
-                    for(item in GlobalList.globalList){
+                    for(item in globalList){
                         if (item.id==GlobalCacheList.globalCacheList[index].id){
                             item.isFavourite=true
                         }
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                 comicAdapter = ComicListAdapter(context)
                 adapter = comicAdapter
             }
-            comicAdapter.submitList(GlobalList.globalList)
+            comicAdapter?.let{it.submitList(globalList)}
 
 
             progBar.visibility = View.GONE
@@ -106,37 +107,42 @@ class MainActivity : AppCompatActivity() {
                 val searchText = newText?.lowercase(Locale.getDefault())
                 searchText?.let { numb ->
                     if (numb.isNotEmpty() && numb.isDigitsOnly()) {
-                        GlobalList.globalList.forEach { item ->
+                            globalList.forEach { item ->
                             if (item.id == numb.toInt()) {
                                 tempSearchList.add(item)
-                                comicAdapter.submitList(tempSearchList)
+                                comicAdapter?.let{it.submitList(tempSearchList)}
                             }
                         }
                     } else if (numb.isNotEmpty() && numb=="fav") {
-                        GlobalList.globalList.forEach { item3 ->
+                            globalList.forEach { item3 ->
                             if (item3.isFavourite) {
                                 tempSearchList.add(item3)
-                                comicAdapter.submitList(tempSearchList)
+                                comicAdapter?.let{it.submitList(tempSearchList)}
                             }
                         }
 
                     } else if (numb.isNotEmpty()) {
-                        GlobalList.globalList.forEach { item2 ->
+                            globalList.forEach { item2 ->
                             if (item2.title.lowercase(Locale.getDefault())
                                     .contains(numb)
                             ) {
                                 tempSearchList.add(item2)
-                                comicAdapter.submitList(tempSearchList)
+                                comicAdapter?.let{it.submitList(tempSearchList)}
                             }
                         }
                     } else {
-                        comicAdapter.submitList(GlobalList.globalList)
+                        comicAdapter?.let{it.submitList(globalList)}
                     }
                 }
                 return false
             }
         })
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        comicAdapter?.let{it.submitList(globalList)}
     }
 
 
