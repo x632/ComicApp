@@ -17,12 +17,17 @@ import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.databinding.ActivityMainBinding
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.GlobalCacheList
+import com.poema.comicapp.model.GlobalCacheList.globalCacheList
 import com.poema.comicapp.model.GlobalList
 import com.poema.comicapp.model.GlobalList.globalList
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import android.content.SharedPreferences
+
+
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -33,6 +38,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recycler : RecyclerView
     private lateinit var progBar : ProgressBar
     lateinit var binding : ActivityMainBinding
+    private var internetConnection = false
+    private var activityInitialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +47,7 @@ class MainActivity : AppCompatActivity() {
 
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
 
-        val internetConnection = this.isInternetAvailable()
+        internetConnection = this.isInternetAvailable()
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         recycler = findViewById<RecyclerView>(R.id.recycler)
         progBar = findViewById<ProgressBar>(R.id.progressBar)
@@ -53,8 +60,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun subscribeToCache() {
         viewModel.offlineComicList.observe(this,{
-            GlobalList.globalList = it as MutableList<ComicListItem>
-            GlobalCacheList.globalCacheList = it
+            globalList = it as MutableList<ComicListItem>
+            globalCacheList = it
             recycler.apply {
                 layoutManager = LinearLayoutManager(this@MainActivity)
                 comicAdapter = ComicListAdapter(context)
@@ -69,15 +76,16 @@ class MainActivity : AppCompatActivity() {
         viewModel.toUiFromViewModel.observe(this, {
             globalList = it
             tempSearchList = it
-            for(index in 0 until GlobalCacheList.globalCacheList.size){
-                if( GlobalCacheList.globalCacheList[index].isFavourite){
+            for(index in 0 until globalCacheList.size){
+                if( globalCacheList[index].isFavourite){
                     for(item in globalList){
-                        if (item.id==GlobalCacheList.globalCacheList[index].id){
+                        if (item.id== globalCacheList[index].id){
                             item.isFavourite=true
                         }
                     }
                 }
             }
+            activityInitialized=true
 
             tempSearchList = it
             recycler.apply {
@@ -140,9 +148,13 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+
     override fun onResume() {
         super.onResume()
-        comicAdapter?.let{it.submitList(globalList)}
+        comicAdapter?.let{
+            it.submitList(globalList)
+        }
+
     }
 
 

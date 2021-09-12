@@ -135,6 +135,7 @@ class DetailActivity : AppCompatActivity() {
 
             titleHolder.text = it.title
             Glide.with(this).load(it.imgBitMap).into(imageHolder)
+            altHolder.text = it.alt
             progBarHolder.visibility = View.GONE
 
         }
