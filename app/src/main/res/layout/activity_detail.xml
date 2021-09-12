@@ -13,7 +13,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/btnWeb"
+        app:layout_constraintBottom_toTopOf="@+id/tvAlt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,11 +50,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="8dp"
         android:text="Explanation"
         app:layout_constraintBottom_toBottomOf="@+id/heartHolder"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/tvAlt" />
 
     <ImageView
         android:id="@+id/heartHolder"
@@ -65,6 +64,22 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_baseline_favorite_border_48" />
+
+    <TextView
+        android:id="@+id/tvAlt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        android:textSize="14sp"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        app:layout_constraintBottom_toTopOf="@+id/heartHolder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

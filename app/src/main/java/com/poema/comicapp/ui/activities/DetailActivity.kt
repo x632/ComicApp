@@ -24,6 +24,7 @@ class DetailActivity : AppCompatActivity() {
     lateinit var viewModel: DetailViewModel
     lateinit var postFromInternet: ComicPost
     lateinit var titleHolder: TextView
+    lateinit var altHolder: TextView
     lateinit var imageHolder: ImageView
     lateinit var progBarHolder: ProgressBar
     private var index: Int? = null
@@ -37,6 +38,7 @@ class DetailActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
 
+        altHolder = findViewById<TextView>(R.id.tvAlt)
         titleHolder = findViewById(R.id.textView)
         imageHolder = findViewById<ImageView>(R.id.imageView)
         progBarHolder = findViewById<ProgressBar>(R.id.progressBar2)
@@ -68,6 +70,7 @@ class DetailActivity : AppCompatActivity() {
                 it.body()?.let { post ->
                     viewModel.createBitmap(post.img)
                     postFromInternet = post
+                    altHolder.text = post.alt
                 }
                 progBarHolder.visibility = View.GONE
             }
@@ -133,6 +136,7 @@ class DetailActivity : AppCompatActivity() {
             titleHolder.text = it.title
             Glide.with(this).load(it.imgBitMap).into(imageHolder)
             progBarHolder.visibility = View.GONE
+
         }
     }
 
@@ -153,6 +157,7 @@ class DetailActivity : AppCompatActivity() {
                 it,
             )
             cachedPostIsInitialized = true
+
         }
     }
 
