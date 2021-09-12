@@ -26,8 +26,9 @@ class DetailActivity : AppCompatActivity() {
     lateinit var titleHolder: TextView
     lateinit var imageHolder: ImageView
     lateinit var progBarHolder: ProgressBar
-    private var index : Int? = null
+    private var index: Int? = null
     private var inCache: Boolean = false
+    private var cachedPostIsInitialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,29 +76,31 @@ class DetailActivity : AppCompatActivity() {
         subscibeToFinishedBitmap()
 
         heartHolder.setOnClickListener {
-            if (!isInCache(number)) {
-                GlobalList.globalList[index!!].isFavourite = true
-                viewModel.saveComicPostCache(cachedPost)
-                viewModel.saveComicListItem(comicListItem)
-                heartHolder.setImageDrawable(heart)
-                showToast("has been saved to favorites!")
-            } else {
-                GlobalList.globalList[index!!].isFavourite = false
-                heartHolder.setImageDrawable(emptyHeart)
-                viewModel.deleteComicPostCacheById(number)
-                viewModel.deleteComicListItemById(number)
+            if (cachedPostIsInitialized) {
+                if (!isInCache(number)) {
+                    GlobalList.globalList[index!!].isFavourite = true
+                    viewModel.saveComicPostCache(cachedPost)
+                    viewModel.saveComicListItem(comicListItem)
+                    heartHolder.setImageDrawable(heart)
+                    //showToast("has been saved to favorites!")
+                } else {
+                    GlobalList.globalList[index!!].isFavourite = false
+                    heartHolder.setImageDrawable(emptyHeart)
+                    viewModel.deleteComicPostCacheById(number)
+                    viewModel.deleteComicListItemById(number)
 
-                showToast("has been deleted from favorites!")
+                    //showToast("has been deleted from favorites!")
+                }
             }
         }
 
         explBtn.setOnClickListener {
-            if(internetConnection) {
+            if (internetConnection) {
                 val intent = Intent(this, ExplanationActivity::class.java)
                 intent.putExtra("id", number)
                 intent.putExtra("title", comicListItem.title)
                 this.startActivity(intent)
-            }else {
+            } else {
                 showToast("You cannot see explanations without internet-connection. Please check your connection!")
             }
         }
@@ -108,7 +111,7 @@ class DetailActivity : AppCompatActivity() {
         for (index in 0 until GlobalList.globalList.size) {
             if (GlobalList.globalList[index].id == number) {
                 placeInGlobalList = index
-                comicListItem=GlobalList.globalList[index]
+                comicListItem = GlobalList.globalList[index]
             }
         }
         return placeInGlobalList
@@ -149,6 +152,7 @@ class DetailActivity : AppCompatActivity() {
                 postFromInternet.day,
                 it,
             )
+            cachedPostIsInitialized = true
         }
     }
 
@@ -159,10 +163,10 @@ class DetailActivity : AppCompatActivity() {
         ).show()
     }
 
-   /* override fun onBackPressed() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        super.onBackPressed()
-    }*/
+    /* override fun onBackPressed() {
+         val intent = Intent(this, MainActivity::class.java)
+         startActivity(intent)
+         super.onBackPressed()
+     }*/
 
 }
