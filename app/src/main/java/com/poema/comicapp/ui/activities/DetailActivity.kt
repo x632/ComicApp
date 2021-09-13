@@ -16,16 +16,11 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
 
-    lateinit var cachedPost: ComicPostCache
-    lateinit var comicListItem: ComicListItem
     lateinit var viewModel: DetailViewModel
-    lateinit var postFromInternet: ComicPost
     lateinit var titleHolder: TextView
     lateinit var altHolder: TextView
     lateinit var imageHolder: ImageView
     lateinit var progBarHolder: ProgressBar
-    private var index: Int? = null
-    private var cachedPostIsInitialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,19 +37,19 @@ class DetailActivity : AppCompatActivity() {
 
         val explBtn = findViewById<Button>(R.id.btnWeb)
 
-        val number = intent.getIntExtra("id", 0)
-        index = indexInList(number)
+        viewModel.number = intent.getIntExtra("id", 0)
+        viewModel.index = viewModel.indexInList(viewModel.number)
         if (internetConnection) {
-            viewModel.getComicPost(number)
+            viewModel.getComicPost(viewModel.number)
         } else {
-            if (isInCache(number)) {
-                viewModel.getComicPostCache(number)
+            if (viewModel.isInCache(viewModel.number)) {
+                viewModel.getComicPostCache(viewModel.number)
                 subscribeToComicPostCache()
             }
         }
         val heart = resources.getDrawable(R.drawable.ic_baseline_favorite_48,)
         val emptyHeart = resources.getDrawable(R.drawable.ic_baseline_favorite_border_48)
-        if (isInCache(number)) heartHolder.setImageDrawable(heart)
+        if (viewModel.isInCache(viewModel.number)) heartHolder.setImageDrawable(heart)
 
         viewModel.getResponse().observe(this, {
 
@@ -65,7 +60,7 @@ class DetailActivity : AppCompatActivity() {
                     .into(imageHolder)
                 it.body()?.let { post ->
                     viewModel.createBitmap(post.img)
-                    postFromInternet = post
+                    viewModel.postFromInternet = post
                     altHolder.text = post.alt
                 }
                 progBarHolder.visibility = View.GONE
@@ -75,18 +70,18 @@ class DetailActivity : AppCompatActivity() {
         subscribeToFinishedBitmap()
 
         heartHolder.setOnClickListener {
-            if (cachedPostIsInitialized) {
-                if (!isInCache(number)) {
-                    GlobalList.globalList[index!!].isFavourite = true
-                    viewModel.saveComicPostCache(cachedPost)
-                    viewModel.saveComicListItem(comicListItem)
+            if (viewModel.cachedPostIsInitialized) {
+                if (!viewModel.isInCache(viewModel.number)) {
+                    GlobalList.globalList[viewModel.index!!].isFavourite = true
+                    viewModel.saveComicPostCache(viewModel.cachedPost!!)
+                    viewModel.saveComicListItem(viewModel.comicListItem!!)
                     heartHolder.setImageDrawable(heart)
                     //showToast("has been saved to favorites!")
                 } else {
-                    GlobalList.globalList[index!!].isFavourite = false
+                    GlobalList.globalList[viewModel.index!!].isFavourite = false
                     heartHolder.setImageDrawable(emptyHeart)
-                    viewModel.deleteComicPostCacheById(number)
-                    viewModel.deleteComicListItemById(number)
+                    viewModel.deleteComicPostCacheById(viewModel.number)
+                    viewModel.deleteComicListItemById(viewModel.number)
 
                     //showToast("has been deleted from favorites!")
                 }
@@ -96,34 +91,13 @@ class DetailActivity : AppCompatActivity() {
         explBtn.setOnClickListener {
             if (internetConnection) {
                 val intent = Intent(this, ExplanationActivity::class.java)
-                intent.putExtra("id", number)
-                intent.putExtra("title", comicListItem.title)
+                intent.putExtra("id", viewModel.number)
+                intent.putExtra("title", viewModel.comicListItem!!.title)
                 this.startActivity(intent)
             } else {
                 showToast("You cannot see explanations without internet-connection. Please check your connection!")
             }
         }
-    }
-
-    private fun indexInList(number: Int): Int {
-        var placeInGlobalList = 0
-        for (index in 0 until GlobalList.globalList.size) {
-            if (GlobalList.globalList[index].id == number) {
-                placeInGlobalList = index
-                comicListItem = GlobalList.globalList[index]
-            }
-        }
-        return placeInGlobalList
-    }
-
-    private fun isInCache(number: Int): Boolean {
-
-        val comicListIt = GlobalList.globalList.find { number == it.id }
-        val temp = comicListIt?.isFavourite == true
-        comicListIt?.let {
-            comicListItem = it
-        }
-        return temp
     }
 
     private fun subscribeToComicPostCache() {
@@ -139,21 +113,21 @@ class DetailActivity : AppCompatActivity() {
 
     private fun subscribeToFinishedBitmap() {
         viewModel.getLiveBitMap().observe(this) {
-            cachedPost = ComicPostCache(
-                postFromInternet.month,
-                postFromInternet.num,
-                postFromInternet.link,
-                postFromInternet.year,
-                postFromInternet.news,
-                postFromInternet.safe_title,
-                postFromInternet.transcript,
-                postFromInternet.alt,
-                postFromInternet.img,
-                postFromInternet.title,
-                postFromInternet.day,
+            viewModel.cachedPost = ComicPostCache(
+                viewModel.postFromInternet!!.month,
+                viewModel.postFromInternet!!.num,
+                viewModel.postFromInternet!!.link,
+                viewModel.postFromInternet!!.year,
+                viewModel.postFromInternet!!.news,
+                viewModel.postFromInternet!!.safe_title,
+                viewModel.postFromInternet!!.transcript,
+                viewModel.postFromInternet!!.alt,
+                viewModel.postFromInternet!!.img,
+                viewModel.postFromInternet!!.title,
+                viewModel.postFromInternet!!.day,
                 it,
             )
-            cachedPostIsInitialized = true
+            viewModel.cachedPostIsInitialized = true
 
         }
     }

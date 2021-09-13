@@ -2,7 +2,6 @@ package com.poema.comicapp.ui.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Settings
 import android.view.Menu
 import android.view.View
 import android.widget.ProgressBar
@@ -16,7 +15,6 @@ import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.databinding.ActivityMainBinding
 import com.poema.comicapp.model.ComicListItem
-import com.poema.comicapp.model.GlobalCacheList
 import com.poema.comicapp.model.GlobalCacheList.globalCacheList
 import com.poema.comicapp.model.GlobalList
 import com.poema.comicapp.model.GlobalList.globalList
@@ -24,7 +22,6 @@ import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
-import android.content.SharedPreferences
 
 
 
@@ -67,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                 comicAdapter = ComicListAdapter(context)
                 adapter = comicAdapter
             }
-            comicAdapter?.let{ it.submitList(GlobalList.globalList)}
+            comicAdapter?.let{ it.submitList(globalList)}
             progBar.visibility = View.GONE
         })
     }
@@ -154,9 +151,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         comicAdapter?.let{
-            //scenario: if didn't have internetconnection at startup and regains connection while in detailscreen, then goes back: below makes sure all items are loaded.
+            //scenario: if didn't have internetconnection at startup and regains connection while in detailscreen, then goes back: below makes sure all items are loaded - only then.
            if(globalList.size < 2511 && this.isInternetAvailable()){
                val preferences = getPreferences(MODE_PRIVATE)
                val ranBefore = preferences.getBoolean("RanBefore", false)
@@ -165,6 +161,7 @@ class MainActivity : AppCompatActivity() {
                    editor.putBoolean("RanBefore", true)
                    editor.apply()
                    recreate()
+                   println("!!! Done THIS OPERATION!")
                }
            }
             it.submitList(globalList)

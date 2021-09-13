@@ -3,6 +3,8 @@ package com.poema.comicapp.ui.viewModels
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.ComicPost
 import com.poema.comicapp.model.ComicPostCache
+import com.poema.comicapp.model.GlobalList
 import com.poema.comicapp.repositories.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
@@ -26,6 +29,13 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     private val theResponse: MutableLiveData<Response<ComicPost>> = MutableLiveData()
     val comicPostCache: MutableLiveData<ComicPostCache> = MutableLiveData()
 
+    var number = 0
+    var cachedPost: ComicPostCache? = null
+    var comicListItem: ComicListItem? = null
+    var postFromInternet: ComicPost? = null
+    var index: Int? = null
+    var cachedPostIsInitialized = false
+
 
     fun getComicPost(postNumber: Int) {
         viewModelScope.launch {
@@ -36,13 +46,13 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun saveComicPostCache(comicPostCache: ComicPostCache) {
         viewModelScope.launch {
-          repository.saveComicPostCache(comicPostCache)
+            repository.saveComicPostCache(comicPostCache)
         }
     }
 
     fun saveComicListItem(comicListItem: ComicListItem) {
         viewModelScope.launch {
-           repository.saveComicListItem(comicListItem)
+            repository.saveComicListItem(comicListItem)
         }
     }
 
@@ -54,18 +64,16 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         }
     }
 
-    fun deleteComicPostCacheById(number:Int){
+    fun deleteComicPostCacheById(number: Int) {
         viewModelScope.launch {
             repository.deleteComicPostCacheById(number)
         }
-
     }
 
-    fun deleteComicListItemById(number:Int){
-        viewModelScope.launch{
+    fun deleteComicListItemById(number: Int) {
+        viewModelScope.launch {
             repository.deleteComicListItemById(number)
         }
-
     }
 
     fun getResponse(): MutableLiveData<Response<ComicPost>> {
@@ -83,6 +91,27 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     override fun onCleared() {
         super.onCleared()
         repository.cancelJobs()
+    }
+
+    fun indexInList(number: Int): Int {
+        var placeInGlobalList = 0
+        for (index in 0 until GlobalList.globalList.size) {
+            if (GlobalList.globalList[index].id == number) {
+                placeInGlobalList = index
+                comicListItem = GlobalList.globalList[index]
+            }
+        }
+        return placeInGlobalList
+    }
+
+    fun isInCache(number: Int): Boolean {
+
+        val comicListIt = GlobalList.globalList.find { number == it.id }
+        val temp = comicListIt?.isFavourite == true
+        comicListIt?.let {
+            comicListItem = it
+        }
+        return temp
     }
 
 }
