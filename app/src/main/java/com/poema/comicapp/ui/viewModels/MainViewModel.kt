@@ -18,7 +18,6 @@ constructor(private val repository: Repository) : ViewModel() {
 
     val offlineComicList: MutableLiveData<List<ComicListItem>> = MutableLiveData()
     private val comicList: MutableList<ComicListItem> = mutableListOf()
-    private val myResponse: MutableLiveData<Response<ComicPost>> = MutableLiveData()
 
     //ordering webscrape in viewmodel first, then sending to UI
     private var stringFromRepo = repository.getLiveString()
@@ -122,5 +121,10 @@ constructor(private val repository: Repository) : ViewModel() {
             comicList.add(listItem)
 
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        repository.cancelJobs()
     }
 }

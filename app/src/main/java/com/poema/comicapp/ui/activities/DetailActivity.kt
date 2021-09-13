@@ -6,14 +6,12 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.poema.comicapp.R
 import com.poema.comicapp.model.*
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
@@ -74,7 +72,7 @@ class DetailActivity : AppCompatActivity() {
             }
         })
 
-        subscibeToFinishedBitmap()
+        subscribeToFinishedBitmap()
 
         heartHolder.setOnClickListener {
             if (cachedPostIsInitialized) {
@@ -139,7 +137,7 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun subscibeToFinishedBitmap() {
+    private fun subscribeToFinishedBitmap() {
         viewModel.getLiveBitMap().observe(this) {
             cachedPost = ComicPostCache(
                 postFromInternet.month,
@@ -166,11 +164,5 @@ class DetailActivity : AppCompatActivity() {
             Toast.LENGTH_SHORT
         ).show()
     }
-
-    /* override fun onBackPressed() {
-         val intent = Intent(this, MainActivity::class.java)
-         startActivity(intent)
-         super.onBackPressed()
-     }*/
 
 }
