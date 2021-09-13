@@ -94,9 +94,12 @@ class MainActivity : AppCompatActivity() {
                 adapter = comicAdapter
             }
             comicAdapter?.let{it.submitList(globalList)}
-
-
             progBar.visibility = View.GONE
+            val preferences = getPreferences(MODE_PRIVATE)
+            val editor = preferences.edit()
+            editor.putBoolean("RanBefore", false)
+            editor.apply()
+
         })
     }
 
@@ -151,8 +154,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
         comicAdapter?.let{
+            //scenario: if didn't have internetconnection at startup and regains connection while in detailscreen, then goes back: below makes sure all items are loaded.
+           if(globalList.size < 2511 && this.isInternetAvailable()){
+               val preferences = getPreferences(MODE_PRIVATE)
+               val ranBefore = preferences.getBoolean("RanBefore", false)
+               if (!ranBefore) {
+                   val editor = preferences.edit()
+                   editor.putBoolean("RanBefore", true)
+                   editor.apply()
+                   recreate()
+               }
+           }
             it.submitList(globalList)
+
         }
 
     }
