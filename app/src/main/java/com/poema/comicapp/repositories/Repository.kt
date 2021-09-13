@@ -32,6 +32,9 @@ class Repository @Inject constructor(
     private val comicDao: ComicDao
 ) {
 
+    private var job1:CompletableJob? = null
+    private var job2:CompletableJob? = null
+
     private val liveString = MutableLiveData<String>()
 
     val bitmap = MutableLiveData<Bitmap>()
@@ -43,8 +46,8 @@ class Repository @Inject constructor(
 
 
     fun getArchiveAsString() {
-
-        CoroutineScope(IO).launch {
+        job1 = Job()
+        CoroutineScope(IO+job1!!).launch {
 
             val request = Request.Builder()
                 .url(ARCHIVE_URL)
@@ -63,8 +66,8 @@ class Repository @Inject constructor(
 
 
     fun getBitMap(url: String) {
-
-        CoroutineScope(IO).launch {
+        job2 = Job()
+        CoroutineScope(IO+job2!!).launch {
 
             val imageS = URL(url).openConnection().getInputStream()
             val theMap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageS))
@@ -89,6 +92,11 @@ class Repository @Inject constructor(
 
     fun getLiveString(): MutableLiveData<String> {
         return liveString
+    }
+
+    fun cancelJobs(){
+        job1?.cancel()
+        job2?.cancel()
     }
 
 

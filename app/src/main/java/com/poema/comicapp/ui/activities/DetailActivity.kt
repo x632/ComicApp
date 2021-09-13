@@ -15,7 +15,6 @@ import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
 
@@ -28,7 +27,6 @@ class DetailActivity : AppCompatActivity() {
     lateinit var imageHolder: ImageView
     lateinit var progBarHolder: ProgressBar
     private var index: Int? = null
-    private var inCache: Boolean = false
     private var cachedPostIsInitialized = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,7 +54,7 @@ class DetailActivity : AppCompatActivity() {
                 subscribeToComicPostCache()
             }
         }
-        val heart = resources.getDrawable(R.drawable.ic_baseline_favorite_48)
+        val heart = resources.getDrawable(R.drawable.ic_baseline_favorite_48,)
         val emptyHeart = resources.getDrawable(R.drawable.ic_baseline_favorite_border_48)
         if (isInCache(number)) heartHolder.setImageDrawable(heart)
 

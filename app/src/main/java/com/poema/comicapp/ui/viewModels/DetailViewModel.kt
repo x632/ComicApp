@@ -74,11 +74,15 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun createBitmap(url: String) {
         repository.getBitMap(url)
-
     }
 
     fun getLiveBitMap(): MutableLiveData<Bitmap> {
         return repository.bitmap
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        repository.cancelJobs()
     }
 
 }
