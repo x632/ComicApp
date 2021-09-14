@@ -78,17 +78,20 @@ class Repository @Inject constructor(
         }
     }
 
-    suspend fun deleteComicPostCacheById(id:Int) = comicDao.deleteComicPostCachedById(id)
 
-    suspend fun deleteComicListItemById(id:Int) = comicDao.deleteComicListItemById(id)
+    suspend fun deleteFavoriteById(id:Int) = comicDao.deleteComicListItemById(id)
 
     suspend fun getFavorites(): List<ComicListItem> = comicDao.getAllComicListItems()
 
+    suspend fun saveFavorite(comicListItem: ComicListItem) = comicDao.insert(comicListItem)
+
     suspend fun saveComicPostCache(comicPostCache: ComicPostCache) = comicDao.insert(comicPostCache)
 
-    suspend fun saveComicListItem(comicListItem: ComicListItem) = comicDao.insert(comicListItem)
+    suspend fun deleteComicPostCacheById(id:Int) = comicDao.deleteComicPostCachedById(id)
 
-    suspend fun findComicPostById(id: Int) = comicDao.findComicPostCacheById(id)
+    suspend fun findComicPostCacheById(id: Int) = comicDao.findComicPostCacheById(id)
+
+
 
     fun getLiveString(): MutableLiveData<String> {
         return liveString

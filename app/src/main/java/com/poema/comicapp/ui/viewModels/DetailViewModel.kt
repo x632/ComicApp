@@ -1,25 +1,16 @@
 package com.poema.comicapp.ui.viewModels
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.ComicPost
 import com.poema.comicapp.model.ComicPostCache
 import com.poema.comicapp.model.GlobalList
 import com.poema.comicapp.repositories.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -52,14 +43,14 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun saveComicListItem(comicListItem: ComicListItem) {
         viewModelScope.launch {
-            repository.saveComicListItem(comicListItem)
+            repository.saveFavorite(comicListItem)
         }
     }
 
     fun getComicPostCache(id: Int) {
 
         viewModelScope.launch {
-            val post = repository.findComicPostById(id)
+            val post = repository.findComicPostCacheById(id)
             comicPostCache.value = post
         }
     }
@@ -72,7 +63,7 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun deleteComicListItemById(number: Int) {
         viewModelScope.launch {
-            repository.deleteComicListItemById(number)
+            repository.deleteFavoriteById(number)
         }
     }
 

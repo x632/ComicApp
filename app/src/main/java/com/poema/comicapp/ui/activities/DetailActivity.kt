@@ -1,14 +1,17 @@
 package com.poema.comicapp.ui.activities
 
+
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.poema.comicapp.R
 import com.poema.comicapp.model.*
+import com.poema.comicapp.model.GlobalList.globalList
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +24,7 @@ class DetailActivity : AppCompatActivity() {
     lateinit var altHolder: TextView
     lateinit var imageHolder: ImageView
     lateinit var progBarHolder: ProgressBar
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +51,9 @@ class DetailActivity : AppCompatActivity() {
                 subscribeToComicPostCache()
             }
         }
-        val heart = resources.getDrawable(R.drawable.ic_baseline_favorite_48,)
-        val emptyHeart = resources.getDrawable(R.drawable.ic_baseline_favorite_border_48)
+
+        val heart = ResourcesCompat.getDrawable(resources,R.drawable.ic_baseline_favorite_48,null)
+        val emptyHeart = ResourcesCompat.getDrawable(resources,R.drawable.ic_baseline_favorite_border_48,null)
         if (viewModel.isInCache(viewModel.number)) heartHolder.setImageDrawable(heart)
 
         viewModel.getResponse().observe(this, {
@@ -72,13 +77,13 @@ class DetailActivity : AppCompatActivity() {
         heartHolder.setOnClickListener {
             if (viewModel.cachedPostIsInitialized) {
                 if (!viewModel.isInCache(viewModel.number)) {
-                    GlobalList.globalList[viewModel.index!!].isFavourite = true
+                    globalList[viewModel.index!!].isFavourite = true
                     viewModel.saveComicPostCache(viewModel.cachedPost!!)
                     viewModel.saveComicListItem(viewModel.comicListItem!!)
                     heartHolder.setImageDrawable(heart)
                     //showToast("has been saved to favorites!")
                 } else {
-                    GlobalList.globalList[viewModel.index!!].isFavourite = false
+                    globalList[viewModel.index!!].isFavourite = false
                     heartHolder.setImageDrawable(emptyHeart)
                     viewModel.deleteComicPostCacheById(viewModel.number)
                     viewModel.deleteComicListItemById(viewModel.number)

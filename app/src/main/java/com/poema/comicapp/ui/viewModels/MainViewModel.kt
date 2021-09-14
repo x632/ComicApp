@@ -37,7 +37,6 @@ constructor(private val repository: Repository) : ViewModel() {
         } else {
             getOnlyCachedList()
             }
-
     }
 
     fun getOnlyCachedList(){

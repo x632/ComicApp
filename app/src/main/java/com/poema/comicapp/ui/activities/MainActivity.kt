@@ -7,23 +7,17 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
-import com.poema.comicapp.databinding.ActivityMainBinding
 import com.poema.comicapp.model.ComicListItem
-import com.poema.comicapp.model.GlobalCacheList.globalCacheList
-import com.poema.comicapp.model.GlobalList
 import com.poema.comicapp.model.GlobalList.globalList
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
-
-
 
 
 @AndroidEntryPoint
@@ -34,15 +28,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
     private lateinit var recycler : RecyclerView
     private lateinit var progBar : ProgressBar
-    lateinit var binding : ActivityMainBinding
     private var internetConnection = false
-    private var activityInitialized = false
+    private lateinit var cacheList : MutableList<ComicListItem>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
 
         internetConnection = this.isInternetAvailable()
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -51,19 +43,23 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.getArchive(internetConnection)
 
-        subscribeToScrapeData()
         subscribeToCache()
+        subscribeToScrapeData()
+    }
+
+    private fun initializeRecycler(){
+        recycler.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            comicAdapter = ComicListAdapter(context)
+            adapter = comicAdapter
+        }
     }
 
     private fun subscribeToCache() {
         viewModel.offlineComicList.observe(this,{
             globalList = it as MutableList<ComicListItem>
-            globalCacheList = it
-            recycler.apply {
-                layoutManager = LinearLayoutManager(this@MainActivity)
-                comicAdapter = ComicListAdapter(context)
-                adapter = comicAdapter
-            }
+            cacheList = it as MutableList<ComicListItem>
+            initializeRecycler()
             comicAdapter?.let{ it.submitList(globalList)}
             progBar.visibility = View.GONE
         })
@@ -73,23 +69,16 @@ class MainActivity : AppCompatActivity() {
         viewModel.toUiFromViewModel.observe(this, {
             globalList = it
             tempSearchList = it
-            for(index in 0 until globalCacheList.size){
-                if( globalCacheList[index].isFavourite){
+            for(index in 0 until cacheList.size){
+                if( cacheList[index].isFavourite){
                     for(item in globalList){
-                        if (item.id== globalCacheList[index].id){
+                        if (item.id== cacheList[index].id){
                             item.isFavourite=true
                         }
                     }
                 }
             }
-            activityInitialized=true
-
-            tempSearchList = it
-            recycler.apply {
-                layoutManager = LinearLayoutManager(this@MainActivity)
-                comicAdapter = ComicListAdapter(context)
-                adapter = comicAdapter
-            }
+            initializeRecycler()
             comicAdapter?.let{it.submitList(globalList)}
             progBar.visibility = View.GONE
             val preferences = getPreferences(MODE_PRIVATE)
@@ -113,15 +102,15 @@ class MainActivity : AppCompatActivity() {
 
                 tempSearchList = mutableListOf()
                 val searchText = newText?.lowercase(Locale.getDefault())
-                searchText?.let { numb ->
-                    if (numb.isNotEmpty() && numb.isDigitsOnly()) {
+                searchText?.let { text ->
+                    if (text.isNotEmpty() && text.isDigitsOnly()) {
                             globalList.forEach { item ->
-                            if (item.id == numb.toInt()) {
+                            if (item.id == text.toInt()) {
                                 tempSearchList.add(item)
                                 comicAdapter?.let{it.submitList(tempSearchList)}
                             }
                         }
-                    } else if (numb.isNotEmpty() && numb=="fav") {
+                    } else if (text.isNotEmpty() && text=="fav") {
                             globalList.forEach { item3 ->
                             if (item3.isFavourite) {
                                 tempSearchList.add(item3)
@@ -129,10 +118,10 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
 
-                    } else if (numb.isNotEmpty()) {
+                    } else if (text.isNotEmpty()) {
                             globalList.forEach { item2 ->
                             if (item2.title.lowercase(Locale.getDefault())
-                                    .contains(numb)
+                                    .contains(text)
                             ) {
                                 tempSearchList.add(item2)
                                 comicAdapter?.let{it.submitList(tempSearchList)}
@@ -152,7 +141,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         comicAdapter?.let{
-            //scenario: if didn't have internetconnection at startup and regains connection while in detailscreen, then goes back: below makes sure all items are loaded - only then.
+            //scenario: if didn't have internetconnection at startup and regains connection while in detailscreen, then goes back: below makes sure all items are reloaded - only then.
            if(globalList.size < 2511 && this.isInternetAvailable()){
                val preferences = getPreferences(MODE_PRIVATE)
                val ranBefore = preferences.getBoolean("RanBefore", false)
@@ -161,14 +150,9 @@ class MainActivity : AppCompatActivity() {
                    editor.putBoolean("RanBefore", true)
                    editor.apply()
                    recreate()
-                   println("!!! Done THIS OPERATION!")
                }
            }
             it.submitList(globalList)
-
         }
-
     }
-
-
 }

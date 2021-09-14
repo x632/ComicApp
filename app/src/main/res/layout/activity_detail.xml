@@ -5,13 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#3C5421"
+    app:barrierMargin="2dp"
     tools:context=".ui.activities.DetailActivity">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="#21231F"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/tvAlt"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +31,7 @@
         android:layout_height="wrap_content"
 
         android:layout_marginTop="8dp"
-        android:textColor="#FFFFFF"
+        android:textColor="#E7EEE6"
 
         android:textSize="24sp"
 
@@ -36,13 +40,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-
     <Button
         android:id="@+id/btnWeb"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:text="Explanation"
+        android:background="#162F0B"
+        android:elevation="4dp"
+        android:paddingHorizontal="12dp"
+        android:text="EXPLANATION"
+        android:textColor="#E4DDDD"
         app:layout_constraintBottom_toBottomOf="@+id/heartHolder"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -60,13 +68,14 @@
         android:id="@+id/tvAlt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="32dp"
+        android:padding="3dp"
+
+        android:textColor="#E7EEE6"
         android:textSize="16sp"
-        android:textAlignment="center"
-        android:textColor="#ffffff"
         app:layout_constraintBottom_toTopOf="@+id/heartHolder"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,6 +83,7 @@
 
     <ProgressBar
         android:id="@+id/progressBar2"
+        style="@android:style/Widget.DeviceDefault.Light.ProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
