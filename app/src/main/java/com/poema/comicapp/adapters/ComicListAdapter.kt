@@ -18,7 +18,6 @@ import com.poema.comicapp.R.*
 class ComicListAdapter(private val context: Context) :
     RecyclerView.Adapter<ComicListAdapter.ComicItemViewHolder>() {
 
-    private var uid = ""
     private lateinit var comicList: List<ComicListItem>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComicItemViewHolder {

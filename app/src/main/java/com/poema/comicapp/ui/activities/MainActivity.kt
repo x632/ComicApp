@@ -1,10 +1,18 @@
 package com.poema.comicapp.ui.activities
 
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.view.Menu
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModelProvider
@@ -14,6 +22,7 @@ import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.GlobalList.globalList
+import com.poema.comicapp.broadcastreceiver.NewItems
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,11 +39,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progBar : ProgressBar
     private var internetConnection = false
     private lateinit var cacheList : MutableList<ComicListItem>
-
+    private lateinit var alarmManager: AlarmManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        createNoficationChannel()
+        setAlarm()
 
         internetConnection = this.isInternetAvailable()
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -47,11 +58,41 @@ class MainActivity : AppCompatActivity() {
         subscribeToScrapeData()
     }
 
+    private fun createNoficationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "andreas channel"
+            val description = "alarm manager channel"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel("andreas",name,importance)
+            channel.description = description
+            val notificationManager = getSystemService(
+                NotificationManager::class.java
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun setAlarm() {
+        alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, NewItems::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this,0,intent,0)
+
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP, System.currentTimeMillis() +5000,
+            AlarmManager.INTERVAL_HOUR,pendingIntent
+        )
+
+        Toast.makeText(this,"Check for newly published xkcd's every hour in the background!", Toast.LENGTH_SHORT).show()
+
+    }
+
     private fun initializeRecycler(){
         recycler.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             comicAdapter = ComicListAdapter(context)
             adapter = comicAdapter
+            comicAdapter?.let{ it.submitList(globalList)}
+            progBar.visibility = View.GONE
         }
     }
 
@@ -60,8 +101,6 @@ class MainActivity : AppCompatActivity() {
             globalList = it as MutableList<ComicListItem>
             cacheList = it as MutableList<ComicListItem>
             initializeRecycler()
-            comicAdapter?.let{ it.submitList(globalList)}
-            progBar.visibility = View.GONE
         })
     }
 
@@ -79,13 +118,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             initializeRecycler()
-            comicAdapter?.let{it.submitList(globalList)}
-            progBar.visibility = View.GONE
+            val sharedPreferences = getDefaultSharedPreferences(this)
+            val editorShared = sharedPreferences.edit()
+            editorShared.putInt("oldAmount", globalList.size)
+            editorShared.apply()
             val preferences = getPreferences(MODE_PRIVATE)
             val editor = preferences.edit()
             editor.putBoolean("RanBefore", false)
             editor.apply()
-
         })
     }
 
