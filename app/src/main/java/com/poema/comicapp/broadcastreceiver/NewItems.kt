@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.poema.comicapp.R
 import com.poema.comicapp.other.Constants
+import com.poema.comicapp.other.Constants.CHANNEL_ID
 import com.poema.comicapp.ui.activities.MainActivity
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -16,12 +17,12 @@ import okhttp3.Request
 import java.io.IOException
 
 class NewItems : BroadcastReceiver() {
+
     override fun onReceive(context: Context?, intent: Intent?) {
 
         var listOfTitles: MutableList<String>? = null
         val preferences = getDefaultSharedPreferences(context)
         var oldAmountOfPosts = preferences.getInt("oldAmount", 0)
-
 
         CoroutineScope(Dispatchers.IO).launch {
 
@@ -32,36 +33,39 @@ class NewItems : BroadcastReceiver() {
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
                 val str = response.body!!.string()
 
-                str?.let {
+                str.let {
                     listOfTitles = startOrderingScrape(it)
                 }
-                println("!!! Fr broadcastreceiver: new size is :${listOfTitles!!.size} old size is: $oldAmountOfPosts")
+                val newTitle = listOfTitles!![0]
+                println("!!! Fr broadcastreceiver: new size is :${listOfTitles!!.size} old size is: $oldAmountOfPosts last title is ${listOfTitles!![0]}")
                 if (listOfTitles!!.size > oldAmountOfPosts) {
                     if (context != null && intent != null) {
-                        makePossibleNotification(context, intent)
+                        makePossibleNotification(context, intent, newTitle)
                     }
                 }
             }
         }
     }
 
-    private fun makePossibleNotification(context: Context, intent: Intent) {
+    private fun makePossibleNotification(context: Context, intent: Intent, newTitle:String) {
 
         val myIntent = Intent(context, MainActivity::class.java)
-        intent!!.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         val pendingIntent = PendingIntent.getActivity(context, 0, myIntent, 0)
 
-        val builder = NotificationCompat.Builder(context!!, "andreas")
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("XKCD")
-            .setContentText("A new XKCD-comic has been published!")
+            .setContentText("A new XKCD-comic, \"$newTitle\" available!")
             .setAutoCancel(true)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
+            .build()
 
         val notificationManager = NotificationManagerCompat.from(context)
-        notificationManager.notify(1, builder.build())
+
+        notificationManager.notify(1, notification)
     }
 
 

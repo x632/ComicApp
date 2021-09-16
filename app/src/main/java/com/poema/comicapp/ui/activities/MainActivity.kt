@@ -23,6 +23,7 @@ import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.GlobalList.globalList
 import com.poema.comicapp.broadcastreceiver.NewItems
+import com.poema.comicapp.other.Constants.CHANNEL_ID
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             val name = "andreas channel"
             val description = "alarm manager channel"
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel("andreas",name,importance)
+            val channel = NotificationChannel(CHANNEL_ID,name,importance)
             channel.description = description
             val notificationManager = getSystemService(
                 NotificationManager::class.java
@@ -81,9 +82,6 @@ class MainActivity : AppCompatActivity() {
             AlarmManager.RTC_WAKEUP, System.currentTimeMillis() +5000,
             AlarmManager.INTERVAL_HOUR,pendingIntent
         )
-
-        Toast.makeText(this,"Check for newly published xkcd's every hour in the background!", Toast.LENGTH_SHORT).show()
-
     }
 
     private fun initializeRecycler(){
