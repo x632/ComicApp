@@ -43,14 +43,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progBar : ProgressBar
     private var internetConnection = false
     private lateinit var cacheList : MutableList<ComicListItem>
-    //private lateinit var alarmManager: AlarmManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         createNotificationChannel()
         createJobScheduler()
-        //setAlarm()
 
         internetConnection = this.isInternetAvailable()
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -84,14 +82,6 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == JobScheduler.RESULT_SUCCESS) {
             println("!!!Job scheduled")
         }
-     /*   alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, NewItems::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this,0,intent,0)
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP, System.currentTimeMillis() +5000,
-            AlarmManager.INTERVAL_HALF_DAY,pendingIntent
-        )*/
     }
 
     private fun initializeRecycler(){
