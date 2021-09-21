@@ -22,16 +22,7 @@ object ScrapingFunctions {
         return actualStartingIndex
     }
 
-    fun startOrderingScrape(htmlString: String) {
 
-        val startAfterThis = "publication date)<br /><br /"
-        val stopAfterThis = "<a href=\"/1/\" title=\"2006-1-1\">Barrel - Part 1</a><br/>"
-        val resultString =
-            extractEntireList(htmlString, startAfterThis, stopAfterThis)
-        extractTitles(resultString)
-        //val list = MutableLiveData(comicList)
-        //return list
-    }
 
     fun extractTitles(resultString: String) {
         val list = resultString.split(">").toTypedArray()

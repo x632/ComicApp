@@ -1,10 +1,12 @@
 package com.poema.comicapp.ui.activities
 
-import android.app.AlarmManager
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Intent
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
+import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,7 +14,6 @@ import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.view.Menu
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModelProvider
@@ -22,8 +23,10 @@ import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.GlobalList.globalList
-import com.poema.comicapp.broadcastreceiver.NewItems
+import com.poema.comicapp.jobscheduler.ExampleJobService
 import com.poema.comicapp.other.Constants.CHANNEL_ID
+import com.poema.comicapp.other.Constants.CHANNEL_NAME
+import com.poema.comicapp.other.Constants.JOB_ID
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,13 +43,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progBar : ProgressBar
     private var internetConnection = false
     private lateinit var cacheList : MutableList<ComicListItem>
-    private lateinit var alarmManager: AlarmManager
+    //private lateinit var alarmManager: AlarmManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        createNoficationChannel()
-        setAlarm()
+        createNotificationChannel()
+        createJobScheduler()
+        //setAlarm()
 
         internetConnection = this.isInternetAvailable()
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -59,29 +63,35 @@ class MainActivity : AppCompatActivity() {
         subscribeToScrapeData()
     }
 
-    private fun createNoficationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "andreas channel"
-            val description = "alarm manager channel"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(CHANNEL_ID,name,importance)
-            channel.description = description
-            val notificationManager = getSystemService(
-                NotificationManager::class.java
-            )
-            notificationManager.createNotificationChannel(channel)
+    fun createNotificationChannel(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_HIGH).apply{
+            }
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
         }
     }
 
-    private fun setAlarm() {
-        alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+    private fun createJobScheduler() {
+        val componentName = ComponentName(this, ExampleJobService::class.java)
+        val info = JobInfo.Builder(JOB_ID, componentName)
+            .setPersisted(true)
+            .setPeriodic((120 * 60 * 1000).toLong())
+            .build()
+        val scheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
+        val resultCode = scheduler.schedule(info)
+        if (resultCode == JobScheduler.RESULT_SUCCESS) {
+            println("!!!Job scheduled")
+        }
+     /*   alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, NewItems::class.java)
         val pendingIntent = PendingIntent.getBroadcast(this,0,intent,0)
 
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP, System.currentTimeMillis() +5000,
-            AlarmManager.INTERVAL_HOUR,pendingIntent
-        )
+            AlarmManager.INTERVAL_HALF_DAY,pendingIntent
+        )*/
     }
 
     private fun initializeRecycler(){

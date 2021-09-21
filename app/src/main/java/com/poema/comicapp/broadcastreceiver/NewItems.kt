@@ -37,7 +37,7 @@ class NewItems : BroadcastReceiver() {
                     listOfTitles = startOrderingScrape(it)
                 }
                 val newTitle = listOfTitles!![0]
-                println("!!! Fr broadcastreceiver: new size is :${listOfTitles!!.size} old size is: $oldAmountOfPosts last title is ${listOfTitles!![0]}")
+
                 if (listOfTitles!!.size > oldAmountOfPosts) {
                     if (context != null && intent != null) {
                         makePossibleNotification(context, intent, newTitle)
@@ -52,7 +52,6 @@ class NewItems : BroadcastReceiver() {
         val myIntent = Intent(context, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         val pendingIntent = PendingIntent.getActivity(context, 0, myIntent, 0)
-
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("XKCD")
