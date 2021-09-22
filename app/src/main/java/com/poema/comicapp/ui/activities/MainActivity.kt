@@ -7,6 +7,7 @@ import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -23,7 +24,7 @@ import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.GlobalList.globalList
-import com.poema.comicapp.jobscheduler.ExampleJobService
+import com.poema.comicapp.jobscheduler.NewComicsJobService
 import com.poema.comicapp.other.Constants.CHANNEL_ID
 import com.poema.comicapp.other.Constants.CHANNEL_NAME
 import com.poema.comicapp.other.Constants.JOB_ID
@@ -72,7 +73,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createJobScheduler() {
-        val componentName = ComponentName(this, ExampleJobService::class.java)
+        val componentName = ComponentName(this, NewComicsJobService::class.java)
         val info = JobInfo.Builder(JOB_ID, componentName)
             .setPersisted(true)
             .setPeriodic((120 * 60 * 1000).toLong())
@@ -104,8 +105,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun subscribeToScrapeData() {
         viewModel.toUiFromViewModel.observe(this, {
+            val prefs = getDefaultSharedPreferences(this)
             globalList = it
             tempSearchList = it
+            checkForNewitems(it,prefs)
+
             for(index in 0 until cacheList.size){
                 if( cacheList[index].isFavourite){
                     for(item in globalList){
@@ -116,8 +120,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             initializeRecycler()
-            val sharedPreferences = getDefaultSharedPreferences(this)
-            val editorShared = sharedPreferences.edit()
+            val editorShared = prefs.edit()
             editorShared.putInt("oldAmount", globalList.size)
             editorShared.apply()
             val preferences = getPreferences(MODE_PRIVATE)
@@ -125,6 +128,16 @@ class MainActivity : AppCompatActivity() {
             editor.putBoolean("RanBefore", false)
             editor.apply()
         })
+    }
+
+    private fun checkForNewitems(list:MutableList<ComicListItem>, prefs: SharedPreferences) {
+        val oldAmountOfPosts = 2515//prefs.getInt("oldAmount", 0)
+        val amountOfNewPosts = list.size-oldAmountOfPosts
+        if (amountOfNewPosts > 0) {
+            for (index in 0..amountOfNewPosts){
+                globalList[index].isNew=true
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

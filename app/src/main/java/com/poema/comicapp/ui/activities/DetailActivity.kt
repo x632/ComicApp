@@ -15,6 +15,10 @@ import com.poema.comicapp.model.GlobalList.globalList
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import android.app.NotificationManager
+import android.content.Context
+import com.poema.comicapp.other.Constants.NOTIFICATION_ID
+
 
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
@@ -43,6 +47,10 @@ class DetailActivity : AppCompatActivity() {
 
         viewModel.number = intent.getIntExtra("id", 0)
         viewModel.index = viewModel.indexInList(viewModel.number)
+        if (globalList[viewModel.index!!].isNew == true){
+            cancelNotification()
+        }
+        globalList[viewModel.index!!].isNew = false
         if (internetConnection) {
             viewModel.getComicPost(viewModel.number)
         } else {
@@ -87,8 +95,6 @@ class DetailActivity : AppCompatActivity() {
                     heartHolder.setImageDrawable(emptyHeart)
                     viewModel.deleteComicPostCacheById(viewModel.number)
                     viewModel.deleteComicListItemById(viewModel.number)
-
-                    //showToast("has been deleted from favorites!")
                 }
             }
         }
@@ -102,6 +108,16 @@ class DetailActivity : AppCompatActivity() {
             } else {
                 showToast("You cannot see explanations without internet-connection. Please check your connection!")
             }
+        }
+    }
+
+    private fun cancelNotification() {
+        globalList[viewModel.index!!].isNew = false
+        val item = globalList.find { it.isNew == true }
+        //but only if there are no unseen items left
+        if (item == null){
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(NOTIFICATION_ID)
         }
     }
 

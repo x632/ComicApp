@@ -1,11 +1,8 @@
-package com.poema.comicapp.repositories
+package com.poema.comicapp.repository
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.BitmapFactory.decodeFile
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import androidx.room.Query
 import com.poema.comicapp.api.PostApi
 import com.poema.comicapp.db.ComicDao
 import com.poema.comicapp.model.ComicListItem
@@ -17,12 +14,8 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.jsoup.Jsoup
-import org.jsoup.select.Elements
 import retrofit2.Response
 import java.io.*
-import java.lang.Exception
-import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
 
@@ -43,7 +36,6 @@ class Repository @Inject constructor(
     suspend fun getComicPost(id: Int): Response<ComicPost> {
         return api.getComicPost(id)
     }
-
 
     fun getArchiveAsString() {
         job1 = Job()
@@ -69,12 +61,12 @@ class Repository @Inject constructor(
         job2 = Job()
         CoroutineScope(IO+job2!!).launch {
 
-            val imageS = URL(url).openConnection().getInputStream()
-            val theMap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageS))
+            val imageStream = URL(url).openConnection().getInputStream()
+            val theMap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageStream))
             withContext(Main) {
                 bitmap.value = theMap
             }
-            imageS.close()
+            imageStream.close()
         }
     }
 

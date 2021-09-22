@@ -2,8 +2,6 @@ package com.poema.comicapp.adapters
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,8 +40,9 @@ class ComicListAdapter(private val context: Context) :
         } else {
             holder.ivheart.setImageResource(drawable.ic_baseline_favorite_24)
         }
-    }
+        if(comicListItem.isNew) holder.ivNew.visibility = View.VISIBLE else holder.ivNew.visibility = View.GONE
 
+    }
     override fun getItemCount(): Int {
         return comicList.size
     }
@@ -59,5 +58,6 @@ class ComicListAdapter(private val context: Context) :
         val tv2: TextView = itemView.findViewById(id.tvDate)
         val tv3: TextView = itemView.findViewById(id.tvNumber)
         val ivheart: ImageView = itemView.findViewById(id.iv_heart)
+        val ivNew: ImageView = itemView.findViewById(id.ivNew)
     }
 }

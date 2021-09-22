@@ -13,7 +13,8 @@ class ComicListItem(
     val title: String,
     @PrimaryKey(autoGenerate = false) val id: Int,
     val date: String,
-    var isFavourite: Boolean
+    var isFavourite: Boolean,
+    var isNew: Boolean
 )
 
 

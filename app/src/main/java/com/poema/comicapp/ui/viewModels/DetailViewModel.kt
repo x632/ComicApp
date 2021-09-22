@@ -8,7 +8,7 @@ import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.ComicPost
 import com.poema.comicapp.model.ComicPostCache
 import com.poema.comicapp.model.GlobalList
-import com.poema.comicapp.repositories.Repository
+import com.poema.comicapp.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Response

@@ -2,12 +2,10 @@ package com.poema.comicapp.ui.viewModels
 
 import androidx.lifecycle.*
 import com.poema.comicapp.model.ComicListItem
-import com.poema.comicapp.model.ComicPost
 import com.poema.comicapp.other.ScrapingFunctions
-import com.poema.comicapp.repositories.Repository
+import com.poema.comicapp.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import retrofit2.Response
 
 import javax.inject.Inject
 
@@ -39,7 +37,7 @@ constructor(private val repository: Repository) : ViewModel() {
             }
     }
 
-    fun getOnlyCachedList(){
+    private fun getOnlyCachedList(){
         viewModelScope.launch {
             val cachedList = repository.getFavorites()
             offlineComicList.value = cachedList
@@ -115,7 +113,7 @@ constructor(private val repository: Repository) : ViewModel() {
 // add scraped material to comicList, then go back and return it to LiveData
         for (index in 0 until finalTitles.size) {
             val listItem =
-                ComicListItem(finalTitles[index], finalNumbers[index], finalDates[index], false)
+                ComicListItem(finalTitles[index], finalNumbers[index], finalDates[index], false,false)
 
             comicList.add(listItem)
 

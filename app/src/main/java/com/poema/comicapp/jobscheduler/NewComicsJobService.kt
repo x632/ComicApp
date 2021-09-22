@@ -23,7 +23,7 @@ import okhttp3.Request
 import java.io.IOException
 
 
-class ExampleJobService : JobService() {
+class NewComicsJobService : JobService() {
     private var jobCancelled = false
     private var job1: CompletableJob? = null
 
@@ -39,29 +39,27 @@ class ExampleJobService : JobService() {
         CoroutineScope(Dispatchers.IO + job1!!).launch {
 
             var listOfTitles: MutableList<String>? = null
-            val preferences = PreferenceManager.getDefaultSharedPreferences(this@ExampleJobService)
-            var oldAmountOfPosts = preferences.getInt("oldAmount", 0)
 
-            CoroutineScope(Dispatchers.IO).launch {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(this@NewComicsJobService)
+            val oldAmountOfPosts = 2515//prefs.getInt("oldAmount", 0)
 
-                val request = Request.Builder()
-                    .url(Constants.ARCHIVE_URL)
-                    .build()
-                OkHttpClient().newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
-                    val str = response.body!!.string()
+            val request = Request.Builder()
+                .url(Constants.ARCHIVE_URL)
+                .build()
+            OkHttpClient().newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                val str = response.body?.string()
 
-                    str.let {
-                        listOfTitles = startOrderingScrape(it)
-                    }
+                str?.let {
+                    listOfTitles = startOrderingScrape(it)
                     val newTitle = listOfTitles!![0]
-
                     if (listOfTitles!!.size > oldAmountOfPosts) {
                         createNotification(newTitle)
                     }
                 }
             }
-            println("!!! Job finished")
+
+            println("!!! Job finished - length of list = ${listOfTitles?.size}. Last list size: $oldAmountOfPosts")
             job1?.cancel()
             jobFinished(params, false)
         }
@@ -79,13 +77,23 @@ class ExampleJobService : JobService() {
             .setContentText("A new XKCD-comic, \"$newTitle\" available!")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
+            .setAutoCancel(false)
             .setContentIntent(pendingIntent)
             .build()
 
         val notificationManager = NotificationManagerCompat.from(this)
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
+
+    override fun onStopJob(params: JobParameters): Boolean {
+        println("!!!Job cancelled before completion")
+        job1?.cancel()
+        jobCancelled = true
+        println("!!! coroutine : $job1")
+        return true
+    }
+
+    //scrapingfunctions
 
     private fun extractEntireList(
         htmlString: String,
@@ -119,14 +127,6 @@ class ExampleJobService : JobService() {
             }
         }
         return titList
-    }
-
-    override fun onStopJob(params: JobParameters): Boolean {
-        println("!!!Job cancelled before completion")
-        job1?.cancel()
-        jobCancelled = true
-        println("!!! coroutine : $job1")
-        return true
     }
 
 }

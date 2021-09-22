@@ -38,7 +38,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name="com.poema.comicapp.jobscheduler.ExampleJobService"
+            android:name="com.poema.comicapp.jobscheduler.NewComicsJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
 
