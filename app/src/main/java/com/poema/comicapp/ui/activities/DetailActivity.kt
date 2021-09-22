@@ -113,7 +113,7 @@ class DetailActivity : AppCompatActivity() {
 
     private fun cancelNotification() {
         globalList[viewModel.index!!].isNew = false
-        val item = globalList.find { it.isNew == true }
+        val item = globalList.find { it.isNew }
         //but only if there are no unseen items left
         if (item == null){
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
