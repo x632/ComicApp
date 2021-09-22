@@ -41,7 +41,7 @@ class NewComicsJobService : JobService() {
             var listOfTitles: MutableList<String>? = null
 
             val prefs = PreferenceManager.getDefaultSharedPreferences(this@NewComicsJobService)
-            val oldAmountOfPosts = 2515//prefs.getInt("oldAmount", 0)
+            val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
 
             val request = Request.Builder()
                 .url(Constants.ARCHIVE_URL)

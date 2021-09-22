@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkForNewitems(list:MutableList<ComicListItem>, prefs: SharedPreferences) {
-        val oldAmountOfPosts = 2515//prefs.getInt("oldAmount", 0)
+        val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
         val amountOfNewPosts = list.size-oldAmountOfPosts
         if (amountOfNewPosts > 0) {
             for (index in 0..amountOfNewPosts){
