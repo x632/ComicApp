@@ -58,8 +58,6 @@ class NewComicsJobService : JobService() {
                     }
                 }
             }
-
-            println("!!! Job finished - length of list = ${listOfTitles?.size}. Last list size: $oldAmountOfPosts")
             job1?.cancel()
             jobFinished(params, false)
         }
@@ -86,10 +84,8 @@ class NewComicsJobService : JobService() {
     }
 
     override fun onStopJob(params: JobParameters): Boolean {
-        println("!!!Job cancelled before completion")
         job1?.cancel()
         jobCancelled = true
-        println("!!! coroutine : $job1")
         return true
     }
 

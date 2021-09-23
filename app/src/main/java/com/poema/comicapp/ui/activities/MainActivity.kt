@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         val componentName = ComponentName(this, NewComicsJobService::class.java)
         val info = JobInfo.Builder(JOB_ID, componentName)
             .setPersisted(true)
-            .setPeriodic((120 * 60 * 1000).toLong())
+            .setPeriodic(120L * 60L * 1000L)
             .build()
         val scheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
         val resultCode = scheduler.schedule(info)
@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
         val amountOfNewPosts = list.size-oldAmountOfPosts
         if (amountOfNewPosts > 0) {
-            for (index in 0..amountOfNewPosts){
+            for (index in 0 until amountOfNewPosts){
                 globalList[index].isNew=true
             }
         }
