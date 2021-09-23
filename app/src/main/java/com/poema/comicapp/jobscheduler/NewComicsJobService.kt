@@ -52,9 +52,8 @@ class NewComicsJobService : JobService() {
 
                 str?.let {
                     listOfTitles = startOrderingScrape(it)
-                    val newTitle = listOfTitles!![0]
                     if (listOfTitles!!.size > oldAmountOfPosts) {
-                        createNotification(newTitle)
+                        createNotification()
                     }
                 }
             }
@@ -63,7 +62,7 @@ class NewComicsJobService : JobService() {
         }
     }
 
-    private fun createNotification(newTitle: String) {
+    private fun createNotification() {
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntent = TaskStackBuilder.create(this).run {
             addNextIntentWithParentStack(intent)
@@ -72,7 +71,7 @@ class NewComicsJobService : JobService() {
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("XKCD")
-            .setContentText("A new XKCD-comic, \"$newTitle\" available!")
+            .setContentText("New XKCD-comics available!")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(false)
