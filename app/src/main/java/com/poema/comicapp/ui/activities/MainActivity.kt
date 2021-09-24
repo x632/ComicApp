@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.view.Menu
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
@@ -31,6 +32,7 @@ import com.poema.comicapp.other.Constants.JOB_ID
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers.Main
 import java.util.*
 
 
@@ -62,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         subscribeToScrapeData()
     }
 
-    fun createNotificationChannel(){
+    private fun createNotificationChannel(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_HIGH).apply{
@@ -108,7 +110,7 @@ class MainActivity : AppCompatActivity() {
             val prefs = getDefaultSharedPreferences(this)
             globalList = it
             tempSearchList = it
-            checkForNewitems(it,prefs)
+            checkForNewItems(it,prefs)
 
             for(index in 0 until cacheList.size){
                 if( cacheList[index].isFavourite){
@@ -130,7 +132,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun checkForNewitems(list:MutableList<ComicListItem>, prefs: SharedPreferences) {
+    private fun checkForNewItems(list:MutableList<ComicListItem>, prefs: SharedPreferences) {
         val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
         val amountOfNewPosts = list.size-oldAmountOfPosts
         if (amountOfNewPosts > 0) {
@@ -193,7 +195,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         comicAdapter?.let{
             //scenario: if didn't have internetconnection at startup and regains connection while in detailscreen, then goes back: below makes sure all items are reloaded - only then.
-           if(globalList.size < 2511 && this.isInternetAvailable()){
+           if(globalList.size == 0 && this.isInternetAvailable()){
                val preferences = getPreferences(MODE_PRIVATE)
                val ranBefore = preferences.getBoolean("RanBefore", false)
                if (!ranBefore) {
@@ -205,5 +207,7 @@ class MainActivity : AppCompatActivity() {
            }
             it.submitList(globalList)
         }
+        val view = this.currentFocus
+        view?.clearFocus();
     }
 }

@@ -28,7 +28,6 @@ class NewComicsJobService : JobService() {
     private var job1: CompletableJob? = null
 
     override fun onStartJob(params: JobParameters): Boolean {
-        println("!!!Job started")
         doBackgroundWork(params)
         return true
     }
