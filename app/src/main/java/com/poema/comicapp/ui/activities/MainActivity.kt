@@ -208,6 +208,6 @@ class MainActivity : AppCompatActivity() {
             it.submitList(globalList)
         }
         val view = this.currentFocus
-        view?.clearFocus();
+        view?.clearFocus()
     }
 }

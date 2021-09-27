@@ -24,7 +24,7 @@ import java.io.IOException
 
 
 class NewComicsJobService : JobService() {
-    private var jobCancelled = false
+
     private var job1: CompletableJob? = null
 
     override fun onStartJob(params: JobParameters): Boolean {
@@ -61,6 +61,11 @@ class NewComicsJobService : JobService() {
         }
     }
 
+    override fun onStopJob(params: JobParameters): Boolean {
+        job1?.cancel()
+        return true
+    }
+
     private fun createNotification() {
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntent = TaskStackBuilder.create(this).run {
@@ -79,12 +84,6 @@ class NewComicsJobService : JobService() {
 
         val notificationManager = NotificationManagerCompat.from(this)
         notificationManager.notify(NOTIFICATION_ID, notification)
-    }
-
-    override fun onStopJob(params: JobParameters): Boolean {
-        job1?.cancel()
-        jobCancelled = true
-        return true
     }
 
     //scrapingfunctions
