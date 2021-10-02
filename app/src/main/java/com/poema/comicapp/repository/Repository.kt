@@ -22,20 +22,18 @@ import javax.inject.Inject
 
 class Repository @Inject constructor(
     private val api: PostApi,
-    private val comicDao: ComicDao
+    private val comicDao: ComicDao,
 ) {
 
-    private var job1:CompletableJob? = null
-    private var job2:CompletableJob? = null
+    private var job1: CompletableJob? = null
+    private var job2: CompletableJob? = null
 
     private val liveString = MutableLiveData<String>()
 
     val bitmap = MutableLiveData<Bitmap>()
 
+    suspend fun getComicPost(id: Int): Response<ComicPost> = api.getComicPost(id)
 
-    suspend fun getComicPost(id: Int): Response<ComicPost> {
-        return api.getComicPost(id)
-    }
 
     fun getArchiveAsString() {
         job1 = Job()
@@ -59,7 +57,7 @@ class Repository @Inject constructor(
 
     fun getBitMap(url: String) {
         job2 = Job()
-        CoroutineScope(IO+job2!!).launch {
+        CoroutineScope(IO + job2!!).launch {
 
             val imageStream = URL(url).openConnection().getInputStream()
             val theMap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageStream))
@@ -71,7 +69,7 @@ class Repository @Inject constructor(
     }
 
 
-    suspend fun deleteFavoriteById(id:Int) = comicDao.deleteComicListItemById(id)
+    suspend fun deleteFavoriteById(id: Int) = comicDao.deleteComicListItemById(id)
 
     suspend fun getFavorites(): List<ComicListItem> = comicDao.getAllComicListItems()
 
@@ -79,21 +77,16 @@ class Repository @Inject constructor(
 
     suspend fun saveComicPostCache(comicPostCache: ComicPostCache) = comicDao.insert(comicPostCache)
 
-    suspend fun deleteComicPostCacheById(id:Int) = comicDao.deleteComicPostCachedById(id)
+    suspend fun deleteComicPostCacheById(id: Int) = comicDao.deleteComicPostCachedById(id)
 
     suspend fun findComicPostCacheById(id: Int) = comicDao.findComicPostCacheById(id)
-
-
 
     fun getLiveString(): MutableLiveData<String> {
         return liveString
     }
 
-    fun cancelJobs(){
+    fun cancelJobs() {
         job1?.cancel()
         job2?.cancel()
     }
-
-
-
 }

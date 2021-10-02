@@ -83,13 +83,13 @@ class DetailActivity : AppCompatActivity() {
         subscribeToFinishedBitmap()
 
         heartHolder.setOnClickListener {
+
             if (viewModel.cachedPostIsInitialized) {
                 if (!viewModel.isInCache(viewModel.number)) {
                     globalList[viewModel.index!!].isFavourite = true
                     viewModel.saveComicPostCache(viewModel.cachedPost!!)
                     viewModel.saveComicListItem(viewModel.comicListItem!!)
                     heartHolder.setImageDrawable(heart)
-                    //showToast("has been saved to favorites!")
                 } else {
                     globalList[viewModel.index!!].isFavourite = false
                     heartHolder.setImageDrawable(emptyHeart)
@@ -100,6 +100,7 @@ class DetailActivity : AppCompatActivity() {
         }
 
         explBtn.setOnClickListener {
+
             if (internetConnection) {
                 val intent = Intent(this, ExplanationActivity::class.java)
                 intent.putExtra("id", viewModel.number)

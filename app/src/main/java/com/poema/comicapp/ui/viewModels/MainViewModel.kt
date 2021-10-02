@@ -5,7 +5,9 @@ import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.other.ScrapingFunctions
 import com.poema.comicapp.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
+import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
 
 import javax.inject.Inject
 
@@ -14,8 +16,11 @@ class MainViewModel
 @Inject
 constructor(private val repository: Repository) : ViewModel() {
 
-    val offlineComicList: MutableLiveData<List<ComicListItem>> = MutableLiveData()
-    private val comicList: MutableList<ComicListItem> = mutableListOf()
+    private val _offlineComicList: MutableLiveData<List<ComicListItem>> = MutableLiveData()
+    val offlineComicList: LiveData<List<ComicListItem>> = _offlineComicList
+
+    private val _comicList: MutableList<ComicListItem> = mutableListOf()
+    val comicList: List<ComicListItem> = _comicList
 
     //ordering webscrape in viewmodel first, then sending to UI
     private var stringFromRepo = repository.getLiveString()
@@ -30,17 +35,17 @@ constructor(private val repository: Repository) : ViewModel() {
             repository.getArchiveAsString()
             viewModelScope.launch {
                 val cachedList = repository.getFavorites()
-                offlineComicList.value = cachedList
+                _offlineComicList.value = cachedList
             }
         } else {
             getOnlyCachedList()
-            }
+        }
     }
 
-    private fun getOnlyCachedList(){
+    private fun getOnlyCachedList() {
         viewModelScope.launch {
             val cachedList = repository.getFavorites()
-            offlineComicList.value = cachedList
+            _offlineComicList.value = cachedList
         }
     }
 
@@ -52,7 +57,7 @@ constructor(private val repository: Repository) : ViewModel() {
         val resultString =
             ScrapingFunctions.extractEntireList(htmlString, startAfterThis, stopAfterThis)
         extractTitles(resultString)
-        val list = MutableLiveData(comicList)
+        val list = MutableLiveData(_comicList)
         return list
     }
 
@@ -113,10 +118,14 @@ constructor(private val repository: Repository) : ViewModel() {
 // add scraped material to comicList, then go back and return it to LiveData
         for (index in 0 until finalTitles.size) {
             val listItem =
-                ComicListItem(finalTitles[index], finalNumbers[index], finalDates[index], false,false)
-
-            comicList.add(listItem)
-
+                ComicListItem(
+                    finalTitles[index],
+                    finalNumbers[index],
+                    finalDates[index],
+                    false,
+                    false
+                )
+            _comicList.add(listItem)
         }
     }
 

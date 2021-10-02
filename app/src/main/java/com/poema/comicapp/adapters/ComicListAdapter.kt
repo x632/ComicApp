@@ -36,9 +36,9 @@ class ComicListAdapter(private val context: Context) :
             context.startActivity(intent)
         }
         if (!comicListItem.isFavourite) {
-            holder.ivheart.setImageResource(drawable.ic_baseline_favorite_border_24)
+            holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_border_24)
         } else {
-            holder.ivheart.setImageResource(drawable.ic_baseline_favorite_24)
+            holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_24)
         }
         if(comicListItem.isNew) holder.ivNew.visibility = View.VISIBLE else holder.ivNew.visibility = View.GONE
 
@@ -57,7 +57,7 @@ class ComicListAdapter(private val context: Context) :
         val tv1: TextView = itemView.findViewById(id.tvTitle)
         val tv2: TextView = itemView.findViewById(id.tvDate)
         val tv3: TextView = itemView.findViewById(id.tvNumber)
-        val ivheart: ImageView = itemView.findViewById(id.iv_heart)
+        val ivHeart: ImageView = itemView.findViewById(id.iv_heart)
         val ivNew: ImageView = itemView.findViewById(id.ivNew)
     }
 }

@@ -38,28 +38,31 @@ class NewComicsJobService : JobService() {
         CoroutineScope(Dispatchers.IO + job1!!).launch {
 
             var listOfTitles: MutableList<String>? = null
-
             val prefs = PreferenceManager.getDefaultSharedPreferences(this@NewComicsJobService)
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
 
             val request = Request.Builder()
                 .url(Constants.ARCHIVE_URL)
                 .build()
-            OkHttpClient().newCall(request).execute().use { response ->
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-                val str = response.body?.string()
-
-                str?.let {
-                    listOfTitles = startOrderingScrape(it)
-                    if (listOfTitles!!.size > oldAmountOfPosts) {
-                        createNotification()
+            try {
+                OkHttpClient().newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                    val str = response.body?.string()
+                    str?.let {
+                        listOfTitles = extractTitles(it)
+                        if (listOfTitles!!.size > oldAmountOfPosts) {
+                            createNotification()
+                        }
                     }
                 }
+            } catch (e: IOException) {
+                println("!!! ${e.message}")
             }
-            job1?.cancel()
-            jobFinished(params, false)
         }
+        job1?.cancel()
+        jobFinished(params, false)
     }
+
 
     override fun onStopJob(params: JobParameters): Boolean {
         job1?.cancel()
@@ -79,6 +82,7 @@ class NewComicsJobService : JobService() {
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(false)
+            .setOnlyAlertOnce(true)
             .setContentIntent(pendingIntent)
             .build()
 
@@ -86,9 +90,9 @@ class NewComicsJobService : JobService() {
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
-    //scrapingfunctions
+//scrapingfunctions
 
-    private fun extractEntireList(
+    private fun extractArea(
         htmlString: String,
         startAfterThis: String,
         stopAfterThis: String
@@ -101,16 +105,16 @@ class NewComicsJobService : JobService() {
     private fun getIndex(htmlString: String, whatToFind: String): Int {
         val indexBeforeString = htmlString.indexOf(whatToFind, 0)
         val lengthOfWhatToFind = whatToFind.length
-        val actualStartingIndex = indexBeforeString + lengthOfWhatToFind
-        return actualStartingIndex
+        return indexBeforeString + lengthOfWhatToFind
     }
 
-    private fun startOrderingScrape(htmlString: String): MutableList<String> {
+    private fun extractTitles(htmlString: String): MutableList<String> {
 
         val startAfterThis = "publication date)<br /><br /"
         val stopAfterThis = "<a href=\"/1/\" title=\"2006-1-1\">Barrel - Part 1</a><br/>"
         val resultString =
-            extractEntireList(htmlString, startAfterThis, stopAfterThis)
+            extractArea(htmlString, startAfterThis, stopAfterThis)
+
         val list = resultString.split(">").toTypedArray()
         val titList = mutableListOf<String>()
         for (listItem in list) {
@@ -121,5 +125,4 @@ class NewComicsJobService : JobService() {
         }
         return titList
     }
-
 }

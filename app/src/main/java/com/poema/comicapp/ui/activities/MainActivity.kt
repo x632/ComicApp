@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.view.Menu
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.ProgressBar
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
@@ -32,7 +31,6 @@ import com.poema.comicapp.other.Constants.JOB_ID
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers.Main
 import java.util.*
 
 
@@ -189,7 +187,6 @@ class MainActivity : AppCompatActivity() {
         })
         return super.onCreateOptionsMenu(menu)
     }
-
 
     override fun onResume() {
         super.onResume()
