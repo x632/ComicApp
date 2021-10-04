@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 
 import javax.inject.Inject
 
@@ -23,7 +24,7 @@ constructor(private val repository: Repository) : ViewModel() {
     val comicList: List<ComicListItem> = _comicList
 
     //ordering webscrape in viewmodel first, then sending to UI
-    private var stringFromRepo = repository.getLiveString()
+    private var stringFromRepo = MutableLiveData<String>()
     var toUiFromViewModel: LiveData<MutableList<ComicListItem>> =
         Transformations.switchMap(stringFromRepo) {
             startOrderingScrape(it)
@@ -32,7 +33,15 @@ constructor(private val repository: Repository) : ViewModel() {
 
     fun getArchive(internetConnection: Boolean) {
         if (internetConnection) {
-            repository.getArchiveAsString()
+            CoroutineScope(IO).launch{
+                val response = repository.getArchiveAsString()
+                val str = response.body!!.string()
+
+                withContext(Main) {
+                    stringFromRepo.value = str
+                }
+            }
+            //repository.getArchiveAsString()
             viewModelScope.launch {
                 val cachedList = repository.getFavorites()
                 _offlineComicList.value = cachedList
@@ -129,8 +138,8 @@ constructor(private val repository: Repository) : ViewModel() {
         }
     }
 
-    override fun onCleared() {
+  /*  override fun onCleared() {
         super.onCleared()
         repository.cancelJobs()
-    }
+    }*/
 }

@@ -46,7 +46,8 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-
+    //Scalars
+    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
     //retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     //Gson
@@ -82,6 +83,7 @@ dependencies {
 
     //jsoup
     implementation 'org.jsoup:jsoup:1.14.2'
+
 
 }
 

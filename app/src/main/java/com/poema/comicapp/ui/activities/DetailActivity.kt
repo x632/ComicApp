@@ -1,6 +1,5 @@
 package com.poema.comicapp.ui.activities
 
-
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,7 +17,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import android.app.NotificationManager
 import android.content.Context
 import com.poema.comicapp.other.Constants.NOTIFICATION_ID
-
 
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
@@ -100,7 +98,6 @@ class DetailActivity : AppCompatActivity() {
         }
 
         explBtn.setOnClickListener {
-
             if (internetConnection) {
                 val intent = Intent(this, ExplanationActivity::class.java)
                 intent.putExtra("id", viewModel.number)
@@ -129,7 +126,6 @@ class DetailActivity : AppCompatActivity() {
             Glide.with(this).load(it.imgBitMap).into(imageHolder)
             altHolder.text = it.alt
             progBarHolder.visibility = View.GONE
-
         }
     }
 

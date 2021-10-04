@@ -10,7 +10,11 @@ import com.poema.comicapp.model.ComicPostCache
 import com.poema.comicapp.model.GlobalList
 import com.poema.comicapp.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -19,6 +23,8 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     private val theResponse: MutableLiveData<Response<ComicPost>> = MutableLiveData()
     val comicPostCache: MutableLiveData<ComicPostCache> = MutableLiveData()
+
+    private val bitmap = MutableLiveData<Bitmap>()
 
     var number = 0
     var cachedPost: ComicPostCache? = null
@@ -72,17 +78,23 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     }
 
     fun createBitmap(url: String) {
-        repository.getBitMap(url)
+        CoroutineScope(IO).launch{
+            val stream = repository.getBitMap(url)
+            withContext(Main){
+                bitmap.value = stream
+            }
+        }
+
     }
 
     fun getLiveBitMap(): MutableLiveData<Bitmap> {
-        return repository.bitmap
+        return bitmap
     }
 
-    override fun onCleared() {
+    /*override fun onCleared() {
         super.onCleared()
         repository.cancelJobs()
-    }
+    }*/
 
     fun indexInList(number: Int): Int {
         var placeInGlobalList = 0
