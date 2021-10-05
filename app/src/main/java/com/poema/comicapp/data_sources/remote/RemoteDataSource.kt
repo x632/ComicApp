@@ -7,7 +7,7 @@ import okhttp3.Request
 import java.io.IOException
 import javax.inject.Inject
 
-data class RemoteDataSource @Inject constructor(
+class RemoteDataSource @Inject constructor(
     private val client: OkHttpClient,
     private val request: Request.Builder,
     val api: PostApi) {

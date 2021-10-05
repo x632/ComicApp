@@ -130,7 +130,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun subscribeToFinishedBitmap() {
-        viewModel.getLiveBitMap().observe(this) {
+        viewModel.bitmap.observe(this) {
             viewModel.cachedPost = ComicPostCache(
                 viewModel.postFromInternet!!.month,
                 viewModel.postFromInternet!!.num,

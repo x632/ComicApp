@@ -1,6 +1,7 @@
 package com.poema.comicapp.ui.viewModels
 
 import android.graphics.Bitmap
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,7 +25,8 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     private val theResponse: MutableLiveData<Response<ComicPost>> = MutableLiveData()
     val comicPostCache: MutableLiveData<ComicPostCache> = MutableLiveData()
 
-    private val bitmap = MutableLiveData<Bitmap>()
+    private val _bitmap = MutableLiveData<Bitmap>()
+    val bitmap:LiveData<Bitmap> = _bitmap
 
     var number = 0
     var cachedPost: ComicPostCache? = null
@@ -81,20 +83,11 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         CoroutineScope(IO).launch{
             val stream = repository.getBitMap(url)
             withContext(Main){
-                bitmap.value = stream
+                _bitmap.value = stream
             }
         }
 
     }
-
-    fun getLiveBitMap(): MutableLiveData<Bitmap> {
-        return bitmap
-    }
-
-    /*override fun onCleared() {
-        super.onCleared()
-        repository.cancelJobs()
-    }*/
 
     fun indexInList(number: Int): Int {
         var placeInGlobalList = 0
