@@ -1,9 +1,7 @@
-package com.poema.comicapp.db
+package com.poema.comicapp.data_sources.local
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.poema.comicapp.model.ComicListItem
-import com.poema.comicapp.model.ComicPost
 import com.poema.comicapp.model.ComicPostCache
 
 

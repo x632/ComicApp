@@ -1,4 +1,4 @@
-package com.poema.comicapp.jobscheduler
+package com.poema.comicapp.job_scheduler
 
 import android.app.PendingIntent
 import android.app.job.JobParameters

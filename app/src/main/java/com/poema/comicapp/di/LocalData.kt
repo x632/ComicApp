@@ -1,10 +1,9 @@
 package com.poema.comicapp.di
 
 import android.content.Context
-import androidx.room.Database
 import androidx.room.Room
-import com.poema.comicapp.db.ComicDao
-import com.poema.comicapp.db.ComicDatabase
+import com.poema.comicapp.data_sources.local.ComicDao
+import com.poema.comicapp.data_sources.local.db.ComicDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,7 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RoomModule {
+object LocalData {
 
     @Singleton
     @Provides
@@ -33,5 +32,7 @@ object RoomModule {
         return comicDatabase.comicDao()
 
     }
+
+
 
 }

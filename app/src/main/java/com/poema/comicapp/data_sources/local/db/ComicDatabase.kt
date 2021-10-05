@@ -1,10 +1,10 @@
-package com.poema.comicapp.db
+package com.poema.comicapp.data_sources.local.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.poema.comicapp.data_sources.local.ComicDao
 import com.poema.comicapp.model.ComicListItem
-import com.poema.comicapp.model.ComicPost
 import com.poema.comicapp.model.ComicPostCache
 
 @Database(entities = [ComicPostCache::class,ComicListItem::class], version = 14)

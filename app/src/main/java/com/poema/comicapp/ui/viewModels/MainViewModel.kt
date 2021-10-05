@@ -35,7 +35,7 @@ constructor(private val repository: Repository) : ViewModel() {
         if (internetConnection) {
             CoroutineScope(IO).launch{
                 val response = repository.getArchiveAsString()
-                val str = response.body!!.string()
+                val str = response!!.body!!.string()
 
                 withContext(Main) {
                     stringFromRepo.value = str

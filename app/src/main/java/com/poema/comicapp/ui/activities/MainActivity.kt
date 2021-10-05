@@ -24,7 +24,7 @@ import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.GlobalList.globalList
-import com.poema.comicapp.jobscheduler.NewComicsJobService
+import com.poema.comicapp.job_scheduler.NewComicsJobService
 import com.poema.comicapp.other.Constants.CHANNEL_ID
 import com.poema.comicapp.other.Constants.CHANNEL_NAME
 import com.poema.comicapp.other.Constants.JOB_ID

@@ -1,4 +1,4 @@
-package com.poema.comicapp.db
+package com.poema.comicapp.data_sources.local.db
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
