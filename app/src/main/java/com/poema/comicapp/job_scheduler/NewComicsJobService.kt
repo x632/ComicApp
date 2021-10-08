@@ -13,6 +13,7 @@ import com.poema.comicapp.R
 import com.poema.comicapp.other.Constants
 import com.poema.comicapp.other.Constants.CHANNEL_ID
 import com.poema.comicapp.other.Constants.NOTIFICATION_ID
+import com.poema.comicapp.other.ScrapingFunctions
 import com.poema.comicapp.ui.activities.MainActivity
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
@@ -49,7 +50,7 @@ class NewComicsJobService : JobService() {
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
                     val str = response.body?.string()
                     str?.let {
-                        listOfTitles = extractTitles(it)
+                        listOfTitles = ScrapingFunctions.extractTitles(it)
                         if (listOfTitles!!.size > oldAmountOfPosts) {
                             createNotification()
                         }
@@ -81,7 +82,7 @@ class NewComicsJobService : JobService() {
             .setContentText("New XKCD-comics available!")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(false)
+            .setAutoCancel(true)
             .setOnlyAlertOnce(true)
             .setContentIntent(pendingIntent)
             .build()
@@ -90,39 +91,5 @@ class NewComicsJobService : JobService() {
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
-//scrapingfunctions
 
-    private fun extractArea(
-        htmlString: String,
-        startAfterThis: String,
-        stopAfterThis: String
-    ): String {
-        val startingIndex = getIndex(htmlString, startAfterThis)
-        val endingIndex = getIndex(htmlString, stopAfterThis)
-        return htmlString.slice(startingIndex..endingIndex)
-    }
-
-    private fun getIndex(htmlString: String, whatToFind: String): Int {
-        val indexBeforeString = htmlString.indexOf(whatToFind, 0)
-        val lengthOfWhatToFind = whatToFind.length
-        return indexBeforeString + lengthOfWhatToFind
-    }
-
-    private fun extractTitles(htmlString: String): MutableList<String> {
-
-        val startAfterThis = "publication date)<br /><br /"
-        val stopAfterThis = "<a href=\"/1/\" title=\"2006-1-1\">Barrel - Part 1</a><br/>"
-        val resultString =
-            extractArea(htmlString, startAfterThis, stopAfterThis)
-
-        val list = resultString.split(">").toTypedArray()
-        val titList = mutableListOf<String>()
-        for (listItem in list) {
-            if (listItem.contains("</a")) {
-                val tit = listItem.dropLast(3)
-                titList.add(tit)
-            }
-        }
-        return titList
-    }
 }

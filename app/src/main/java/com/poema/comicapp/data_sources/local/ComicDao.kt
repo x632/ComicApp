@@ -1,8 +1,11 @@
 package com.poema.comicapp.data_sources.local
 
+
 import androidx.room.*
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.ComicPostCache
+import com.poema.comicapp.model.IsRead
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -28,5 +31,11 @@ interface ComicDao {
 
     @Query("SELECT * FROM comicListItems")
     suspend fun getAllComicListItems(): List<ComicListItem>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(isRead: IsRead):Long
+
+    @Query("SELECT * FROM read")
+    fun observeIsRead(): Flow<List<IsRead>>
 
 }

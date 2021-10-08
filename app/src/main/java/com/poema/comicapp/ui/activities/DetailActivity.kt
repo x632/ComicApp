@@ -45,7 +45,8 @@ class DetailActivity : AppCompatActivity() {
 
         viewModel.number = intent.getIntExtra("id", 0)
         viewModel.index = viewModel.indexInList(viewModel.number)
-        if (globalList[viewModel.index!!].isNew == true){
+
+        if (globalList[viewModel.index!!].isNew == true) {
             cancelNotification()
         }
         globalList[viewModel.index!!].isNew = false
@@ -58,11 +59,12 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
-        val heart = ResourcesCompat.getDrawable(resources,R.drawable.ic_baseline_favorite_48,null)
-        val emptyHeart = ResourcesCompat.getDrawable(resources,R.drawable.ic_baseline_favorite_border_48,null)
+        val heart = ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_favorite_48, null)
+        val emptyHeart =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_favorite_border_48, null)
         if (viewModel.isInCache(viewModel.number)) heartHolder.setImageDrawable(heart)
 
-        viewModel.getResponse().observe(this, {
+        viewModel.response.observe(this, {
 
             if (it.isSuccessful) {
                 titleHolder.text = it.body()?.title
@@ -77,7 +79,7 @@ class DetailActivity : AppCompatActivity() {
                 progBarHolder.visibility = View.GONE
             }
         })
-
+        observeIsRead()
         subscribeToFinishedBitmap()
 
         heartHolder.setOnClickListener {
@@ -109,12 +111,27 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun observeIsRead() {
+        viewModel.isReadList.observe(this) {
+            println("!!! VARIT I ISREAD OBSERVERAREN")
+            for(item1 in it){
+                for (item in globalList) {
+                    if(item.id == item1.id){
+                        item.isRead = true
+                        println("!!! SATT DEN TILL TRUE!!! RUBRIK: ${item.title} ID:${item.id} ISREAD:${item.id} GlobalList: ${globalList[globalList.size-item1.id+1].title}")
+                    }
+                }
+            }
+        }
+    }
+
     private fun cancelNotification() {
         globalList[viewModel.index!!].isNew = false
         val item = globalList.find { it.isNew }
         //but only if there are no unseen items left
-        if (item == null){
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (item == null) {
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.cancel(NOTIFICATION_ID)
         }
     }

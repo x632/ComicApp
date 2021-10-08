@@ -13,9 +13,9 @@ class RemoteDataSource @Inject constructor(
     val api: PostApi) {
 
 
-    fun getArchive():Response?{
+    fun getArchive(): Response? {
         return try {
-            client.newCall(request.build()).execute();
+            client.newCall(request.build()).execute()
 
         } catch (e: IOException) {
             e.printStackTrace()
@@ -23,3 +23,4 @@ class RemoteDataSource @Inject constructor(
         }
     }
 }
+

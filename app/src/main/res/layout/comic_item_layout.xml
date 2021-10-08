@@ -71,10 +71,22 @@
             android:layout_marginTop="5dp"
             android:layout_marginEnd="5dp"
             app:layout_constraintBottom_toBottomOf="@+id/iv_heart"
+            app:layout_constraintEnd_toStartOf="@+id/ivUnread"
+            app:layout_constraintTop_toTopOf="parent"
+
+            app:srcCompat="@drawable/ic_baseline_fiber_new_24" />
+
+        <ImageView
+            android:id="@+id/ivUnread"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_heart"
             app:layout_constraintEnd_toStartOf="@+id/iv_heart"
             app:layout_constraintTop_toTopOf="parent"
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_baseline_fiber_new_24" />
+
+            app:srcCompat="@drawable/ic_baseline_unread_1_12" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

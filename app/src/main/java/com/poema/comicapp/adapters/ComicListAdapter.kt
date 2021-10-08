@@ -40,9 +40,13 @@ class ComicListAdapter(private val context: Context) :
         } else {
             holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_24)
         }
-        if(comicListItem.isNew) holder.ivNew.visibility = View.VISIBLE else holder.ivNew.visibility = View.GONE
+        if (comicListItem.isNew) holder.ivNew.visibility =
+            View.VISIBLE else holder.ivNew.visibility = View.GONE
 
+        if (comicListItem.isRead) holder.ivIsRead.visibility =
+            View.GONE else holder.ivIsRead.visibility = View.VISIBLE
     }
+
     override fun getItemCount(): Int {
         return comicList.size
     }
@@ -59,5 +63,6 @@ class ComicListAdapter(private val context: Context) :
         val tv3: TextView = itemView.findViewById(id.tvNumber)
         val ivHeart: ImageView = itemView.findViewById(id.iv_heart)
         val ivNew: ImageView = itemView.findViewById(id.ivNew)
+        val ivIsRead: ImageView = itemView.findViewById(id.ivUnread)
     }
 }

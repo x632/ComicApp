@@ -1,44 +1,36 @@
 package com.poema.comicapp.repository
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import com.poema.comicapp.data_sources.DataSources
 import com.poema.comicapp.model.ComicListItem
 import com.poema.comicapp.model.ComicPost
 import com.poema.comicapp.model.ComicPostCache
+import com.poema.comicapp.model.IsRead
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
-import java.net.URL
-import javax.inject.Inject
 
 
-class Repository @Inject constructor(
-    private val dataSources: DataSources
-) {
+interface Repository {
 
-    suspend fun getComicPost(id: Int): Response<ComicPost> = dataSources.remote.api.getComicPost(id)
+    suspend fun getComicPost(id: Int): Response<ComicPost>
 
-    fun getArchiveAsString() = dataSources.remote.getArchive()
+    fun getArchive() : List<ComicListItem>?
 
-    suspend fun deleteFavoriteById(id: Int) = dataSources.local.comicDao.deleteComicListItemById(id)
+    suspend fun deleteFavoriteById(id: Int)
 
-    suspend fun getFavorites(): List<ComicListItem> =
-        dataSources.local.comicDao.getAllComicListItems()
+    suspend fun getFavorites() : List<ComicListItem>
 
-    suspend fun saveFavorite(comicListItem: ComicListItem) =
-        dataSources.local.comicDao.insert(comicListItem)
+    suspend fun saveFavorite(comicListItem: ComicListItem): Long
 
-    suspend fun saveComicPostCache(comicPostCache: ComicPostCache) =
-        dataSources.local.comicDao.insert(comicPostCache)
+    suspend fun saveComicPostCache(comicPostCache: ComicPostCache):Long
 
-    suspend fun deleteComicPostCacheById(id: Int) =
-        dataSources.local.comicDao.deleteComicPostCachedById(id)
+    suspend fun deleteComicPostCacheById(id: Int)
 
-    suspend fun findComicPostCacheById(id: Int) =
-        dataSources.local.comicDao.findComicPostCacheById(id)
+    suspend fun findComicPostCacheById(id: Int) : ComicPostCache
 
-    fun getBitMap(url: String): Bitmap {
-        val imageStream = URL(url).openConnection().getInputStream()
-        return Bitmap.createBitmap(BitmapFactory.decodeStream(imageStream))
-    }
+    fun getBitMap(url: String): Bitmap
 
+    fun observeAllIsRead(): Flow<List<IsRead>>
+
+    suspend fun saveIsRead(isRead: IsRead):Long
 }
+

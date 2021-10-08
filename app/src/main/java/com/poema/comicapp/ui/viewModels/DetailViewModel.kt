@@ -1,15 +1,10 @@
 package com.poema.comicapp.ui.viewModels
 
 import android.graphics.Bitmap
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.poema.comicapp.model.ComicListItem
-import com.poema.comicapp.model.ComicPost
-import com.poema.comicapp.model.ComicPostCache
-import com.poema.comicapp.model.GlobalList
+import androidx.lifecycle.*
+import com.poema.comicapp.model.*
 import com.poema.comicapp.repository.Repository
+import com.poema.comicapp.repository.RepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -22,11 +17,15 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
-    private val theResponse: MutableLiveData<Response<ComicPost>> = MutableLiveData()
+    private val _response: MutableLiveData<Response<ComicPost>> = MutableLiveData()
+    val response : LiveData<Response<ComicPost>> = _response
     val comicPostCache: MutableLiveData<ComicPostCache> = MutableLiveData()
 
     private val _bitmap = MutableLiveData<Bitmap>()
     val bitmap:LiveData<Bitmap> = _bitmap
+
+    val isReadList: LiveData<List<IsRead>> = repository.observeAllIsRead().asLiveData()
+
 
     var number = 0
     var cachedPost: ComicPostCache? = null
@@ -39,7 +38,7 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     fun getComicPost(postNumber: Int) {
         viewModelScope.launch {
             val response = repository.getComicPost(postNumber)
-            theResponse.value = response
+            _response.value = response
         }
     }
 
@@ -75,10 +74,6 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         }
     }
 
-    fun getResponse(): MutableLiveData<Response<ComicPost>> {
-        return theResponse
-    }
-
     fun createBitmap(url: String) {
         CoroutineScope(IO).launch{
             val stream = repository.getBitMap(url)
@@ -97,7 +92,15 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
                 comicListItem = GlobalList.globalList[index]
             }
         }
+       saveIsReadItem()
         return placeInGlobalList
+    }
+
+    private fun saveIsReadItem(){
+        val isReadItem = comicListItem?.let { IsRead(it.id) }
+        viewModelScope.launch{
+            repository.saveIsRead(isReadItem!!)
+        }
     }
 
     fun isInCache(number: Int): Boolean {

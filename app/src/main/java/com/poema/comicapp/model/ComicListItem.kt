@@ -14,7 +14,8 @@ class ComicListItem(
     @PrimaryKey(autoGenerate = false) val id: Int,
     val date: String,
     var isFavourite: Boolean,
-    var isNew: Boolean
+    var isNew: Boolean,
+    var isRead: Boolean = false,
 )
 
 

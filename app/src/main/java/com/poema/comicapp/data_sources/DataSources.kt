@@ -9,6 +9,4 @@ import javax.inject.Inject
 data class DataSources @Inject constructor (
     val local: LocalDataSource,
     val remote: RemoteDataSource
-){
-
-}
+)
