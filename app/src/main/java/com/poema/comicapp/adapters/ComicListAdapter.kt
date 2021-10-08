@@ -42,7 +42,6 @@ class ComicListAdapter(private val context: Context) :
         }
         if (comicListItem.isNew) holder.ivNew.visibility =
             View.VISIBLE else holder.ivNew.visibility = View.GONE
-
         if (comicListItem.isRead) holder.ivIsRead.visibility =
             View.GONE else holder.ivIsRead.visibility = View.VISIBLE
     }

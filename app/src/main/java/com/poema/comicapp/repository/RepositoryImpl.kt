@@ -48,14 +48,12 @@ class RepositoryImpl @Inject constructor(
 
     override fun getBitMap(url: String): Bitmap {
         val imageStream = URL(url).openConnection().getInputStream()
-        return Bitmap.createBitmap(BitmapFactory.decodeStream(imageStream))
+        val bitmap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageStream))
+        imageStream.close()
+        return bitmap
     }
 
     override fun observeAllIsRead(): Flow<List<IsRead>> = dataSources.local.comicDao.observeIsRead()
 
-    override suspend fun saveIsRead(isRead: IsRead) : Long{
-       val a =  dataSources.local.comicDao.insert(isRead)
-        println("!!! En isRead sparades med id:t: $a")
-        return a
-    }
+    override suspend fun saveIsRead(isRead: IsRead) =  dataSources.local.comicDao.insert(isRead)
 }

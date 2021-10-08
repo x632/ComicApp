@@ -113,12 +113,10 @@ class DetailActivity : AppCompatActivity() {
 
     private fun observeIsRead() {
         viewModel.isReadList.observe(this) {
-            println("!!! VARIT I ISREAD OBSERVERAREN")
             for(item1 in it){
                 for (item in globalList) {
                     if(item.id == item1.id){
                         item.isRead = true
-                        println("!!! SATT DEN TILL TRUE!!! RUBRIK: ${item.title} ID:${item.id} ISREAD:${item.id} GlobalList: ${globalList[globalList.size-item1.id+1].title}")
                     }
                 }
             }

@@ -57,7 +57,9 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         recycler = findViewById<RecyclerView>(R.id.recycler)
         progBar = findViewById<ProgressBar>(R.id.progressBar)
-        progBar.visibility = View.VISIBLE
+        if (this.internetConnection){
+            progBar.visibility = View.VISIBLE
+        }
         viewModel.getArchive()
 
         subscribeToCache()
@@ -137,7 +139,7 @@ class MainActivity : AppCompatActivity() {
             editorShared.apply()
             val preferences = getPreferences(MODE_PRIVATE)
             val editor = preferences.edit()
-            editor.putBoolean("RanBefore", false)
+            editor.putBoolean("RanBefore", true)
             editor.apply()
             progBar.visibility = View.GONE
         })
@@ -157,6 +159,7 @@ class MainActivity : AppCompatActivity() {
             editor.putBoolean("RanBefore", true)
             editor.apply()
         } else {
+
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
             val amountOfNewPosts = list.size - oldAmountOfPosts
             if (amountOfNewPosts > 0) {
