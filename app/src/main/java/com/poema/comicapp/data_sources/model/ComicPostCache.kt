@@ -1,4 +1,4 @@
-package com.poema.comicapp.model
+package com.poema.comicapp.data_sources.model
 
 import android.graphics.Bitmap
 import androidx.room.Entity

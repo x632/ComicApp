@@ -2,9 +2,9 @@ package com.poema.comicapp.data_sources.local
 
 
 import androidx.room.*
-import com.poema.comicapp.model.ComicListItem
-import com.poema.comicapp.model.ComicPostCache
-import com.poema.comicapp.model.IsRead
+import com.poema.comicapp.data_sources.model.ComicListItem
+import com.poema.comicapp.data_sources.model.ComicPostCache
+import com.poema.comicapp.data_sources.model.IsRead
 import kotlinx.coroutines.flow.Flow
 
 

@@ -9,8 +9,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.poema.comicapp.R
-import com.poema.comicapp.model.*
-import com.poema.comicapp.model.GlobalList.globalList
+import com.poema.comicapp.data_sources.model.*
+import com.poema.comicapp.data_sources.model.GlobalList.globalList
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint

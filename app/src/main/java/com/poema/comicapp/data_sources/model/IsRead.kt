@@ -1,4 +1,4 @@
-package com.poema.comicapp.model
+package com.poema.comicapp.data_sources.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

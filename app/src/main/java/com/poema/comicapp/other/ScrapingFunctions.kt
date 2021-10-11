@@ -1,6 +1,6 @@
 package com.poema.comicapp.other
 
-import com.poema.comicapp.model.ComicListItem
+import com.poema.comicapp.data_sources.model.ComicListItem
 
 
 object ScrapingFunctions {

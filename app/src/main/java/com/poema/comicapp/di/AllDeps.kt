@@ -2,16 +2,13 @@ package com.poema.comicapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.poema.comicapp.api.PostApi
-import com.poema.comicapp.data_sources.DataSources
 import com.poema.comicapp.data_sources.local.ComicDao
 import com.poema.comicapp.data_sources.local.LocalDataSource
 import com.poema.comicapp.data_sources.local.db.ComicDatabase
 import com.poema.comicapp.data_sources.remote.RemoteDataSource
 import com.poema.comicapp.other.Constants
-import com.poema.comicapp.repository.Repository
+import com.poema.comicapp.data_sources.repository.Repository
 import com.poema.comicapp.repository.RepositoryImpl
 import dagger.Module
 import dagger.Provides
@@ -90,10 +87,8 @@ object AllDeps {
         api: PostApi,
     ): Repository {
         return RepositoryImpl(
-            DataSources(
-                local = LocalDataSource(comicDao = comicDao),
-                remote = RemoteDataSource(request = request, api = api,client = okHttpClient)
-            )
+            localDataSource = LocalDataSource(comicDao = comicDao),
+            remoteDataSource = RemoteDataSource(request = request, api = api, client = okHttpClient)
         )
     }
 }

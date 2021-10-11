@@ -1,10 +1,10 @@
-package com.poema.comicapp.repository
+package com.poema.comicapp.data_sources.repository
 
 import android.graphics.Bitmap
-import com.poema.comicapp.model.ComicListItem
-import com.poema.comicapp.model.ComicPost
-import com.poema.comicapp.model.ComicPostCache
-import com.poema.comicapp.model.IsRead
+import com.poema.comicapp.data_sources.model.ComicListItem
+import com.poema.comicapp.data_sources.model.ComicPost
+import com.poema.comicapp.data_sources.model.ComicPostCache
+import com.poema.comicapp.data_sources.model.IsRead
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 

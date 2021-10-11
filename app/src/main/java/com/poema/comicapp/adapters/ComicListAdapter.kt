@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.poema.comicapp.model.ComicListItem
+import com.poema.comicapp.data_sources.model.ComicListItem
 import com.poema.comicapp.ui.activities.DetailActivity
 import com.poema.comicapp.R.*
 

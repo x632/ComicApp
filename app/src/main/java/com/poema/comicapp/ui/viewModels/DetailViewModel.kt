@@ -2,9 +2,8 @@ package com.poema.comicapp.ui.viewModels
 
 import android.graphics.Bitmap
 import androidx.lifecycle.*
-import com.poema.comicapp.model.*
-import com.poema.comicapp.repository.Repository
-import com.poema.comicapp.repository.RepositoryImpl
+import com.poema.comicapp.data_sources.model.*
+import com.poema.comicapp.data_sources.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
@@ -25,7 +24,6 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     val bitmap:LiveData<Bitmap> = _bitmap
 
     val isReadList: LiveData<List<IsRead>> = repository.observeAllIsRead().asLiveData()
-
 
     var number = 0
     var cachedPost: ComicPostCache? = null

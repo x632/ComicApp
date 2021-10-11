@@ -1,11 +1,7 @@
-package com.poema.comicapp.model
+package com.poema.comicapp.data_sources.model
 
-import android.widget.ImageView
-import androidx.core.content.ContextCompat
-import androidx.databinding.BindingAdapter
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.poema.comicapp.R
 
 
 @Entity(tableName = "comicListItems")

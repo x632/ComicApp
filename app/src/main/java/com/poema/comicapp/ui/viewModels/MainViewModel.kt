@@ -1,14 +1,13 @@
 package com.poema.comicapp.ui.viewModels
 
 import androidx.lifecycle.*
-import com.poema.comicapp.model.ComicListItem
-import com.poema.comicapp.model.IsRead
-import com.poema.comicapp.repository.Repository
+import com.poema.comicapp.data_sources.model.ComicListItem
+import com.poema.comicapp.data_sources.model.IsRead
+import com.poema.comicapp.data_sources.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import okhttp3.Response
 import javax.inject.Inject
 
 
