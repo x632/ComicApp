@@ -38,15 +38,13 @@ import java.util.*
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private var isReadList: MutableList<IsRead>? = null
     private var comicAdapter: ComicListAdapter? = null
     private lateinit var tempSearchList: MutableList<ComicListItem>
     private lateinit var viewModel: MainViewModel
     private lateinit var recycler : RecyclerView
     private lateinit var progBar : ProgressBar
     private var internetConnection = false
-    private lateinit var cacheList : MutableList<ComicListItem>
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -102,7 +100,7 @@ class MainActivity : AppCompatActivity() {
     private fun subscribeToCache() {
         viewModel.offlineComicList.observe(this,{
             globalList = it as MutableList<ComicListItem>
-            cacheList = it as MutableList<ComicListItem>
+            viewModel.cacheList = it as MutableList<ComicListItem>
             initializeRecycler()
         })
     }
@@ -114,30 +112,13 @@ class MainActivity : AppCompatActivity() {
             globalList = it as MutableList<ComicListItem>
             tempSearchList = it
             checkForNewItems(it,prefs)
-
-            for(index in 0 until cacheList.size){
-                if( cacheList[index].isFavourite){
-                    for(item in globalList){
-                        if (item.id== cacheList[index].id){
-                            item.isFavourite=true
-                        }
-                    }
-                }
-            }
-
-            for(item1 in isReadList!!){
-                for (item in globalList) {
-                    if(item.id == item1.id){
-                        item.isRead = true
-                    }
-                }
-            }
-
+            viewModel.setFavorite()
+            viewModel.setIsRead()
             initializeRecycler()
+            val preferences = getPreferences(MODE_PRIVATE)
             val editorShared = prefs.edit()
             editorShared.putInt("oldAmount", globalList.size)
             editorShared.apply()
-            val preferences = getPreferences(MODE_PRIVATE)
             val editor = preferences.edit()
             editor.putBoolean("RanBefore", true)
             editor.apply()
@@ -147,11 +128,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeIsRead() {
         viewModel.isReadList.observe(this) {
-            isReadList= it as MutableList<IsRead>?
+            viewModel.isReadMutList= (it as MutableList<IsRead>?)!!
         }
     }
 
     private fun checkForNewItems(list:MutableList<ComicListItem>, prefs: SharedPreferences) {
+        //makes sure it does not put a "new-icon" on all 2500 comics the first time app installs
+        //once they all have been loaded once, it will create notifications for new ones.
         val preferences = getPreferences(MODE_PRIVATE)
         val ranBefore = preferences.getBoolean("RanBefore", false)
         if (!ranBefore) {
@@ -159,7 +142,6 @@ class MainActivity : AppCompatActivity() {
             editor.putBoolean("RanBefore", true)
             editor.apply()
         } else {
-
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
             val amountOfNewPosts = list.size - oldAmountOfPosts
             if (amountOfNewPosts > 0) {

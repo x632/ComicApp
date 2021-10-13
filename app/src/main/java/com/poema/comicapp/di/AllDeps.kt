@@ -83,12 +83,12 @@ object AllDeps {
     fun provideRepository(
         comicDao: ComicDao,
         okHttpClient: OkHttpClient,
-        request: Request.Builder,
+        requestBuilder: Request.Builder,
         api: PostApi,
     ): Repository {
         return RepositoryImpl(
             localDataSource = LocalDataSource(comicDao = comicDao),
-            remoteDataSource = RemoteDataSource(request = request, api = api, client = okHttpClient)
+            remoteDataSource = RemoteDataSource(req = requestBuilder, api = api, client = okHttpClient)
         )
     }
 }

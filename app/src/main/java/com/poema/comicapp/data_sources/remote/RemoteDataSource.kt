@@ -9,13 +9,13 @@ import javax.inject.Inject
 
 class RemoteDataSource @Inject constructor(
     private val client: OkHttpClient,
-    private val request: Request.Builder,
+    private val req: Request.Builder,
     val api: PostApi) {
 
 
     fun getArchive(): Response? {
         return try {
-            client.newCall(request.build()).execute()
+            client.newCall(req.build()).execute()
 
         } catch (e: IOException) {
             e.printStackTrace()

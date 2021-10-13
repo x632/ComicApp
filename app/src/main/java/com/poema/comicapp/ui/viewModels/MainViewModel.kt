@@ -1,7 +1,9 @@
 package com.poema.comicapp.ui.viewModels
 
+
 import androidx.lifecycle.*
 import com.poema.comicapp.data_sources.model.ComicListItem
+import com.poema.comicapp.data_sources.model.GlobalList.globalList
 import com.poema.comicapp.data_sources.model.IsRead
 import com.poema.comicapp.data_sources.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,11 +18,14 @@ class MainViewModel
 @Inject
 constructor(private val repository: Repository) : ViewModel() {
 
+    var isReadMutList = mutableListOf<IsRead>()
+    var cacheList: MutableList<ComicListItem> = mutableListOf()
+
     private val _offlineComicList: MutableLiveData<List<ComicListItem>> = MutableLiveData()
     val offlineComicList: LiveData<List<ComicListItem>> = _offlineComicList
 
     private val _onlineComicList = MutableLiveData<List<ComicListItem>>()
-    val onlineComicList :LiveData<List<ComicListItem>> = _onlineComicList
+    val onlineComicList: LiveData<List<ComicListItem>> = _onlineComicList
 
     val isReadList: LiveData<List<IsRead>> = repository.observeAllIsRead().asLiveData()
 
@@ -30,8 +35,7 @@ constructor(private val repository: Repository) : ViewModel() {
             val list: List<ComicListItem>? = repository.getArchive()
             if (list == null) {
                 println("!!! Could not reach server!")
-            }
-            else {
+            } else {
                 withContext(Main) {
                     _onlineComicList.value = list!!
                 }
@@ -42,5 +46,29 @@ constructor(private val repository: Repository) : ViewModel() {
             _offlineComicList.value = cachedList
         }
     }
+
+    fun setFavorite() {
+        for (index in 0 until cacheList.size) {
+            if (cacheList[index].isFavourite) {
+                for (item in globalList) {
+                    if (item.id == cacheList[index].id) {
+                        item.isFavourite = true
+                    }
+                }
+            }
+        }
+    }
+
+    fun setIsRead() {
+        for (item1 in isReadMutList) {
+            for (item in globalList) {
+                if (item.id == item1.id) {
+                    item.isRead = true
+                }
+            }
+        }
+
+    }
+
 }
 

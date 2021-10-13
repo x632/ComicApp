@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
+import com.poema.comicapp.data_sources.model.GlobalList.globalList
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
@@ -84,10 +85,10 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun indexInList(number: Int): Int {
         var placeInGlobalList = 0
-        for (index in 0 until GlobalList.globalList.size) {
-            if (GlobalList.globalList[index].id == number) {
+        for (index in 0 until globalList.size) {
+            if (globalList[index].id == number) {
                 placeInGlobalList = index
-                comicListItem = GlobalList.globalList[index]
+                comicListItem = globalList[index]
             }
         }
        saveIsReadItem()
@@ -103,7 +104,7 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun isInCache(number: Int): Boolean {
 
-        val comicListIt = GlobalList.globalList.find { number == it.id }
+        val comicListIt = globalList.find { number == it.id }
         val temp = comicListIt?.isFavourite == true
         comicListIt?.let {
             comicListItem = it

@@ -114,11 +114,10 @@ class DetailActivity : AppCompatActivity() {
     private fun observeIsRead() {
         viewModel.isReadList.observe(this) {
             for(item1 in it){
-                for (item in globalList) {
-                    if(item.id == item1.id){
-                        item.isRead = true
-                    }
+                val comicListIt = globalList.find {searchItem->
+                    item1.id == searchItem.id
                 }
+                comicListIt?.isRead = true
             }
         }
     }

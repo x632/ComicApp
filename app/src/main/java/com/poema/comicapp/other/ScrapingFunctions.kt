@@ -22,7 +22,7 @@ object ScrapingFunctions {
     }
 
 
-    fun extractTitles(htmlString: String): MutableList<String> {
+    fun extractOnlyTitles(htmlString: String): MutableList<String> {
 
         val startAfterThis = "publication date)<br /><br /"
         val stopAfterThis = "<a href=\"/1/\" title=\"2006-1-1\">Barrel - Part 1</a><br/>"

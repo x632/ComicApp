@@ -38,13 +38,6 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun getComicPost(id: Int) = remoteDataSource.api.getComicPost(id)
 
-    override fun getBitMap(url: String): Bitmap {
-        val imageStream = URL(url).openConnection().getInputStream()
-        val bitmap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageStream))
-        imageStream.close()
-        return bitmap
-    }
-
     override fun getArchive() : List<ComicListItem>? {
         val response = remoteDataSource.getArchive()
         return if(response != null){
@@ -54,6 +47,13 @@ class RepositoryImpl @Inject constructor(
         } else{
             null
         }
+    }
+
+    override fun getBitMap(url: String): Bitmap {
+        val imageStream = URL(url).openConnection().getInputStream()
+        val bitmap = Bitmap.createBitmap(BitmapFactory.decodeStream(imageStream))
+        imageStream.close()
+        return bitmap
     }
 
 
