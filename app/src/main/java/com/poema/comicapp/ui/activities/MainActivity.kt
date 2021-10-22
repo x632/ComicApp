@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recycler : RecyclerView
     private lateinit var progBar : ProgressBar
     private var internetConnection = false
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

@@ -50,8 +50,8 @@ class NewComicsJobService : JobService() {
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
                     val str = response.body?.string()
                     str?.let {
-                        listOfTitles = ScrapingFunctions.extractOnlyTitles(it)
-                        if (listOfTitles!!.size > oldAmountOfPosts) {
+                        val list = ScrapingFunctions.doScrape(it)
+                        if (list.size > oldAmountOfPosts) {
                             createNotification()
                         }
                     }

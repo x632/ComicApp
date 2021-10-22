@@ -55,6 +55,4 @@ class RepositoryImpl @Inject constructor(
         imageStream.close()
         return bitmap
     }
-
-
 }

@@ -5,6 +5,16 @@ import com.poema.comicapp.data_sources.model.ComicListItem
 
 object ScrapingFunctions {
 
+    fun doScrape(htmlString: String): MutableList<ComicListItem> {
+
+        val startAfterThis = "publication date)<br /><br /"
+        val stopAfterThis = "<a href=\"/1/\" title=\"2006-1-1\">Barrel - Part 1</a><br/>"
+        val resultString = extractArea(htmlString, startAfterThis, stopAfterThis)
+        val list = extractAll(resultString)
+
+        return list
+    }
+    
     fun extractArea(
         htmlString: String,
         startAfterThis: String,
@@ -21,34 +31,6 @@ object ScrapingFunctions {
         return indexBeforeString + lengthOfWhatToFind
     }
 
-
-    fun extractOnlyTitles(htmlString: String): MutableList<String> {
-
-        val startAfterThis = "publication date)<br /><br /"
-        val stopAfterThis = "<a href=\"/1/\" title=\"2006-1-1\">Barrel - Part 1</a><br/>"
-        val resultString =
-            extractArea(htmlString, startAfterThis, stopAfterThis)
-
-        val list = resultString.split(">").toTypedArray()
-        val TitleList = mutableListOf<String>()
-        for (listItem in list) {
-            if (listItem.contains("</a")) {
-                val tit = listItem.dropLast(3)
-                TitleList.add(tit)
-            }
-        }
-        return TitleList
-    }
-
-    fun doScrape(htmlString: String): MutableList<ComicListItem> {
-
-        val startAfterThis = "publication date)<br /><br /"
-        val stopAfterThis = "<a href=\"/1/\" title=\"2006-1-1\">Barrel - Part 1</a><br/>"
-        val resultString = extractArea(htmlString, startAfterThis, stopAfterThis)
-        val list = extractAll(resultString)
-
-        return list
-    }
 
     fun extractAll(resultString: String): MutableList<ComicListItem> {
         val tempList = resultString.split(">").toTypedArray()
