@@ -38,7 +38,7 @@ class NewComicsJobService : JobService() {
         job1 = Job()
         CoroutineScope(Dispatchers.IO + job1!!).launch {
 
-            var listOfTitles: MutableList<String>? = null
+
             val prefs = PreferenceManager.getDefaultSharedPreferences(this@NewComicsJobService)
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
 
