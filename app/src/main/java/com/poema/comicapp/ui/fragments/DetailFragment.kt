@@ -1,31 +1,194 @@
 package com.poema.comicapp.ui.fragments
 
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
-import androidx.lifecycle.ViewModelProvider
+import android.widget.*
+import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.viewModels
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.poema.comicapp.R
+import com.poema.comicapp.data_sources.model.ComicPostCache
+import com.poema.comicapp.data_sources.model.GlobalList
+import com.poema.comicapp.databinding.FragmentDetailBinding
+import com.poema.comicapp.databinding.FragmentHomeBinding
+import com.poema.comicapp.other.Constants
 import com.poema.comicapp.other.Utility.isInternetAvailable
+import com.poema.comicapp.ui.activities.ExplanationActivity
+import com.poema.comicapp.ui.viewModels.DetailViewModel
 import com.poema.comicapp.ui.viewModels.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class DetailFragment : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private val viewModel: DetailViewModel by viewModels()
+    lateinit var titleHolder: TextView
+    lateinit var altHolder: TextView
+    lateinit var imageHolder: ImageView
+    lateinit var progBarHolder: ProgressBar
+    private lateinit var binding: FragmentDetailBinding
+    val args: DetailFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        binding = FragmentDetailBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        return inflater.inflate(R.layout.fragment_detail, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val internetConnection = activity?.isInternetAvailable()
+
+        altHolder = binding.tvAlt
+        titleHolder = binding.textView
+        imageHolder = binding.imageView
+        progBarHolder = binding.progressBar2
+        val heartHolder = binding.heartHolder
+
+        val explBtn = binding.btnWeb
+
+        viewModel.number = args.id
+        viewModel.index = viewModel.indexInList(viewModel.number)
+
+        if (GlobalList.globalList[viewModel.index!!].isNew == true) {
+            cancelNotification()
+        }
+        GlobalList.globalList[viewModel.index!!].isNew = false
+        if (internetConnection!!) {
+            viewModel.getComicPost(viewModel.number)
+        } else {
+            if (viewModel.isInCache(viewModel.number)) {
+                viewModel.getComicPostCache(viewModel.number)
+                subscribeToComicPostCache()
+            }
+        }
+
+        val heart = ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_favorite_48, null)
+        val emptyHeart =
+            ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_favorite_border_48, null)
+        if (viewModel.isInCache(viewModel.number)) heartHolder.setImageDrawable(heart)
+
+        viewModel.response.observe(viewLifecycleOwner, {
+
+            if (it.isSuccessful) {
+                titleHolder.text = it.body()?.title
+                Glide.with(this)
+                    .load(it.body()?.img)
+                    .into(imageHolder)
+                it.body()?.let { post ->
+                    viewModel.createBitmap(post.img)
+                    viewModel.postFromInternet = post
+                    altHolder.text = post.alt
+                }
+                progBarHolder.visibility = View.GONE
+            }
+        })
+        observeIsRead()
+        subscribeToFinishedBitmap()
+
+        heartHolder.setOnClickListener {
+
+            if (viewModel.cachedPostIsInitialized) {
+                if (!viewModel.isInCache(viewModel.number)) {
+                    GlobalList.globalList[viewModel.index!!].isFavourite = true
+                    viewModel.saveComicPostCache(viewModel.cachedPost!!)
+                    viewModel.saveComicListItem(viewModel.comicListItem!!)
+                    heartHolder.setImageDrawable(heart)
+                } else {
+                    GlobalList.globalList[viewModel.index!!].isFavourite = false
+                    heartHolder.setImageDrawable(emptyHeart)
+                    viewModel.deleteComicPostCacheById(viewModel.number)
+                    viewModel.deleteComicListItemById(viewModel.number)
+                }
+            }
+        }
+
+        explBtn.setOnClickListener {
+            if (internetConnection) {
+                val id = viewModel.number
+                val title = viewModel.comicListItem!!.title
+                val action =
+                    DetailFragmentDirections.actionDetailFragmentToExplanationFragment(id, title)
+                Navigation.findNavController(it).navigate(action)
+                /*  val intent = Intent(this, ExplanationActivity::class.java)
+                  intent.putExtra("id", viewModel.number)
+                  intent.putExtra("title", viewModel.comicListItem!!.title)
+                  this.startActivity(intent)*/
+            } else {
+                showToast("You cannot see explanations without internet-connection. Please check your connection!")
+            }
+        }
+    }
+
+    private fun observeIsRead() {
+        viewModel.isReadList.observe(viewLifecycleOwner) {
+            for (item1 in it) {
+                val comicListIt = GlobalList.globalList.find { searchItem ->
+                    item1.id == searchItem.id
+                }
+                comicListIt?.isRead = true
+            }
+        }
+    }
+
+    private fun cancelNotification() {
+        GlobalList.globalList[viewModel.index!!].isNew = false
+        val item = GlobalList.globalList.find { it.isNew }
+        //but only if there are no unseen items left
+        if (item == null) {
+            val notificationManager =
+                activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(Constants.NOTIFICATION_ID)
+        }
+    }
+
+    private fun subscribeToComicPostCache() {
+        viewModel.comicPostCache.observe(viewLifecycleOwner) {
+
+            titleHolder.text = it.title
+            Glide.with(this).load(it.imgBitMap).into(imageHolder)
+            altHolder.text = it.alt
+            progBarHolder.visibility = View.GONE
+        }
+    }
+
+    private fun subscribeToFinishedBitmap() {
+        viewModel.bitmap.observe(viewLifecycleOwner) {
+            viewModel.cachedPost = ComicPostCache(
+                viewModel.postFromInternet!!.month,
+                viewModel.postFromInternet!!.num,
+                viewModel.postFromInternet!!.link,
+                viewModel.postFromInternet!!.year,
+                viewModel.postFromInternet!!.news,
+                viewModel.postFromInternet!!.safe_title,
+                viewModel.postFromInternet!!.transcript,
+                viewModel.postFromInternet!!.alt,
+                viewModel.postFromInternet!!.img,
+                viewModel.postFromInternet!!.title,
+                viewModel.postFromInternet!!.day,
+                it,
+            )
+            viewModel.cachedPostIsInitialized = true
+
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(
+            requireContext(), message,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
 

@@ -15,10 +15,8 @@ import androidx.fragment.app.Fragment
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.text.isDigitsOnly
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.poema.comicapp.R
@@ -31,16 +29,18 @@ import com.poema.comicapp.job_scheduler.NewComicsJobService
 import com.poema.comicapp.other.Constants
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
-
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!
+
+    private val viewModel: MainViewModel by viewModels()
+
+    private lateinit var binding: FragmentHomeBinding
     private var comicAdapter: ComicListAdapter? = null
     private lateinit var tempSearchList: MutableList<ComicListItem>
-    private lateinit var viewModel: MainViewModel
     private lateinit var recycler: RecyclerView
     private lateinit var progBar: ProgressBar
     private var internetConnection = false
@@ -48,16 +48,20 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
         val view = binding.root
+        return view
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         createNotificationChannel()
         createJobScheduler()
+        setHasOptionsMenu(true)
 
         internetConnection = requireContext().isInternetAvailable()
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         recycler = binding.recycler
         progBar = binding.progressBar
         if (this.internetConnection) {
@@ -68,9 +72,7 @@ class HomeFragment : Fragment() {
         subscribeToCache()
         observeIsRead()
         subscribeToScrapeData()
-        return view
     }
-
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -165,7 +167,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        activity?.menuInflater?.inflate(R.menu.menu, menu)
+        activity?.menuInflater!!.inflate(R.menu.menu, menu)
         val menuItem = menu.findItem(R.id.search)
         val searchView = menuItem?.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -214,6 +216,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        println("!!! BEEN HERE      !!!!!")
         comicAdapter?.submitList(GlobalList.globalList)
         val view = activity?.currentFocus
         view?.clearFocus()

@@ -35,5 +35,4 @@ class ExplanationActivity : AppCompatActivity() {
         }
     }
 
-
 }

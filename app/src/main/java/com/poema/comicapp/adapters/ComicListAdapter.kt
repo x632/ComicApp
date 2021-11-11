@@ -1,7 +1,6 @@
 package com.poema.comicapp.adapters
 
 import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +8,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.poema.comicapp.data_sources.model.ComicListItem
-import com.poema.comicapp.ui.activities.DetailActivity
 import com.poema.comicapp.R.*
+import androidx.navigation.Navigation
+import com.poema.comicapp.ui.fragments.HomeFragmentDirections
 
 
 class ComicListAdapter(private val context: Context) :
@@ -30,10 +30,11 @@ class ComicListAdapter(private val context: Context) :
         holder.tv2.text = comicListItem.date
         holder.tv3.text = comicListItem.id.toString()
         holder.itemView.setOnClickListener {
-
-            val intent = Intent(context, DetailActivity::class.java)
+            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(comicListItem.id)
+            Navigation.findNavController(it).navigate(action)
+           /* val intent = Intent(context, DetailActivity::class.java)
             intent.putExtra("id", comicListItem.id)
-            context.startActivity(intent)
+            context.startActivity(intent)*/
         }
         if (!comicListItem.isFavourite) {
             holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_border_24)

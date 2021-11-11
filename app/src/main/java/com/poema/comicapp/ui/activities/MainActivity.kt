@@ -26,6 +26,7 @@ import com.poema.comicapp.data_sources.model.ComicListItem
 import com.poema.comicapp.data_sources.model.GlobalList.globalList
 import com.poema.comicapp.job_scheduler.NewComicsJobService
 import com.poema.comicapp.data_sources.model.IsRead
+import com.poema.comicapp.databinding.ActivityMainBinding
 import com.poema.comicapp.other.Constants.CHANNEL_ID
 import com.poema.comicapp.other.Constants.CHANNEL_NAME
 import com.poema.comicapp.other.Constants.JOB_ID
@@ -38,20 +39,22 @@ import java.util.*
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private var comicAdapter: ComicListAdapter? = null
+    private lateinit var binding: ActivityMainBinding
+   /* private var comicAdapter: ComicListAdapter? = null
     private lateinit var tempSearchList: MutableList<ComicListItem>
     private lateinit var viewModel: MainViewModel
     private lateinit var recycler : RecyclerView
     private lateinit var progBar : ProgressBar
-    private var internetConnection = false
+    private var internetConnection = false*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        createNotificationChannel()
-        createJobScheduler()
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+       /* createNotificationChannel()
+        createJobScheduler()*/
 
-        internetConnection = this.isInternetAvailable()
+        /*internetConnection = this.isInternetAvailable()
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         recycler = findViewById<RecyclerView>(R.id.recycler)
         progBar = findViewById<ProgressBar>(R.id.progressBar)
@@ -62,9 +65,9 @@ class MainActivity : AppCompatActivity() {
 
         subscribeToCache()
         observeIsRead()
-        subscribeToScrapeData()
+        subscribeToScrapeData()*/
     }
-
+/*
     private fun createNotificationChannel(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME,
@@ -208,5 +211,5 @@ class MainActivity : AppCompatActivity() {
         }
         val view = this.currentFocus
         view?.clearFocus()
-    }
+    }*/
 }

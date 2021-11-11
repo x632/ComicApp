@@ -6,7 +6,7 @@
     app:startDestination="@id/homeFragment">
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.poema.comicapp.DetailFragment"
+        android:name="com.poema.comicapp.ui.fragments.DetailFragment"
         android:label="fragment_detail"
         tools:layout="@layout/fragment_detail" >
         <action
@@ -15,10 +15,14 @@
         <action
             android:id="@+id/action_detailFragment_to_explanationFragment"
             app:destination="@id/explanationFragment" />
+        <argument
+            android:name="id"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.poema.comicapp.HomeFragment"
+        android:name="com.poema.comicapp.ui.fragments.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -27,11 +31,19 @@
     </fragment>
     <fragment
         android:id="@+id/explanationFragment"
-        android:name="com.poema.comicapp.ExplanationFragment"
+        android:name="com.poema.comicapp.ui.fragments.ExplanationFragment"
         android:label="fragment_explanation"
         tools:layout="@layout/fragment_explanation" >
         <action
             android:id="@+id/action_explanationFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
+        <argument
+            android:name="id"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="title"
+            app:argType="string"
+            android:defaultValue='""' />
     </fragment>
 </navigation>
