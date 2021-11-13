@@ -37,7 +37,7 @@ class HomeFragment : Fragment() {
 
 
     private val viewModel: MainViewModel by viewModels()
-    private var receivedCache : Boolean = false
+    private var receivedCache: Boolean = false
     private lateinit var binding: FragmentHomeBinding
     private var comicAdapter: ComicListAdapter? = null
     private lateinit var tempSearchList: MutableList<ComicListItem>
@@ -67,6 +67,7 @@ class HomeFragment : Fragment() {
         if (internetConnection) {
             progBar.visibility = View.VISIBLE
         }
+
         observeCache()
         observeIsRead()
         subscribeToScrapeData()
@@ -95,6 +96,7 @@ class HomeFragment : Fragment() {
             activity?.getSystemService(AppCompatActivity.JOB_SCHEDULER_SERVICE) as JobScheduler
         val resultCode = scheduler.schedule(info)
         if (resultCode == JobScheduler.RESULT_SUCCESS) {
+            println("!!! crated schedule")
         }
     }
 
@@ -109,16 +111,18 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeCache() {
-        if(!receivedCache) {
-            viewModel.offlineComicList.observe(viewLifecycleOwner, {
-                GlobalList.globalList = it as MutableList<ComicListItem>
-                viewModel.cacheList = it as MutableList<ComicListItem>
-                initializeRecycler()
-                println("!!! received cacheobservation!")
-                receivedCache = true
-                //denna gör två observationer om man har varit för länge i annan fragment.
-            })
-        }
+        viewModel.offlineComicList.observe(viewLifecycleOwner, {
+            GlobalList.globalList = it as MutableList<ComicListItem>
+            viewModel.cacheList = it as MutableList<ComicListItem>
+            initializeRecycler()
+            println("!!! received cacheobservation!")
+            receivedCache = true
+            //denna gör två observationer om man har varit för länge i annan fragment.
+            if (internetConnection) {
+                subscribeToScrapeData()
+            }
+        })
+
     }
 
 
