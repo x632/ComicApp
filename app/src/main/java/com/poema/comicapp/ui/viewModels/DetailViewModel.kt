@@ -31,7 +31,7 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     var comicListItem: ComicListItem? = null
     var postFromInternet: ComicPost? = null
     var index: Int? = null
-    var cachedPostIsInitialized = false
+
 
 
     fun getComicPost(postNumber: Int) {
@@ -54,7 +54,6 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     }
 
     fun getComicPostCache(id: Int) {
-
         viewModelScope.launch {
             val post = repository.findComicPostCacheById(id)
             comicPostCache.value = post
@@ -103,7 +102,6 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     }
 
     fun isInCache(number: Int): Boolean {
-
         val comicListIt = globalList.find { number == it.id }
         val temp = comicListIt?.isFavourite == true
         comicListIt?.let {
@@ -111,6 +109,5 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         }
         return temp
     }
-
 }
 

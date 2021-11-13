@@ -1,59 +1,52 @@
 package com.poema.comicapp.ui.fragments
 
+import android.app.Activity
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.poema.comicapp.R
 import com.poema.comicapp.data_sources.model.ComicPostCache
 import com.poema.comicapp.data_sources.model.GlobalList
 import com.poema.comicapp.databinding.FragmentDetailBinding
-import com.poema.comicapp.databinding.FragmentHomeBinding
 import com.poema.comicapp.other.Constants
 import com.poema.comicapp.other.Utility.isInternetAvailable
-import com.poema.comicapp.ui.activities.ExplanationActivity
 import com.poema.comicapp.ui.viewModels.DetailViewModel
-import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class DetailFragment : Fragment() {
 
     private val viewModel: DetailViewModel by viewModels()
-    lateinit var titleHolder: TextView
-    lateinit var altHolder: TextView
-    lateinit var imageHolder: ImageView
-    lateinit var progBarHolder: ProgressBar
+    private lateinit var titleHolder: TextView
+    private lateinit var altHolder: TextView
+    private lateinit var imageHolder: ImageView
+    private lateinit var progBarHolder: ProgressBar
     private lateinit var binding: FragmentDetailBinding
-    val args: DetailFragmentArgs by navArgs()
+    private val args: DetailFragmentArgs by navArgs()
+    private var cachedPostIsInitialized = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentDetailBinding.inflate(inflater, container, false)
-        return binding.root
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         val internetConnection = activity?.isInternetAvailable()
 
         altHolder = binding.tvAlt
         titleHolder = binding.textView
         imageHolder = binding.imageView
         progBarHolder = binding.progressBar2
+
         val heartHolder = binding.heartHolder
 
         val explBtn = binding.btnWeb
@@ -61,7 +54,7 @@ class DetailFragment : Fragment() {
         viewModel.number = args.id
         viewModel.index = viewModel.indexInList(viewModel.number)
 
-        if (GlobalList.globalList[viewModel.index!!].isNew == true) {
+        if (GlobalList.globalList[viewModel.index!!].isNew) {
             cancelNotification()
         }
         GlobalList.globalList[viewModel.index!!].isNew = false
@@ -99,7 +92,7 @@ class DetailFragment : Fragment() {
 
         heartHolder.setOnClickListener {
 
-            if (viewModel.cachedPostIsInitialized) {
+            if (cachedPostIsInitialized) {
                 if (!viewModel.isInCache(viewModel.number)) {
                     GlobalList.globalList[viewModel.index!!].isFavourite = true
                     viewModel.saveComicPostCache(viewModel.cachedPost!!)
@@ -129,16 +122,19 @@ class DetailFragment : Fragment() {
                 showToast("You cannot see explanations without internet-connection. Please check your connection!")
             }
         }
+        return binding.root
     }
 
     private fun observeIsRead() {
         viewModel.isReadList.observe(viewLifecycleOwner) {
-            for (item1 in it) {
+            for (item in it) {
                 val comicListIt = GlobalList.globalList.find { searchItem ->
-                    item1.id == searchItem.id
+                    item.id == searchItem.id
                 }
                 comicListIt?.isRead = true
+
             }
+            println("!!!  har observerat isread!")
         }
     }
 
@@ -160,6 +156,7 @@ class DetailFragment : Fragment() {
             Glide.with(this).load(it.imgBitMap).into(imageHolder)
             altHolder.text = it.alt
             progBarHolder.visibility = View.GONE
+            println("!!!  har observerat comicpostcache!!")
         }
     }
 
@@ -179,8 +176,8 @@ class DetailFragment : Fragment() {
                 viewModel.postFromInternet!!.day,
                 it,
             )
-            viewModel.cachedPostIsInitialized = true
-
+            cachedPostIsInitialized = true
+            println("!!! Har blivit initialiserad")
         }
     }
 
@@ -189,6 +186,12 @@ class DetailFragment : Fragment() {
             requireContext(), message,
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val a = activity as AppCompatActivity
+        a.supportActionBar?.hide()
     }
 
 

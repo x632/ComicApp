@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.navArgs
 import com.poema.comicapp.R
 import com.poema.comicapp.databinding.FragmentDetailBinding
@@ -34,8 +35,17 @@ class ExplanationFragment : Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        val a = activity as AppCompatActivity
+        a.supportActionBar?.show()
+    }
 
-
+    override fun onStop() {
+        super.onStop()
+        val a = activity as AppCompatActivity
+        a.supportActionBar?.hide()
+    }
 
     private fun webViewSetup(url:String) {
 

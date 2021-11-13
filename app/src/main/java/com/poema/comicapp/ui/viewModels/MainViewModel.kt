@@ -21,16 +21,16 @@ constructor(private val repository: Repository) : ViewModel() {
     var isReadMutList = mutableListOf<IsRead>()
     var cacheList: MutableList<ComicListItem> = mutableListOf()
 
-    private val _offlineComicList: MutableLiveData<List<ComicListItem>> = MutableLiveData()
-    val offlineComicList: LiveData<List<ComicListItem>> = _offlineComicList
+    //private val _offlineComicList: MutableLiveData<List<ComicListItem>> = MutableLiveData()
+    val offlineComicList: LiveData<List<ComicListItem>> = repository.observeFavorites().asLiveData()
 
     private val _onlineComicList = MutableLiveData<List<ComicListItem>>()
     val onlineComicList: LiveData<List<ComicListItem>> = _onlineComicList
 
     val isReadList: LiveData<List<IsRead>> = repository.observeAllIsRead().asLiveData()
 
-    fun getArchive() {
-
+    init {
+        println("!!! init has been run!!")
         CoroutineScope(IO).launch {
             val list: List<ComicListItem>? = repository.getArchive()
             if (list == null) {
@@ -40,10 +40,6 @@ constructor(private val repository: Repository) : ViewModel() {
                     _onlineComicList.value = list!!
                 }
             }
-        }
-        viewModelScope.launch {
-            val cachedList = repository.getFavorites()
-            _offlineComicList.value = cachedList
         }
     }
 

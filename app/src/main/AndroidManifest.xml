@@ -16,20 +16,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ComicApp">
-        <activity
-            android:name=".ui.activities.ExplanationActivity"
-            android:exported="true" />
+
+
+
 
         <activity
-            android:name=".ui.activities.DetailActivity"
-            android:theme="@style/AppTheme.FullScreenTheme"
+            android:name=".ui.MainActivity"
 
-            android:exported="true" />
-
-        <activity
-            android:name=".ui.activities.MainActivity"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

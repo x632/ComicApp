@@ -37,7 +37,7 @@ class HomeFragment : Fragment() {
 
 
     private val viewModel: MainViewModel by viewModels()
-
+    private var receivedCache : Boolean = false
     private lateinit var binding: FragmentHomeBinding
     private var comicAdapter: ComicListAdapter? = null
     private lateinit var tempSearchList: MutableList<ComicListItem>
@@ -64,12 +64,10 @@ class HomeFragment : Fragment() {
         internetConnection = requireContext().isInternetAvailable()
         recycler = binding.recycler
         progBar = binding.progressBar
-        if (this.internetConnection) {
+        if (internetConnection) {
             progBar.visibility = View.VISIBLE
         }
-        viewModel.getArchive()
-
-        subscribeToCache()
+        observeCache()
         observeIsRead()
         subscribeToScrapeData()
     }
@@ -97,25 +95,30 @@ class HomeFragment : Fragment() {
             activity?.getSystemService(AppCompatActivity.JOB_SCHEDULER_SERVICE) as JobScheduler
         val resultCode = scheduler.schedule(info)
         if (resultCode == JobScheduler.RESULT_SUCCESS) {
-            println("!!!Job scheduled")
         }
     }
 
     private fun initializeRecycler() {
         recycler.apply {
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager = LinearLayoutManager(context)
             comicAdapter = ComicListAdapter(context)
             adapter = comicAdapter
-            comicAdapter?.submitList(GlobalList.globalList)
+            adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.ALLOW
+            comicAdapter!!.submitList(GlobalList.globalList)
         }
     }
 
-    private fun subscribeToCache() {
-        viewModel.offlineComicList.observe(viewLifecycleOwner, {
-            GlobalList.globalList = it as MutableList<ComicListItem>
-            viewModel.cacheList = it as MutableList<ComicListItem>
-            initializeRecycler()
-        })
+    private fun observeCache() {
+        if(!receivedCache) {
+            viewModel.offlineComicList.observe(viewLifecycleOwner, {
+                GlobalList.globalList = it as MutableList<ComicListItem>
+                viewModel.cacheList = it as MutableList<ComicListItem>
+                initializeRecycler()
+                println("!!! received cacheobservation!")
+                receivedCache = true
+                //denna gör två observationer om man har varit för länge i annan fragment.
+            })
+        }
     }
 
 
@@ -136,6 +139,7 @@ class HomeFragment : Fragment() {
             editor?.putBoolean("RanBefore", true)
             editor?.apply()
             progBar.visibility = View.GONE
+            println("!!! received scrapedata!")
         })
     }
 
@@ -216,10 +220,8 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        println("!!! BEEN HERE      !!!!!")
-        comicAdapter?.submitList(GlobalList.globalList)
-        val view = activity?.currentFocus
-        view?.clearFocus()
+        val a = activity as AppCompatActivity
+        a.supportActionBar?.show()
     }
 }
 

@@ -22,7 +22,7 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun deleteFavoriteById(id: Int) = localDataSource.comicDao.deleteComicListItemById(id)
 
-    override suspend fun getFavorites() = localDataSource.comicDao.getAllComicListItems()
+    override fun observeFavorites() = localDataSource.comicDao.observeComicListItems()
 
     override suspend fun saveFavorite(comicListItem: ComicListItem) = localDataSource.comicDao.insert(comicListItem)
 

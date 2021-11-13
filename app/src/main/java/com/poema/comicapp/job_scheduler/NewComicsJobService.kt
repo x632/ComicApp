@@ -14,7 +14,7 @@ import com.poema.comicapp.other.Constants
 import com.poema.comicapp.other.Constants.CHANNEL_ID
 import com.poema.comicapp.other.Constants.NOTIFICATION_ID
 import com.poema.comicapp.other.ScrapingFunctions
-import com.poema.comicapp.ui.activities.MainActivity
+import com.poema.comicapp.ui.MainActivity
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

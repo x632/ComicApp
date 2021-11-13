@@ -30,7 +30,7 @@ interface ComicDao {
     suspend fun findComicListItemById(id: Int) : ComicListItem
 
     @Query("SELECT * FROM comicListItems")
-    suspend fun getAllComicListItems(): List<ComicListItem>
+    fun observeComicListItems(): Flow<List<ComicListItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(isRead: IsRead):Long

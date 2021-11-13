@@ -17,7 +17,7 @@ interface Repository {
 
     suspend fun deleteFavoriteById(id: Int)
 
-    suspend fun getFavorites() : List<ComicListItem>
+    fun observeFavorites() : Flow<List<ComicListItem>>
 
     suspend fun saveFavorite(comicListItem: ComicListItem): Long
 
