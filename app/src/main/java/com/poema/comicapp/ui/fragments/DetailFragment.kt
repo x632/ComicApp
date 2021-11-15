@@ -134,7 +134,6 @@ class DetailFragment : Fragment() {
                 comicListIt?.isRead = true
 
             }
-            println("!!!  har observerat isread!")
         }
     }
 
@@ -156,7 +155,6 @@ class DetailFragment : Fragment() {
             Glide.with(this).load(it.imgBitMap).into(imageHolder)
             altHolder.text = it.alt
             progBarHolder.visibility = View.GONE
-            println("!!!  har observerat comicpostcache!!")
         }
     }
 

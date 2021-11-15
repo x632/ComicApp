@@ -21,7 +21,6 @@ constructor(private val repository: Repository) : ViewModel() {
     var isReadMutList = mutableListOf<IsRead>()
     var cacheList: MutableList<ComicListItem> = mutableListOf()
 
-    //private val _offlineComicList: MutableLiveData<List<ComicListItem>> = MutableLiveData()
     val offlineComicList: LiveData<List<ComicListItem>> = repository.observeFavorites().asLiveData()
 
     private val _onlineComicList = MutableLiveData<List<ComicListItem>>()

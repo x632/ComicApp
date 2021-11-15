@@ -32,9 +32,6 @@ class ComicListAdapter(private val context: Context) :
         holder.itemView.setOnClickListener {
             val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(comicListItem.id)
             Navigation.findNavController(it).navigate(action)
-           /* val intent = Intent(context, DetailActivity::class.java)
-            intent.putExtra("id", comicListItem.id)
-            context.startActivity(intent)*/
         }
         if (!comicListItem.isFavourite) {
             holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_border_24)

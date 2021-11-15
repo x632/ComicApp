@@ -70,7 +70,6 @@ class HomeFragment : Fragment() {
 
         observeCache()
         observeIsRead()
-        subscribeToScrapeData()
     }
 
     private fun createNotificationChannel() {

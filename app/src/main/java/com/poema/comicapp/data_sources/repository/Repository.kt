@@ -1,6 +1,7 @@
 package com.poema.comicapp.data_sources.repository
 
 import android.graphics.Bitmap
+import androidx.lifecycle.LiveData
 import com.poema.comicapp.data_sources.model.ComicListItem
 import com.poema.comicapp.data_sources.model.ComicPost
 import com.poema.comicapp.data_sources.model.ComicPostCache
