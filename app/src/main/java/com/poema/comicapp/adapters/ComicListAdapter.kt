@@ -39,9 +39,11 @@ class ComicListAdapter(private val context: Context) :
             holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_24)
         }
         if (comicListItem.isNew) holder.ivNew.visibility =
-            View.VISIBLE else holder.ivNew.visibility = View.GONE
+            View.VISIBLE
+        else holder.ivNew.visibility = View.GONE
         if (comicListItem.isRead) holder.ivIsRead.visibility =
-            View.GONE else holder.ivIsRead.visibility = View.VISIBLE
+            View.GONE
+        else holder.ivIsRead.visibility = View.VISIBLE
     }
 
     override fun getItemCount(): Int {

@@ -51,12 +51,6 @@ class HomeFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val view = binding.root
-        return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         createNotificationChannel()
         createJobScheduler()
         setHasOptionsMenu(true)
@@ -68,9 +62,15 @@ class HomeFragment : Fragment() {
             progBar.visibility = View.VISIBLE
         }
 
+        initializeRecycler()
         observeCache()
         observeIsRead()
+        subscribeToScrapeData()
+
+        return binding.root
     }
+
+
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -100,12 +100,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun initializeRecycler() {
+        println("!!! Initializing recyclerview!")
         recycler.apply {
             layoutManager = LinearLayoutManager(context)
             comicAdapter = ComicListAdapter(context)
             adapter = comicAdapter
-            adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.ALLOW
-            comicAdapter!!.submitList(GlobalList.globalList)
+            comicAdapter?.submitList(GlobalList.globalList)
         }
     }
 
@@ -113,11 +113,12 @@ class HomeFragment : Fragment() {
         viewModel.offlineComicList.observe(viewLifecycleOwner, {
             GlobalList.globalList = it as MutableList<ComicListItem>
             viewModel.cacheList = it as MutableList<ComicListItem>
-            initializeRecycler()
+            //initializeRecycler()
             println("!!! received cacheobservation!")
             receivedCache = true
+            comicAdapter?.submitList(GlobalList.globalList)
             //denna gör två observationer om man har varit för länge i annan fragment.
-            if (internetConnection) {
+           if (internetConnection) {
                 subscribeToScrapeData()
             }
         })
@@ -127,13 +128,13 @@ class HomeFragment : Fragment() {
 
     private fun subscribeToScrapeData() {
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
-            val prefs = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+            val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
             GlobalList.globalList = it as MutableList<ComicListItem>
             tempSearchList = it
             checkForNewItems(it, prefs)
             viewModel.setFavorite()
             viewModel.setIsRead()
-            initializeRecycler()
+            //initializeRecycler()
             val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
             val editorShared = prefs.edit()
             editorShared.putInt("oldAmount", GlobalList.globalList.size)
@@ -143,6 +144,8 @@ class HomeFragment : Fragment() {
             editor?.apply()
             progBar.visibility = View.GONE
             println("!!! received scrapedata!")
+            comicAdapter?.submitList(GlobalList.globalList)
+
         })
     }
 
@@ -155,13 +158,14 @@ class HomeFragment : Fragment() {
     private fun checkForNewItems(list: MutableList<ComicListItem>, prefs: SharedPreferences) {
         //makes sure it does not put a "new-icon" on all 2500 comics the first time app installs
         //once they all have been loaded once, it will create notifications for newly created ones.
-        //there is also the less noticable read/unread - icon that shows which ones are unseen.
-        val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
+        //there is also the less noticable read/unread - icon that shows which comics are unseen.
+        val preferences = this.activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
         val ranBefore = preferences?.getBoolean("RanBefore", false)
         if (ranBefore!!) {
             val editor = preferences.edit()
             editor!!.putBoolean("RanBefore", true)
             editor.apply()
+            println("!!! BEEN IN THE WRONG CONDITION")
         } else {
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
             val amountOfNewPosts = list.size - oldAmountOfPosts
@@ -169,6 +173,8 @@ class HomeFragment : Fragment() {
                 for (index in 0 until amountOfNewPosts) {
                     GlobalList.globalList[index].isNew = true
                 }
+                println("!!! inititalied recyc. because of new item")
+                initializeRecycler()
             }
         }
     }

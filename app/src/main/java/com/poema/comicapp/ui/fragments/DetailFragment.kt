@@ -175,7 +175,6 @@ class DetailFragment : Fragment() {
                 it,
             )
             cachedPostIsInitialized = true
-            println("!!! Har blivit initialiserad")
         }
     }
 
