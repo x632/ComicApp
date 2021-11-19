@@ -128,13 +128,13 @@ class HomeFragment : Fragment() {
 
     private fun subscribeToScrapeData() {
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
-            val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
+            val prefs = context!!.getSharedPreferences("oldAmount",0)
+            //val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
             GlobalList.globalList = it as MutableList<ComicListItem>
             tempSearchList = it
             checkForNewItems(it, prefs)
             viewModel.setFavorite()
             viewModel.setIsRead()
-            //initializeRecycler()
             val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
             val editorShared = prefs.edit()
             editorShared.putInt("oldAmount", GlobalList.globalList.size)
@@ -159,15 +159,17 @@ class HomeFragment : Fragment() {
         //makes sure it does not put a "new-icon" on all 2500 comics the first time app installs
         //once they all have been loaded once, it will create notifications for newly created ones.
         //there is also the less noticable read/unread - icon that shows which comics are unseen.
-        val preferences = this.activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
+        val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
         val ranBefore = preferences?.getBoolean("RanBefore", false)
-        if (ranBefore!!) {
+        println("!!! I homefragment är ranBefore : $ranBefore")
+        if (!ranBefore!!) {
             val editor = preferences.edit()
             editor!!.putBoolean("RanBefore", true)
             editor.apply()
             println("!!! BEEN IN THE WRONG CONDITION")
         } else {
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
+            println("!!! homefragment/checkForNewItems old amount = $oldAmountOfPosts")
             val amountOfNewPosts = list.size - oldAmountOfPosts
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {

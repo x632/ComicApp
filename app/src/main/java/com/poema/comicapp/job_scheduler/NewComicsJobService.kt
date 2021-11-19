@@ -4,8 +4,10 @@ import android.app.PendingIntent
 import android.app.job.JobParameters
 import kotlinx.coroutines.*
 import android.app.job.JobService
+import android.content.Context
 import android.content.Intent
 import android.preference.PreferenceManager
+import android.provider.Settings.Global.getInt
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -38,10 +40,10 @@ class NewComicsJobService : JobService() {
         job1 = Job()
         CoroutineScope(Dispatchers.IO + job1!!).launch {
 
-
-            val prefs = PreferenceManager.getDefaultSharedPreferences(this@NewComicsJobService)
+            val prefs = applicationContext.getSharedPreferences("oldAmount",0)
+           // val prefs = PreferenceManager.getDefaultSharedPreferences(this@NewComicsJobService)
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
-
+            println("!!! i jobservice för oldAmount värdet: $oldAmountOfPosts")
             val request = Request.Builder()
                 .url(Constants.ARCHIVE_URL)
                 .build()
@@ -90,6 +92,4 @@ class NewComicsJobService : JobService() {
         val notificationManager = NotificationManagerCompat.from(this)
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
-
-
 }
