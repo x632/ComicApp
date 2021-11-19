@@ -100,7 +100,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun initializeRecycler() {
-        println("!!! Initializing recyclerview!")
         recycler.apply {
             layoutManager = LinearLayoutManager(context)
             comicAdapter = ComicListAdapter(context)
@@ -113,8 +112,6 @@ class HomeFragment : Fragment() {
         viewModel.offlineComicList.observe(viewLifecycleOwner, {
             GlobalList.globalList = it as MutableList<ComicListItem>
             viewModel.cacheList = it as MutableList<ComicListItem>
-            //initializeRecycler()
-            println("!!! received cacheobservation!")
             receivedCache = true
             comicAdapter?.submitList(GlobalList.globalList)
             //denna gör två observationer om man har varit för länge i annan fragment.
@@ -143,7 +140,6 @@ class HomeFragment : Fragment() {
             editor?.putBoolean("RanBefore", true)
             editor?.apply()
             progBar.visibility = View.GONE
-            println("!!! received scrapedata!")
             comicAdapter?.submitList(GlobalList.globalList)
 
         })
@@ -166,7 +162,6 @@ class HomeFragment : Fragment() {
             val editor = preferences.edit()
             editor!!.putBoolean("RanBefore", true)
             editor.apply()
-            println("!!! BEEN IN THE WRONG CONDITION")
         } else {
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
             println("!!! homefragment/checkForNewItems old amount = $oldAmountOfPosts")
@@ -176,7 +171,7 @@ class HomeFragment : Fragment() {
                     GlobalList.globalList[index].isNew = true
                 }
                 println("!!! inititalied recyc. because of new item")
-                initializeRecycler()
+                comicAdapter?.submitList(GlobalList.globalList)
             }
         }
     }

@@ -29,7 +29,6 @@ constructor(private val repository: Repository) : ViewModel() {
     val isReadList: LiveData<List<IsRead>> = repository.observeAllIsRead().asLiveData()
 
     init {
-        println("!!! init has been run!!")
         CoroutineScope(IO).launch {
             val list: List<ComicListItem>? = repository.getArchive()
             if (list == null) {
