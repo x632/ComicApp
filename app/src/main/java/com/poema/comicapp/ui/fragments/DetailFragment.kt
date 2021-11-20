@@ -26,11 +26,8 @@ import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import android.graphics.Bitmap
 import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.ViewTarget
 import com.bumptech.glide.request.transition.Transition
-
-
-
-
 
 
 @AndroidEntryPoint
@@ -95,13 +92,17 @@ class DetailFragment : Fragment() {
                     .with(this)
                     .asBitmap()
                     .load(it.body()?.img)
-                    .into(object : SimpleTarget<Bitmap?>(800,800) {
+                    .into(object : SimpleTarget<Bitmap?>(800, 800) {
 
                         override fun onResourceReady(
                             resource: Bitmap,
                             transition: Transition<in Bitmap?>?
                         ) {
-                            (imageHolder as SubsamplingScaleImageView).setImage(ImageSource.cachedBitmap(resource))
+                            (imageHolder as SubsamplingScaleImageView).setImage(
+                                ImageSource.cachedBitmap(
+                                    resource
+                                )
+                            )
                         }
                     })
 
@@ -150,7 +151,6 @@ class DetailFragment : Fragment() {
     }
 
 
-
     private fun observeIsRead() {
         viewModel.isReadList.observe(viewLifecycleOwner) {
             for (item in it) {
@@ -178,8 +178,14 @@ class DetailFragment : Fragment() {
         viewModel.comicPostCache.observe(viewLifecycleOwner) {
 
             titleHolder.text = it.title
-            (imageHolder as SubsamplingScaleImageView).setImage(ImageSource.cachedBitmap(it.imgBitMap!!))
-            /*Glide.with(this).load(it.imgBitMap).into(imageHolder)*/
+            val srcBmp = it.imgBitMap!!
+            val dstBmp = Bitmap.createScaledBitmap(
+                srcBmp,
+                srcBmp.width * 3,
+                srcBmp.height * 3,
+                true
+            )
+            (imageHolder as SubsamplingScaleImageView).setImage(ImageSource.bitmap(dstBmp))
             altHolder.text = it.alt
             progBarHolder.visibility = View.GONE
         }
