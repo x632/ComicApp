@@ -11,8 +11,11 @@ import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.*
+import android.widget.ActionMenuView
 import androidx.fragment.app.Fragment
 import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
@@ -37,13 +40,13 @@ class HomeFragment : Fragment() {
 
 
     private val viewModel: MainViewModel by viewModels()
-    private var receivedCache: Boolean = false
     private lateinit var binding: FragmentHomeBinding
     private var comicAdapter: ComicListAdapter? = null
     private lateinit var tempSearchList: MutableList<ComicListItem>
     private lateinit var recycler: RecyclerView
     private lateinit var progBar: ProgressBar
     private var internetConnection = false
+    var everyOther = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,7 +72,6 @@ class HomeFragment : Fragment() {
 
         return binding.root
     }
-
 
 
     private fun createNotificationChannel() {
@@ -112,10 +114,9 @@ class HomeFragment : Fragment() {
         viewModel.offlineComicList.observe(viewLifecycleOwner, {
             GlobalList.globalList = it as MutableList<ComicListItem>
             viewModel.cacheList = it as MutableList<ComicListItem>
-            receivedCache = true
             comicAdapter?.submitList(GlobalList.globalList)
             //denna gör två observationer om man har varit för länge i annan fragment.
-           if (internetConnection) {
+            if (internetConnection) {
                 subscribeToScrapeData()
             }
         })
@@ -125,7 +126,7 @@ class HomeFragment : Fragment() {
 
     private fun subscribeToScrapeData() {
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
-            val prefs = context!!.getSharedPreferences("oldAmount",0)
+            val prefs = context!!.getSharedPreferences("oldAmount", 0)
             //val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
             GlobalList.globalList = it as MutableList<ComicListItem>
             tempSearchList = it
@@ -157,7 +158,6 @@ class HomeFragment : Fragment() {
         //there is also the less noticable read/unread - icon that shows which comics are unseen.
         val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
         val ranBefore = preferences?.getBoolean("RanBefore", false)
-        println("!!! I homefragment är ranBefore : $ranBefore")
         if (!ranBefore!!) {
             val editor = preferences.edit()
             editor!!.putBoolean("RanBefore", true)
@@ -170,7 +170,6 @@ class HomeFragment : Fragment() {
                 for (index in 0 until amountOfNewPosts) {
                     GlobalList.globalList[index].isNew = true
                 }
-                println("!!! inititalied recyc. because of new item")
                 comicAdapter?.submitList(GlobalList.globalList)
             }
         }
@@ -194,15 +193,20 @@ class HomeFragment : Fragment() {
                         GlobalList.globalList.forEach { item ->
                             if (item.id == text.toInt()) {
                                 tempSearchList.add(item)
-                                comicAdapter?.let { it.submitList(tempSearchList) }
                             }
+                        }
+                        comicAdapter?.let {
+                            it.submitList(tempSearchList)
                         }
                     } else if (text.isNotEmpty() && text == "fav") {
                         GlobalList.globalList.forEach { item3 ->
                             if (item3.isFavourite) {
                                 tempSearchList.add(item3)
-                                comicAdapter?.let { it.submitList(tempSearchList) }
                             }
+
+                        }
+                        comicAdapter?.let {
+                            it.submitList(tempSearchList)
                         }
 
                     } else if (text.isNotEmpty()) {
@@ -211,9 +215,9 @@ class HomeFragment : Fragment() {
                                     .contains(text)
                             ) {
                                 tempSearchList.add(item2)
-                                comicAdapter?.submitList(tempSearchList)
                             }
                         }
+                        comicAdapter?.submitList(tempSearchList)
                     } else {
                         comicAdapter?.submitList(GlobalList.globalList)
                     }
@@ -228,6 +232,35 @@ class HomeFragment : Fragment() {
         super.onResume()
         val a = activity as AppCompatActivity
         a.supportActionBar?.show()
+        everyOther = false
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val list = mutableListOf<ComicListItem>()
+        everyOther = !everyOther
+        when (item.itemId) {
+            R.id.fav -> {
+
+                if (everyOther) {
+
+                    GlobalList.globalList.forEach { item ->
+                        if (item.isFavourite) {
+                            list.add(item)
+                        }
+                    }
+                    comicAdapter?.let {
+                        it.submitList(list)
+                    }
+                } else {
+                    comicAdapter?.let {
+                        it.submitList(GlobalList.globalList)
+                    }
+                }
+            }
+
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 }
 

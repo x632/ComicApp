@@ -9,4 +9,10 @@
         app:showAsAction="always|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView"/>
 
+    <item
+        android:id="@+id/fav"
+        android:title="favs"
+        android:icon="@drawable/action_bar_heart"
+        app:showAsAction="ifRoom"
+        />
 </menu>
