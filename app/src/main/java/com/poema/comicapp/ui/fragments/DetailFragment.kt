@@ -9,10 +9,13 @@ import androidx.fragment.app.Fragment
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.davemorrissey.labs.subscaleview.ImageSource
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.poema.comicapp.R
 import com.poema.comicapp.data_sources.model.ComicPostCache
 import com.poema.comicapp.data_sources.model.GlobalList
@@ -21,18 +24,29 @@ import com.poema.comicapp.other.Constants
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import android.graphics.Bitmap
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
+
+
+
+
+
 
 @AndroidEntryPoint
 class DetailFragment : Fragment() {
 
+
+    private var scaleFactor = 0.1F
     private val viewModel: DetailViewModel by viewModels()
     private lateinit var titleHolder: TextView
     private lateinit var altHolder: TextView
-    private lateinit var imageHolder: ImageView
+    private lateinit var imageHolder: View
     private lateinit var progBarHolder: ProgressBar
     private lateinit var binding: FragmentDetailBinding
     private val args: DetailFragmentArgs by navArgs()
     private var cachedPostIsInitialized = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +60,7 @@ class DetailFragment : Fragment() {
         titleHolder = binding.textView
         imageHolder = binding.imageView
         progBarHolder = binding.progressBar2
+
 
         val heartHolder = binding.heartHolder
 
@@ -76,9 +91,20 @@ class DetailFragment : Fragment() {
 
             if (it.isSuccessful) {
                 titleHolder.text = it.body()?.title
-                Glide.with(this)
+                Glide
+                    .with(this)
+                    .asBitmap()
                     .load(it.body()?.img)
-                    .into(imageHolder)
+                    .into(object : SimpleTarget<Bitmap?>(800,800) {
+
+                        override fun onResourceReady(
+                            resource: Bitmap,
+                            transition: Transition<in Bitmap?>?
+                        ) {
+                            (imageHolder as SubsamplingScaleImageView).setImage(ImageSource.cachedBitmap(resource))
+                        }
+                    })
+
                 it.body()?.let { post ->
                     viewModel.createBitmap(post.img)
                     viewModel.postFromInternet = post
@@ -114,16 +140,16 @@ class DetailFragment : Fragment() {
                 val action =
                     DetailFragmentDirections.actionDetailFragmentToExplanationFragment(id, title)
                 Navigation.findNavController(it).navigate(action)
-                /*  val intent = Intent(this, ExplanationActivity::class.java)
-                  intent.putExtra("id", viewModel.number)
-                  intent.putExtra("title", viewModel.comicListItem!!.title)
-                  this.startActivity(intent)*/
+
             } else {
                 showToast("You cannot see explanations without internet-connection. Please check your connection!")
             }
         }
+
         return binding.root
     }
+
+
 
     private fun observeIsRead() {
         viewModel.isReadList.observe(viewLifecycleOwner) {
@@ -152,7 +178,8 @@ class DetailFragment : Fragment() {
         viewModel.comicPostCache.observe(viewLifecycleOwner) {
 
             titleHolder.text = it.title
-            Glide.with(this).load(it.imgBitMap).into(imageHolder)
+            (imageHolder as SubsamplingScaleImageView).setImage(ImageSource.cachedBitmap(it.imgBitMap!!))
+            /*Glide.with(this).load(it.imgBitMap).into(imageHolder)*/
             altHolder.text = it.alt
             progBarHolder.visibility = View.GONE
         }
