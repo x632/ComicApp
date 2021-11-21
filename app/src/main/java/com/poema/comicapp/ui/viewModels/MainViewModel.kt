@@ -28,6 +28,8 @@ constructor(private val repository: Repository) : ViewModel() {
 
     val isReadList: LiveData<List<IsRead>> = repository.observeAllIsRead().asLiveData()
 
+    var showFavorites = false
+
     init {
         CoroutineScope(IO).launch {
             val list: List<ComicListItem>? = repository.getArchive()

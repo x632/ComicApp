@@ -25,7 +25,6 @@ class ExplanationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentExplanationBinding.inflate(inflater, container, false)
-
         val number = args.id
         val title = args.title
 

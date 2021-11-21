@@ -42,7 +42,6 @@ class HomeFragment : Fragment() {
     private lateinit var recycler: RecyclerView
     private lateinit var progBar: ProgressBar
     private var internetConnection = false
-    var showFavorites = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,7 +59,6 @@ class HomeFragment : Fragment() {
         if (internetConnection) {
             progBar.visibility = View.VISIBLE
         }
-
         initializeRecycler()
         observeCache()
         observeIsRead()
@@ -68,7 +66,6 @@ class HomeFragment : Fragment() {
 
         return binding.root
     }
-
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -93,7 +90,7 @@ class HomeFragment : Fragment() {
             activity?.getSystemService(AppCompatActivity.JOB_SCHEDULER_SERVICE) as JobScheduler
         val resultCode = scheduler.schedule(info)
         if (resultCode == JobScheduler.RESULT_SUCCESS) {
-            println("!!! crated schedule")
+            println("!!! everything ok!")
         }
     }
 
@@ -109,7 +106,7 @@ class HomeFragment : Fragment() {
     private fun observeCache() {
         viewModel.offlineComicList.observe(viewLifecycleOwner, {
             GlobalList.globalList = it as MutableList<ComicListItem>
-            viewModel.cacheList = it as MutableList<ComicListItem>
+            viewModel.cacheList = it
             comicAdapter?.submitList(GlobalList.globalList)
             if (internetConnection) {
                 subscribeToScrapeData()
@@ -118,11 +115,9 @@ class HomeFragment : Fragment() {
 
     }
 
-
     private fun subscribeToScrapeData() {
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
             val prefs = context!!.getSharedPreferences("oldAmount", 0)
-            //val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
             GlobalList.globalList = it as MutableList<ComicListItem>
             tempSearchList = it
             checkForNewItems(it, prefs)
@@ -137,7 +132,9 @@ class HomeFragment : Fragment() {
             editor?.apply()
             progBar.visibility = View.GONE
             comicAdapter?.submitList(GlobalList.globalList)
-
+            if (viewModel.showFavorites) {
+                comicAdapter!!.submitList(viewModel.cacheList)
+            }
         })
     }
 
@@ -149,7 +146,7 @@ class HomeFragment : Fragment() {
 
     private fun checkForNewItems(list: MutableList<ComicListItem>, prefs: SharedPreferences) {
         //makes sure it does not put a "new-icon" on all 2500 comics the first time app installs
-        //once they all have been loaded once, it will create notifications for newly created ones.
+        //once they all have been loaded once, it will create icons for newly created ones.
         //there is also the less noticable read/unread - icon that shows which comics are unseen.
         val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
         val ranBefore = preferences?.getBoolean("RanBefore", false)
@@ -171,6 +168,11 @@ class HomeFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         activity?.menuInflater!!.inflate(R.menu.menu, menu)
+        val item = menu.findItem(R.id.fav)
+        if (viewModel.showFavorites) {
+            comicAdapter!!.submitList(viewModel.cacheList)
+            item.setIcon(R.drawable.action_bar_heart)
+        }
         val menuItem = menu.findItem(R.id.search)
         val searchView = menuItem?.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -190,18 +192,8 @@ class HomeFragment : Fragment() {
                             }
                         }
                         comicAdapter?.submitList(tempSearchList)
-
-                    } else if (text.isNotEmpty() && text == "fav") {
-                        GlobalList.globalList.forEach { item3 ->
-                            if (item3.isFavourite) {
-                                tempSearchList.add(item3)
-                            }
-
-                        }
-                        comicAdapter?.submitList(tempSearchList)
-
-
-                    } else if (text.isNotEmpty()) {
+                    }
+                    else if (text.isNotEmpty()) {
                         GlobalList.globalList.forEach { item2 ->
                             if (item2.title.lowercase(Locale.getDefault())
                                     .contains(text)
@@ -220,39 +212,30 @@ class HomeFragment : Fragment() {
         return super.onCreateOptionsMenu(menu, inflater)
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        viewModel.showFavorites = !viewModel.showFavorites
+        when (item.itemId) {
+            R.id.fav -> {
+
+                if (viewModel.showFavorites) {
+                    item.setIcon(R.drawable.action_bar_heart)
+                    comicAdapter?.submitList(viewModel.cacheList)
+
+                } else {
+                    item.setIcon(R.drawable.grey_border_heart)
+                    comicAdapter?.submitList(GlobalList.globalList)
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onResume() {
         super.onResume()
         val a = activity as AppCompatActivity
         a.supportActionBar?.show()
-        showFavorites = false
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val list = mutableListOf<ComicListItem>()
-        showFavorites = !showFavorites
-        when (item.itemId) {
-            R.id.fav -> {
-
-                if (showFavorites) {
-                    item.setIcon(R.drawable.action_bar_heart)
-                    GlobalList.globalList.forEach { item ->
-                        if (item.isFavourite) {
-                            list.add(item)
-                        }
-                    }
-                    comicAdapter?.let {
-                        it.submitList(list)
-                    }
-                } else {
-                    item.setIcon(R.drawable.grey_border_heart)
-                    comicAdapter?.let {
-                        it.submitList(GlobalList.globalList)
-                    }
-                }
-            }
-
-        }
-        return super.onOptionsItemSelected(item)
     }
 
 }
