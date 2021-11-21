@@ -12,7 +12,7 @@
     <item
         android:id="@+id/fav"
         android:title="favs"
-        android:icon="@drawable/action_bar_heart"
+        android:icon="@drawable/grey_border_heart"
         app:showAsAction="ifRoom"
         />
 </menu>

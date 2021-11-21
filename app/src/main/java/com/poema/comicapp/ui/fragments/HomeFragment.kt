@@ -9,13 +9,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.*
-import android.widget.ActionMenuView
 import androidx.fragment.app.Fragment
 import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
@@ -46,7 +42,7 @@ class HomeFragment : Fragment() {
     private lateinit var recycler: RecyclerView
     private lateinit var progBar: ProgressBar
     private var internetConnection = false
-    var everyOther = false
+    var showFavorites = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -115,7 +111,6 @@ class HomeFragment : Fragment() {
             GlobalList.globalList = it as MutableList<ComicListItem>
             viewModel.cacheList = it as MutableList<ComicListItem>
             comicAdapter?.submitList(GlobalList.globalList)
-            //denna gör två observationer om man har varit för länge i annan fragment.
             if (internetConnection) {
                 subscribeToScrapeData()
             }
@@ -164,7 +159,6 @@ class HomeFragment : Fragment() {
             editor.apply()
         } else {
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
-            println("!!! homefragment/checkForNewItems old amount = $oldAmountOfPosts")
             val amountOfNewPosts = list.size - oldAmountOfPosts
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {
@@ -195,9 +189,8 @@ class HomeFragment : Fragment() {
                                 tempSearchList.add(item)
                             }
                         }
-                        comicAdapter?.let {
-                            it.submitList(tempSearchList)
-                        }
+                        comicAdapter?.submitList(tempSearchList)
+
                     } else if (text.isNotEmpty() && text == "fav") {
                         GlobalList.globalList.forEach { item3 ->
                             if (item3.isFavourite) {
@@ -205,9 +198,8 @@ class HomeFragment : Fragment() {
                             }
 
                         }
-                        comicAdapter?.let {
-                            it.submitList(tempSearchList)
-                        }
+                        comicAdapter?.submitList(tempSearchList)
+
 
                     } else if (text.isNotEmpty()) {
                         GlobalList.globalList.forEach { item2 ->
@@ -232,17 +224,17 @@ class HomeFragment : Fragment() {
         super.onResume()
         val a = activity as AppCompatActivity
         a.supportActionBar?.show()
-        everyOther = false
+        showFavorites = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val list = mutableListOf<ComicListItem>()
-        everyOther = !everyOther
+        showFavorites = !showFavorites
         when (item.itemId) {
             R.id.fav -> {
 
-                if (everyOther) {
-
+                if (showFavorites) {
+                    item.setIcon(R.drawable.action_bar_heart)
                     GlobalList.globalList.forEach { item ->
                         if (item.isFavourite) {
                             list.add(item)
@@ -252,6 +244,7 @@ class HomeFragment : Fragment() {
                         it.submitList(list)
                     }
                 } else {
+                    item.setIcon(R.drawable.grey_border_heart)
                     comicAdapter?.let {
                         it.submitList(GlobalList.globalList)
                     }
