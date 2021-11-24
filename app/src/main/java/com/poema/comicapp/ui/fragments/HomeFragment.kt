@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
@@ -42,18 +43,20 @@ class HomeFragment : Fragment() {
     private lateinit var recycler: RecyclerView
     private lateinit var progBar: ProgressBar
     private var internetConnection = false
+    private var favButtonView : MenuItem? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         createNotificationChannel()
         createJobScheduler()
         setHasOptionsMenu(true)
 
         internetConnection = requireContext().isInternetAvailable()
+
         recycler = binding.recycler
         progBar = binding.progressBar
         if (internetConnection) {
@@ -63,7 +66,6 @@ class HomeFragment : Fragment() {
         observeCache()
         observeIsRead()
         subscribeToScrapeData()
-
         return binding.root
     }
 
@@ -111,8 +113,8 @@ class HomeFragment : Fragment() {
             if (internetConnection) {
                 subscribeToScrapeData()
             }
+            progBar.visibility = View.GONE
         })
-
     }
 
     private fun subscribeToScrapeData() {
@@ -169,6 +171,7 @@ class HomeFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         activity?.menuInflater!!.inflate(R.menu.menu, menu)
         val item = menu.findItem(R.id.fav)
+        favButtonView = item
         if (viewModel.showFavorites) {
             comicAdapter!!.submitList(viewModel.cacheList)
             item.setIcon(R.drawable.action_bar_heart)
@@ -214,10 +217,9 @@ class HomeFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        viewModel.showFavorites = !viewModel.showFavorites
         when (item.itemId) {
             R.id.fav -> {
-
+                viewModel.showFavorites = !viewModel.showFavorites
                 if (viewModel.showFavorites) {
                     item.setIcon(R.drawable.action_bar_heart)
                     comicAdapter?.submitList(viewModel.cacheList)
@@ -227,8 +229,25 @@ class HomeFragment : Fragment() {
                     comicAdapter?.submitList(GlobalList.globalList)
                 }
             }
+            R.id.update -> {
+                if(requireContext().isInternetAvailable()){
+                    progBar.visibility = View.VISIBLE
+                    viewModel.reloadData()
+                    viewModel.showFavorites = false
+                    favButtonView?.setIcon(R.drawable.grey_border_heart)
+                }else showToast("Currently there is no internet connection. You cannot reload data. Please check your connection!")
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+
+
+    private fun showToast(message: String) {
+        Toast.makeText(
+            requireContext(), message,
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     override fun onResume() {
@@ -237,6 +256,5 @@ class HomeFragment : Fragment() {
         a.supportActionBar?.show()
 
     }
-
 }
 

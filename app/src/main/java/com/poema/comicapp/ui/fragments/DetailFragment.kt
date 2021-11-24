@@ -1,6 +1,5 @@
 package com.poema.comicapp.ui.fragments
 
-import android.app.Activity
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Bundle
@@ -9,7 +8,6 @@ import androidx.fragment.app.Fragment
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
@@ -26,7 +24,6 @@ import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import android.graphics.Bitmap
 import com.bumptech.glide.request.target.SimpleTarget
-import com.bumptech.glide.request.target.ViewTarget
 import com.bumptech.glide.request.transition.Transition
 
 
@@ -83,37 +80,7 @@ class DetailFragment : Fragment() {
         val emptyHeart =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_favorite_border_48, null)
         if (viewModel.isInCache(viewModel.number)) heartHolder.setImageDrawable(heart)
-
-        viewModel.response.observe(viewLifecycleOwner, {
-
-            if (it.isSuccessful) {
-                titleHolder.text = it.body()?.title
-                Glide
-                    .with(this)
-                    .asBitmap()
-                    .load(it.body()?.img)
-                    .into(object : SimpleTarget<Bitmap?>(800, 800) {
-
-                        override fun onResourceReady(
-                            resource: Bitmap,
-                            transition: Transition<in Bitmap?>?
-                        ) {
-                            (imageHolder as SubsamplingScaleImageView).setImage(
-                                ImageSource.cachedBitmap(
-                                    resource
-                                )
-                            )
-                        }
-                    })
-
-                it.body()?.let { post ->
-                    viewModel.createBitmap(post.img)
-                    viewModel.postFromInternet = post
-                    altHolder.text = post.alt
-                }
-                progBarHolder.visibility = View.GONE
-            }
-        })
+        observeComicPostResponse()
         observeIsRead()
         subscribeToFinishedBitmap()
 
@@ -148,6 +115,39 @@ class DetailFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun observeComicPostResponse() {
+        viewModel.response.observe(viewLifecycleOwner, {
+
+            if (it.isSuccessful) {
+                titleHolder.text = it.body()?.title
+                Glide
+                    .with(this)
+                    .asBitmap()
+                    .load(it.body()?.img)
+                    .into(object : SimpleTarget<Bitmap?>(800, 800) {
+
+                        override fun onResourceReady(
+                            resource: Bitmap,
+                            transition: Transition<in Bitmap?>?
+                        ) {
+                            (imageHolder as SubsamplingScaleImageView).setImage(
+                                ImageSource.cachedBitmap(
+                                    resource
+                                )
+                            )
+                        }
+                    })
+
+                it.body()?.let { post ->
+                    viewModel.createBitmap(post.img)
+                    viewModel.postFromInternet = post
+                    altHolder.text = post.alt
+                }
+                progBarHolder.visibility = View.GONE
+            }
+        })
     }
 
 
@@ -223,6 +223,4 @@ class DetailFragment : Fragment() {
         val a = activity as AppCompatActivity
         a.supportActionBar?.hide()
     }
-
-
 }

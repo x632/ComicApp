@@ -43,7 +43,6 @@ class NewComicsJobService : JobService() {
             val prefs = applicationContext.getSharedPreferences("oldAmount",0)
            // val prefs = PreferenceManager.getDefaultSharedPreferences(this@NewComicsJobService)
             val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
-            println("!!! i jobservice för oldAmount värdet: $oldAmountOfPosts")
             val request = Request.Builder()
                 .url(Constants.ARCHIVE_URL)
                 .build()

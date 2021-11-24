@@ -1,6 +1,7 @@
 package com.poema.comicapp.ui.viewModels
 
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import com.poema.comicapp.data_sources.model.ComicListItem
 import com.poema.comicapp.data_sources.model.GlobalList.globalList
@@ -63,8 +64,21 @@ constructor(private val repository: Repository) : ViewModel() {
                 }
             }
         }
-
     }
+
+    fun reloadData(){
+        CoroutineScope(IO).launch {
+            val list: List<ComicListItem>? = repository.getArchive()
+            if (list == null) {
+                println("!!! Could not reach server!")
+            } else {
+                withContext(Main) {
+                    _onlineComicList.value = list!!
+                }
+            }
+        }
+    }
+
 
 }
 
