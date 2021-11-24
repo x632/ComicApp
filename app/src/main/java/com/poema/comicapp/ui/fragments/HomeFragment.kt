@@ -149,7 +149,7 @@ class HomeFragment : Fragment() {
     private fun checkForNewItems(list: MutableList<ComicListItem>, prefs: SharedPreferences) {
         //makes sure it does not put a "new-icon" on all 2500 comics the first time app installs
         //once they all have been loaded once, it will create icons for newly created ones.
-        //there is also the less noticable read/unread - icon that shows which comics are unseen.
+        //there is also the less noticeably read/unread - icon that shows which comics are unseen.
         val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
         val ranBefore = preferences?.getBoolean("RanBefore", false)
         if (!ranBefore!!) {
@@ -170,11 +170,11 @@ class HomeFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         activity?.menuInflater!!.inflate(R.menu.menu, menu)
-        val item = menu.findItem(R.id.fav)
-        favButtonView = item
+        favButtonView = menu.findItem(R.id.fav)
+
         if (viewModel.showFavorites) {
             comicAdapter!!.submitList(viewModel.cacheList)
-            item.setIcon(R.drawable.action_bar_heart)
+            favButtonView!!.setIcon(R.drawable.action_bar_heart)
         }
         val menuItem = menu.findItem(R.id.search)
         val searchView = menuItem?.actionView as SearchView
@@ -240,8 +240,6 @@ class HomeFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-
 
     private fun showToast(message: String) {
         Toast.makeText(
