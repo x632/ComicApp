@@ -42,7 +42,6 @@ class HomeFragment : Fragment() {
     private lateinit var tempSearchList: MutableList<ComicListItem>
     private lateinit var recycler: RecyclerView
     private lateinit var progBar: ProgressBar
-    private var internetConnection = false
     private var favButtonView : MenuItem? = null
 
 
@@ -55,11 +54,9 @@ class HomeFragment : Fragment() {
         createJobScheduler()
         setHasOptionsMenu(true)
 
-        internetConnection = requireContext().isInternetAvailable()
-
         recycler = binding.recycler
         progBar = binding.progressBar
-        if (internetConnection) {
+        if (requireContext().isInternetAvailable()) {
             progBar.visibility = View.VISIBLE
         }
         initializeRecycler()
@@ -90,10 +87,7 @@ class HomeFragment : Fragment() {
             .build()
         val scheduler =
             activity?.getSystemService(AppCompatActivity.JOB_SCHEDULER_SERVICE) as JobScheduler
-        val resultCode = scheduler.schedule(info)
-        if (resultCode == JobScheduler.RESULT_SUCCESS) {
-            println("!!! everything ok!")
-        }
+        scheduler.schedule(info)
     }
 
     private fun initializeRecycler() {
@@ -110,8 +104,14 @@ class HomeFragment : Fragment() {
             GlobalList.globalList = it as MutableList<ComicListItem>
             viewModel.cacheList = it
             comicAdapter?.submitList(GlobalList.globalList)
-            if (internetConnection) {
+            if (requireContext().isInternetAvailable()) {
                 subscribeToScrapeData()
+            } else if ( viewModel.showFavorites){
+               //NO OP
+            }
+            else{
+                showToast("Internet not available. Restricted to favorite comics only. Please check your connection!")
+                viewModel.showFavorites = true
             }
             progBar.visibility = View.GONE
         })
@@ -250,8 +250,12 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val a = activity as AppCompatActivity
-        a.supportActionBar?.show()
+        val temp = activity as AppCompatActivity
+        temp.apply{
+            supportActionBar?.setDisplayHomeAsUpEnabled(false)
+            supportActionBar?.setDisplayShowTitleEnabled(true)
+            supportActionBar?.show()
+        }
 
     }
 }

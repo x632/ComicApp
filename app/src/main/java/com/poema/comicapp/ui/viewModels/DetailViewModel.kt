@@ -19,8 +19,8 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     private val _response: MutableLiveData<Response<ComicPost>> = MutableLiveData()
     val response : LiveData<Response<ComicPost>> = _response
-    val comicPostCache: MutableLiveData<ComicPostCache> = MutableLiveData()
 
+    val comicPostCache: MutableLiveData<ComicPostCache> = MutableLiveData()
     private val _bitmap = MutableLiveData<Bitmap>()
     val bitmap:LiveData<Bitmap> = _bitmap
 

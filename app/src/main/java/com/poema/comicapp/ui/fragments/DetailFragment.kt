@@ -30,8 +30,6 @@ import com.bumptech.glide.request.transition.Transition
 @AndroidEntryPoint
 class DetailFragment : Fragment() {
 
-
-    private var scaleFactor = 0.1F
     private val viewModel: DetailViewModel by viewModels()
     private lateinit var titleHolder: TextView
     private lateinit var altHolder: TextView
@@ -47,8 +45,6 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentDetailBinding.inflate(inflater, container, false)
-
-        val internetConnection = activity?.isInternetAvailable()
 
         altHolder = binding.tvAlt
         titleHolder = binding.textView
@@ -67,12 +63,14 @@ class DetailFragment : Fragment() {
             cancelNotification()
         }
         GlobalList.globalList[viewModel.index!!].isNew = false
-        if (internetConnection!!) {
+        if (activity?.isInternetAvailable()!!) {
             viewModel.getComicPost(viewModel.number)
         } else {
             if (viewModel.isInCache(viewModel.number)) {
                 viewModel.getComicPostCache(viewModel.number)
                 subscribeToComicPostCache()
+            }else{
+                showToast("This comic is not in your favorites. Please check your connection!")
             }
         }
 
@@ -85,24 +83,27 @@ class DetailFragment : Fragment() {
         subscribeToFinishedBitmap()
 
         heartHolder.setOnClickListener {
-
-            if (cachedPostIsInitialized) {
-                if (!viewModel.isInCache(viewModel.number)) {
-                    GlobalList.globalList[viewModel.index!!].isFavourite = true
-                    viewModel.saveComicPostCache(viewModel.cachedPost!!)
-                    viewModel.saveComicListItem(viewModel.comicListItem!!)
-                    heartHolder.setImageDrawable(heart)
-                } else {
-                    GlobalList.globalList[viewModel.index!!].isFavourite = false
-                    heartHolder.setImageDrawable(emptyHeart)
-                    viewModel.deleteComicPostCacheById(viewModel.number)
-                    viewModel.deleteComicListItemById(viewModel.number)
+            if (requireContext().isInternetAvailable()){
+                if (cachedPostIsInitialized) {
+                    if (!viewModel.isInCache(viewModel.number)) {
+                        GlobalList.globalList[viewModel.index!!].isFavourite = true
+                        viewModel.saveComicPostCache(viewModel.cachedPost!!)
+                        viewModel.saveComicListItem(viewModel.comicListItem!!)
+                        heartHolder.setImageDrawable(heart)
+                    } else {
+                        GlobalList.globalList[viewModel.index!!].isFavourite = false
+                        heartHolder.setImageDrawable(emptyHeart)
+                        viewModel.deleteComicPostCacheById(viewModel.number)
+                        viewModel.deleteComicListItemById(viewModel.number)
+                    }
                 }
+            }else{
+                showToast("You can only alter your favorites when there is an internet connection. Please check your connection!")
             }
         }
 
         explBtn.setOnClickListener {
-            if (internetConnection) {
+            if (activity?.isInternetAvailable()!!) {
                 val id = viewModel.number
                 val title = viewModel.comicListItem!!.title
                 val action =
@@ -122,6 +123,7 @@ class DetailFragment : Fragment() {
 
             if (it.isSuccessful) {
                 titleHolder.text = it.body()?.title
+
                 Glide
                     .with(this)
                     .asBitmap()
@@ -220,7 +222,7 @@ class DetailFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val a = activity as AppCompatActivity
-        a.supportActionBar?.hide()
+        val temp = activity as AppCompatActivity
+        temp.supportActionBar?.hide()
     }
 }

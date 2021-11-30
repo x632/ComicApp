@@ -9,12 +9,14 @@ object Utility {
 
         val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val netInfo = cm.activeNetworkInfo
-        if (netInfo != null && netInfo.isConnected) {
+        return netInfo != null && netInfo.isConnected
+
+    /*    if (netInfo != null && netInfo.isConnected) {
             return true
         } else {
-            showErrorToast("Internet not available. Restricted to favorite comics only. Please check your connection!")
+            //showErrorToast("Internet not available. Restricted to favorite comics only. Please check your connection!")
             return false
-        }
+        }*/
     }
 
     private fun Context.showErrorToast(message: String?) {

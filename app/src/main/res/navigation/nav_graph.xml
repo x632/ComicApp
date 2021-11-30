@@ -53,5 +53,8 @@
             android:name="title"
             app:argType="string"
             android:defaultValue='""' />
+        <action
+            android:id="@+id/action_explanationFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
     </fragment>
 </navigation>
