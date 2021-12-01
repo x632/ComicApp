@@ -70,7 +70,7 @@ class DetailFragment : Fragment() {
                 viewModel.getComicPostCache(viewModel.number)
                 subscribeToComicPostCache()
             }else{
-                showToast("This comic is not in your favorites. Please check your connection!")
+                showToast("There is no internet connection. This comic is not in your cached favorites. Please check your connection!")
             }
         }
 
