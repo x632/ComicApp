@@ -216,7 +216,7 @@ class DetailFragment : Fragment() {
     private fun showToast(message: String) {
         Toast.makeText(
             requireContext(), message,
-            Toast.LENGTH_SHORT
+            Toast.LENGTH_LONG
         ).show()
     }
 
