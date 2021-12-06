@@ -8,7 +8,7 @@ import com.poema.comicapp.data_sources.model.ComicListItem
 import com.poema.comicapp.data_sources.model.ComicPostCache
 import com.poema.comicapp.data_sources.model.IsRead
 
-@Database(entities = [ComicPostCache::class,ComicListItem::class, IsRead::class], version = 16)
+@Database(entities = [ComicPostCache::class,ComicListItem::class, IsRead::class], version = 17)
 @TypeConverters(Converters::class)
 abstract class ComicDatabase: RoomDatabase(){
 

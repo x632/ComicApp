@@ -1,6 +1,8 @@
 package com.poema.comicapp.di
 
+import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.poema.comicapp.api.PostApi
 import com.poema.comicapp.data_sources.local.ComicDao
@@ -9,6 +11,8 @@ import com.poema.comicapp.data_sources.local.db.ComicDatabase
 import com.poema.comicapp.data_sources.remote.RemoteDataSource
 import com.poema.comicapp.other.Constants
 import com.poema.comicapp.data_sources.repository.Repository
+import com.poema.comicapp.other.UserPreferences
+import com.poema.comicapp.other.UserPreferencesImpl
 import com.poema.comicapp.repository.RepositoryImpl
 import dagger.Module
 import dagger.Provides
@@ -90,5 +94,17 @@ object AllDeps {
             localDataSource = LocalDataSource(comicDao = comicDao),
             remoteDataSource = RemoteDataSource(req = requestBuilder, api = api, client = okHttpClient)
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferences(app: Application): SharedPreferences {
+        return app.getSharedPreferences("sharedPref", 0)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserPreferences(prefs: SharedPreferences): UserPreferences {
+        return UserPreferencesImpl(prefs)
     }
 }

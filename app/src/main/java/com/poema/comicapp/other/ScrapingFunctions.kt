@@ -10,9 +10,8 @@ object ScrapingFunctions {
         val startAfterThis = "publication date)<br /><br /"
         val stopAfterThis = "<a href=\"/1/\" title=\"2006-1-1\">Barrel - Part 1</a><br/>"
         val resultString = extractArea(htmlString, startAfterThis, stopAfterThis)
-        val list = extractAll(resultString)
 
-        return list
+        return extractAll(resultString)
     }
     
     fun extractArea(
@@ -87,11 +86,11 @@ object ScrapingFunctions {
                     finalNumbers[index],
                     finalDates[index],
                     false,
+                    false,
                     false
                 )
             finalList.add(listItem)
         }
         return finalList
     }
-
 }

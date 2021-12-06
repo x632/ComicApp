@@ -2,12 +2,6 @@ package com.poema.comicapp.repository
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.lifecycle.LiveData
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.SimpleTarget
-import com.bumptech.glide.request.transition.Transition
-import com.davemorrissey.labs.subscaleview.ImageSource
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.poema.comicapp.data_sources.local.LocalDataSource
 import com.poema.comicapp.data_sources.model.ComicListItem
 import com.poema.comicapp.data_sources.model.ComicPostCache

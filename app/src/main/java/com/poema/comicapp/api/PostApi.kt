@@ -8,9 +8,6 @@ import retrofit2.http.Path
 interface PostApi {
     @GET("{id}/info.0.json")
     suspend fun getComicPost(@Path("id") postId:Int): Response<ComicPost>
-
-   /* @GET
-    suspend fun getAsString(@Url url:String): Call<String>*/
 }
 
 

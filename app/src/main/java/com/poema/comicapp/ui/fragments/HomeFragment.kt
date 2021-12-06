@@ -27,14 +27,19 @@ import com.poema.comicapp.data_sources.model.IsRead
 import com.poema.comicapp.databinding.FragmentHomeBinding
 import com.poema.comicapp.job_scheduler.NewComicsJobService
 import com.poema.comicapp.other.Constants
+import com.poema.comicapp.other.UserPreferences
+import com.poema.comicapp.other.UserPreferencesImpl
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(
 
+) {
+@Inject lateinit var prefsClass : UserPreferences
 
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: FragmentHomeBinding
@@ -119,16 +124,14 @@ class HomeFragment : Fragment() {
 
     private fun subscribeToScrapeData() {
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
-            val prefs = context!!.getSharedPreferences("oldAmount", 0)
+
             GlobalList.globalList = it as MutableList<ComicListItem>
+            prefsClass.saveOldAmount( GlobalList.globalList.size)
             tempSearchList = it
-            checkForNewItems(it, prefs)
+            checkForNewItems(it)
             viewModel.setFavorite()
             viewModel.setIsRead()
             val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
-            val editorShared = prefs.edit()
-            editorShared.putInt("oldAmount", GlobalList.globalList.size)
-            editorShared.apply()
             val editor = preferences?.edit()
             editor?.putBoolean("RanBefore", true)
             editor?.apply()
@@ -146,7 +149,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun checkForNewItems(list: MutableList<ComicListItem>, prefs: SharedPreferences) {
+    private fun checkForNewItems(list: MutableList<ComicListItem>) {
         //makes sure it does not put a "new-icon" on all 2500 comics the first time app installs
         //once they all have been loaded once, it will create icons for newly created ones.
         //there is also the less noticeably read/unread - icon that shows which comics are unseen.
@@ -157,7 +160,7 @@ class HomeFragment : Fragment() {
             editor!!.putBoolean("RanBefore", true)
             editor.apply()
         } else {
-            val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
+            val oldAmountOfPosts = prefsClass.getOldAmount()
             val amountOfNewPosts = list.size - oldAmountOfPosts
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {

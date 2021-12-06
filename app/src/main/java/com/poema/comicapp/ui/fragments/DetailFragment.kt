@@ -196,17 +196,17 @@ class DetailFragment : Fragment() {
     private fun subscribeToFinishedBitmap() {
         viewModel.bitmap.observe(viewLifecycleOwner) {
             viewModel.cachedPost = ComicPostCache(
-                viewModel.postFromInternet!!.month,
+                //viewModel.postFromInternet!!.month,
                 viewModel.postFromInternet!!.num,
-                viewModel.postFromInternet!!.link,
+               /* viewModel.postFromInternet!!.link,
                 viewModel.postFromInternet!!.year,
                 viewModel.postFromInternet!!.news,
-                viewModel.postFromInternet!!.safe_title,
-                viewModel.postFromInternet!!.transcript,
+                viewModel.postFromInternet!!.safe_title,*/
+                //viewModel.postFromInternet!!.transcript,
                 viewModel.postFromInternet!!.alt,
-                viewModel.postFromInternet!!.img,
+                //viewModel.postFromInternet!!.img,
                 viewModel.postFromInternet!!.title,
-                viewModel.postFromInternet!!.day,
+                //viewModel.postFromInternet!!.day,
                 it,
             )
             cachedPostIsInitialized = true
