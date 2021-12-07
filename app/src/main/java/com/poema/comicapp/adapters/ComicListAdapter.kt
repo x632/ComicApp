@@ -1,6 +1,7 @@
 package com.poema.comicapp.adapters
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.poema.comicapp.data_sources.model.ComicListItem
 import com.poema.comicapp.R.*
 import androidx.navigation.Navigation
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
+import com.davemorrissey.labs.subscaleview.ImageSource
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.poema.comicapp.ui.fragments.HomeFragmentDirections
 
 
@@ -41,9 +47,11 @@ class ComicListAdapter(private val context: Context) :
         if (comicListItem.isNew) holder.ivNew.visibility =
             View.VISIBLE
         else holder.ivNew.visibility = View.GONE
-        if (comicListItem.isRead) holder.ivIsRead.visibility =
-            View.GONE
-        else holder.ivIsRead.visibility = View.VISIBLE
+        if (comicListItem.bitmap != null){
+          holder.bitmap.setImageBitmap(comicListItem.bitmap)
+        } else {
+            holder.bitmap.setImageResource(drawable.ic_launcher_foreground2)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -62,6 +70,6 @@ class ComicListAdapter(private val context: Context) :
         val tv3: TextView = itemView.findViewById(id.tvNumber)
         val ivHeart: ImageView = itemView.findViewById(id.iv_heart)
         val ivNew: ImageView = itemView.findViewById(id.ivNew)
-        val ivIsRead: ImageView = itemView.findViewById(id.ivUnread)
+        val bitmap : ImageView = itemView.findViewById(id.bitmap)
     }
 }

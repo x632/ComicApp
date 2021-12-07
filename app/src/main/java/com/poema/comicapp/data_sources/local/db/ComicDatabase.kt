@@ -5,10 +5,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.poema.comicapp.data_sources.local.ComicDao
 import com.poema.comicapp.data_sources.model.ComicListItem
-import com.poema.comicapp.data_sources.model.ComicPostCache
-import com.poema.comicapp.data_sources.model.IsRead
 
-@Database(entities = [ComicPostCache::class,ComicListItem::class, IsRead::class], version = 17)
+@Database(entities = [ComicListItem::class], version = 26)
 @TypeConverters(Converters::class)
 abstract class ComicDatabase: RoomDatabase(){
 

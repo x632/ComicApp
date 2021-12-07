@@ -10,8 +10,8 @@ class ComicListItem(
     val title: String,
     @PrimaryKey(autoGenerate = false) val id: Int,
     val date: String,
-   /* val alt : String? = null,
-    val bitmap : Bitmap? = null,*/
+    var alt : String? = null,
+    var bitmap: Bitmap? = null,
     var isFavourite: Boolean,
     var isNew: Boolean,
     var isRead: Boolean,

@@ -17,19 +17,15 @@ import com.poema.comicapp.data_sources.model.GlobalList.globalList
 @HiltViewModel
 class DetailViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
-    private val _response: MutableLiveData<Response<ComicPost>> = MutableLiveData()
-    val response : LiveData<Response<ComicPost>> = _response
+    private val _response: MutableLiveData<Response<ComicPostDto>> = MutableLiveData()
+    val response : LiveData<Response<ComicPostDto>> = _response
 
-    val comicPostCache: MutableLiveData<ComicPostCache> = MutableLiveData()
     private val _bitmap = MutableLiveData<Bitmap>()
     val bitmap:LiveData<Bitmap> = _bitmap
 
-    val isReadList: LiveData<List<IsRead>> = repository.observeAllIsRead().asLiveData()
-
     var number = 0
-    var cachedPost: ComicPostCache? = null
     var comicListItem: ComicListItem? = null
-    var postFromInternet: ComicPost? = null
+    var postDtoFromInternet: ComicPostDto? = null
     var index: Int? = null
 
 
@@ -41,34 +37,10 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         }
     }
 
-    fun saveComicPostCache(comicPostCache: ComicPostCache) {
-        viewModelScope.launch {
-            repository.saveComicPostCache(comicPostCache)
-        }
-    }
 
     fun saveComicListItem(comicListItem: ComicListItem) {
         viewModelScope.launch {
             repository.saveFavorite(comicListItem)
-        }
-    }
-
-    fun getComicPostCache(id: Int) {
-        viewModelScope.launch {
-            val post = repository.findComicPostCacheById(id)
-            comicPostCache.value = post
-        }
-    }
-
-    fun deleteComicPostCacheById(number: Int) {
-        viewModelScope.launch {
-            repository.deleteComicPostCacheById(number)
-        }
-    }
-
-    fun deleteComicListItemById(number: Int) {
-        viewModelScope.launch {
-            repository.deleteFavoriteById(number)
         }
     }
 
@@ -90,20 +62,14 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
                 comicListItem = globalList[index]
             }
         }
-       saveIsReadItem()
         return placeInGlobalList
     }
 
-    private fun saveIsReadItem(){
-        val isReadItem = comicListItem?.let { IsRead(it.id) }
-        viewModelScope.launch{
-            repository.saveIsRead(isReadItem!!)
-        }
-    }
+
 
     fun isInCache(number: Int): Boolean {
         val comicListIt = globalList.find { number == it.id }
-        val temp = comicListIt?.isFavourite == true
+        val temp = comicListIt?.bitmap != null
         comicListIt?.let {
             comicListItem = it
         }

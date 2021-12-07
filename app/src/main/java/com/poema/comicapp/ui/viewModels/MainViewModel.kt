@@ -1,11 +1,10 @@
 package com.poema.comicapp.ui.viewModels
 
 
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
 import com.poema.comicapp.data_sources.model.ComicListItem
+import com.poema.comicapp.data_sources.model.GlobalList
 import com.poema.comicapp.data_sources.model.GlobalList.globalList
-import com.poema.comicapp.data_sources.model.IsRead
 import com.poema.comicapp.data_sources.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -19,66 +18,57 @@ class MainViewModel
 @Inject
 constructor(private val repository: Repository) : ViewModel() {
 
-    var isReadMutList = mutableListOf<IsRead>()
     var cacheList: MutableList<ComicListItem> = mutableListOf()
-
-    val offlineComicList: LiveData<List<ComicListItem>> = repository.observeFavorites().asLiveData()
+    var favoritesList: MutableList<ComicListItem> = mutableListOf()
+    val offlineComicList: LiveData<List<ComicListItem>> = repository.observeCache().asLiveData()
 
     private val _onlineComicList = MutableLiveData<List<ComicListItem>>()
     val onlineComicList: LiveData<List<ComicListItem>> = _onlineComicList
-
-    val isReadList: LiveData<List<IsRead>> = repository.observeAllIsRead().asLiveData()
 
     var showFavorites = false
 
     init {
         CoroutineScope(IO).launch {
             val list: List<ComicListItem>? = repository.getArchive()
-            if (list == null) {
-                println("!!! Could not reach server!")
-            } else {
-                withContext(Main) {
-                    _onlineComicList.value = list!!
-                }
+            withContext(Main) {
+                _onlineComicList.value = list!!
             }
         }
     }
 
     fun setFavorite() {
+        favoritesList = mutableListOf()
         for (index in 0 until cacheList.size) {
             if (cacheList[index].isFavourite) {
                 for (item in globalList) {
                     if (item.id == cacheList[index].id) {
                         item.isFavourite = true
+                        favoritesList.add(item)
                     }
                 }
             }
         }
     }
 
-    fun setIsRead() {
-        for (item1 in isReadMutList) {
+    fun setBitMap() {
+        for (index in 0 until cacheList.size) {
             for (item in globalList) {
-                if (item.id == item1.id) {
-                    item.isRead = true
+                if (item.id == cacheList[index].id) {
+                    item.bitmap = cacheList[index].bitmap
+                    item.alt = cacheList[index].alt
                 }
             }
+
         }
     }
 
-    fun reloadData(){
+    fun reloadData() {
         CoroutineScope(IO).launch {
             val list: List<ComicListItem>? = repository.getArchive()
-            if (list == null) {
-                println("!!! Could not reach server!")
-            } else {
-                withContext(Main) {
-                    _onlineComicList.value = list!!
-                }
+            withContext(Main) {
+                _onlineComicList.value = list!!
             }
         }
     }
-
-
 }
 

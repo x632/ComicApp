@@ -11,12 +11,6 @@ object Utility {
         val netInfo = cm.activeNetworkInfo
         return netInfo != null && netInfo.isConnected
 
-    /*    if (netInfo != null && netInfo.isConnected) {
-            return true
-        } else {
-            //showErrorToast("Internet not available. Restricted to favorite comics only. Please check your connection!")
-            return false
-        }*/
     }
 
     private fun Context.showErrorToast(message: String?) {

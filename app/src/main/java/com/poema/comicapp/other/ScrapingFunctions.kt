@@ -85,9 +85,11 @@ object ScrapingFunctions {
                     titleList[index],
                     finalNumbers[index],
                     finalDates[index],
-                    false,
-                    false,
-                    false
+                    null,
+                    bitmap = null,
+                    isFavourite = false,
+                    isNew = false,
+                    isRead = false,
                 )
             finalList.add(listItem)
         }

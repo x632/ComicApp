@@ -3,8 +3,6 @@ package com.poema.comicapp.data_sources.local
 
 import androidx.room.*
 import com.poema.comicapp.data_sources.model.ComicListItem
-import com.poema.comicapp.data_sources.model.ComicPostCache
-import com.poema.comicapp.data_sources.model.IsRead
 import kotlinx.coroutines.flow.Flow
 
 
@@ -12,19 +10,10 @@ import kotlinx.coroutines.flow.Flow
 interface ComicDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(comicPostCache: ComicPostCache):Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(comicLisItem: ComicListItem):Long
-
-    @Query("DELETE FROM comics WHERE num = :id")
-    suspend fun deleteComicPostCachedById(id: Int)
+    suspend fun insert(comicListItem: ComicListItem):Long
 
     @Query("DELETE FROM comicListItems WHERE id = :id")
     suspend fun deleteComicListItemById(id: Int)
-
-    @Query("SELECT * FROM comics WHERE num = :id" )
-    suspend fun findComicPostCacheById(id: Int) : ComicPostCache
 
     @Query("SELECT * FROM comicListItems WHERE id = :id" )
     suspend fun findComicListItemById(id: Int) : ComicListItem
@@ -32,10 +21,7 @@ interface ComicDao {
     @Query("SELECT * FROM comicListItems")
     fun observeComicListItems(): Flow<List<ComicListItem>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(isRead: IsRead):Long
-
-    @Query("SELECT * FROM read")
-    fun observeIsRead(): Flow<List<IsRead>>
+    @Query("SELECT * FROM comicListItems")
+    suspend fun getComicListItems(): List<ComicListItem>
 
 }

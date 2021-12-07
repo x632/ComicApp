@@ -6,13 +6,13 @@ import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.ComponentName
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
@@ -23,12 +23,11 @@ import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.data_sources.model.ComicListItem
 import com.poema.comicapp.data_sources.model.GlobalList
-import com.poema.comicapp.data_sources.model.IsRead
+import com.poema.comicapp.data_sources.model.GlobalList.globalList
 import com.poema.comicapp.databinding.FragmentHomeBinding
 import com.poema.comicapp.job_scheduler.NewComicsJobService
 import com.poema.comicapp.other.Constants
 import com.poema.comicapp.other.UserPreferences
-import com.poema.comicapp.other.UserPreferencesImpl
 import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,7 +65,6 @@ class HomeFragment : Fragment(
         }
         initializeRecycler()
         observeCache()
-        observeIsRead()
         subscribeToScrapeData()
         return binding.root
     }
@@ -84,6 +82,8 @@ class HomeFragment : Fragment(
         }
     }
 
+
+
     private fun createJobScheduler() {
         val componentName = ComponentName(requireContext(), NewComicsJobService::class.java)
         val info = JobInfo.Builder(Constants.JOB_ID, componentName)
@@ -100,53 +100,52 @@ class HomeFragment : Fragment(
             layoutManager = LinearLayoutManager(context)
             comicAdapter = ComicListAdapter(context)
             adapter = comicAdapter
-            comicAdapter?.submitList(GlobalList.globalList)
+            comicAdapter?.submitList(globalList)
         }
     }
 
     private fun observeCache() {
         viewModel.offlineComicList.observe(viewLifecycleOwner, {
-            GlobalList.globalList = it as MutableList<ComicListItem>
-            viewModel.cacheList = it
-            comicAdapter?.submitList(GlobalList.globalList)
-            if (requireContext().isInternetAvailable()) {
-                subscribeToScrapeData()
-            } else if ( viewModel.showFavorites){
-               //NO OP
-            }
-            else{
-                showToast("Internet not available. Restricted to favorite comics only. Please check your connection!")
-                viewModel.showFavorites = true
-            }
+            //eftersom cachelisten bara består av sådana som man över huvud besökt så kan bara dessa också vara favoriter
+            globalList = it as MutableList<ComicListItem>
+            viewModel.cacheList = it as MutableList<ComicListItem>
+            viewModel.setFavorite()
+            comicAdapter?.submitList(globalList)
+            if(viewModel.showFavorites) {
+                    comicAdapter!!.submitList(viewModel.favoritesList)
+                }
             progBar.visibility = View.GONE
+           if(requireContext().isInternetAvailable()){
+                subscribeToScrapeData()
+            }
+            println("!!! OBSERVECACHE KÖRS")
         })
     }
 
     private fun subscribeToScrapeData() {
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
 
-            GlobalList.globalList = it as MutableList<ComicListItem>
-            prefsClass.saveOldAmount( GlobalList.globalList.size)
+            globalList = it as MutableList<ComicListItem>
+            prefsClass.saveOldAmount(globalList.size)
             tempSearchList = it
             checkForNewItems(it)
+            viewModel.setBitMap()
             viewModel.setFavorite()
-            viewModel.setIsRead()
-            val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
-            val editor = preferences?.edit()
-            editor?.putBoolean("RanBefore", true)
-            editor?.apply()
+            setHasRanBefore()
             progBar.visibility = View.GONE
-            comicAdapter?.submitList(GlobalList.globalList)
+            comicAdapter?.submitList(globalList)
             if (viewModel.showFavorites) {
-                comicAdapter!!.submitList(viewModel.cacheList)
+                comicAdapter!!.submitList(viewModel.favoritesList)
             }
+            println("!!! SCRAPEDATA KÖRS")
         })
     }
 
-    private fun observeIsRead() {
-        viewModel.isReadList.observe(viewLifecycleOwner) {
-            viewModel.isReadMutList = (it as MutableList<IsRead>?)!!
-        }
+    private fun setHasRanBefore(){
+        val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
+        val editor = preferences?.edit()
+        editor?.putBoolean("RanBefore", true)
+        editor?.apply()
     }
 
     private fun checkForNewItems(list: MutableList<ComicListItem>) {
@@ -161,12 +160,14 @@ class HomeFragment : Fragment(
             editor.apply()
         } else {
             val oldAmountOfPosts = prefsClass.getOldAmount()
+            println("!!! oldAmount = $oldAmountOfPosts")
             val amountOfNewPosts = list.size - oldAmountOfPosts
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {
-                    GlobalList.globalList[index].isNew = true
+                    globalList[index].isNew = true
+                    println("!!! Setting item to true")
                 }
-                comicAdapter?.submitList(GlobalList.globalList)
+                comicAdapter?.submitList(globalList)
             }
         }
     }
@@ -176,7 +177,7 @@ class HomeFragment : Fragment(
         favButtonView = menu.findItem(R.id.fav)
 
         if (viewModel.showFavorites) {
-            comicAdapter!!.submitList(viewModel.cacheList)
+            comicAdapter!!.submitList(viewModel.favoritesList)
             favButtonView!!.setIcon(R.drawable.action_bar_heart)
         }
         val menuItem = menu.findItem(R.id.search)
@@ -192,7 +193,7 @@ class HomeFragment : Fragment(
                 val searchText = newText?.lowercase(Locale.getDefault())
                 searchText?.let { text ->
                     if (text.isNotEmpty() && text.isDigitsOnly()) {
-                        GlobalList.globalList.forEach { item ->
+                        globalList.forEach { item ->
                             if (item.id == text.toInt()) {
                                 tempSearchList.add(item)
                             }
@@ -200,7 +201,7 @@ class HomeFragment : Fragment(
                         comicAdapter?.submitList(tempSearchList)
                     }
                     else if (text.isNotEmpty()) {
-                        GlobalList.globalList.forEach { item2 ->
+                        globalList.forEach { item2 ->
                             if (item2.title.lowercase(Locale.getDefault())
                                     .contains(text)
                             ) {
@@ -209,7 +210,7 @@ class HomeFragment : Fragment(
                         }
                         comicAdapter?.submitList(tempSearchList)
                     } else {
-                        comicAdapter?.submitList(GlobalList.globalList)
+                        comicAdapter?.submitList(globalList)
                     }
                 }
                 return false
@@ -225,11 +226,11 @@ class HomeFragment : Fragment(
                 viewModel.showFavorites = !viewModel.showFavorites
                 if (viewModel.showFavorites) {
                     item.setIcon(R.drawable.action_bar_heart)
-                    comicAdapter?.submitList(viewModel.cacheList)
+                    comicAdapter?.submitList(viewModel.favoritesList)
 
                 } else {
                     item.setIcon(R.drawable.grey_border_heart)
-                    comicAdapter?.submitList(GlobalList.globalList)
+                    comicAdapter?.submitList(globalList)
                 }
             }
             R.id.update -> {

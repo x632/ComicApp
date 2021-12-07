@@ -15,7 +15,6 @@ import com.bumptech.glide.Glide
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.poema.comicapp.R
-import com.poema.comicapp.data_sources.model.ComicPostCache
 import com.poema.comicapp.data_sources.model.GlobalList
 import com.poema.comicapp.databinding.FragmentDetailBinding
 import com.poema.comicapp.other.Constants
@@ -23,8 +22,11 @@ import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import android.graphics.Bitmap
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
+import com.poema.comicapp.data_sources.model.ComicListItem
 
 
 @AndroidEntryPoint
@@ -38,6 +40,7 @@ class DetailFragment : Fragment() {
     private lateinit var binding: FragmentDetailBinding
     private val args: DetailFragmentArgs by navArgs()
     private var cachedPostIsInitialized = false
+    private var internetPostInitialized = false
 
 
     override fun onCreateView(
@@ -51,9 +54,7 @@ class DetailFragment : Fragment() {
         imageHolder = binding.imageView
         progBarHolder = binding.progressBar2
 
-
         val heartHolder = binding.heartHolder
-
         val explBtn = binding.btnWeb
 
         viewModel.number = args.id
@@ -62,42 +63,57 @@ class DetailFragment : Fragment() {
         if (GlobalList.globalList[viewModel.index!!].isNew) {
             cancelNotification()
         }
+
         GlobalList.globalList[viewModel.index!!].isNew = false
-        if (activity?.isInternetAvailable()!!) {
-            viewModel.getComicPost(viewModel.number)
+
+
+        if (viewModel.isInCache(viewModel.number)) {
+            titleHolder.text = GlobalList.globalList[viewModel.index!!].title
+            val srcBmp = GlobalList.globalList[viewModel.index!!].bitmap!!
+            val dstBmp = Bitmap.createScaledBitmap(
+                srcBmp,
+                srcBmp.width * 3,
+                srcBmp.height * 3,
+                true
+            )
+            (imageHolder as SubsamplingScaleImageView).setImage(ImageSource.bitmap(dstBmp))
+            altHolder.text = GlobalList.globalList[viewModel.index!!].alt
+            progBarHolder.visibility = View.GONE
+            cachedPostIsInitialized = true
         } else {
-            if (viewModel.isInCache(viewModel.number)) {
-                viewModel.getComicPostCache(viewModel.number)
-                subscribeToComicPostCache()
+            if (activity?.isInternetAvailable()!!) {
+                viewModel.getComicPost(viewModel.number)
             }else{
-                showToast("There is no internet connection. This comic is not in your cached favorites. Please check your connection!")
+                showToast("Please check your internet connection! This comic has not yet been cached. ")
             }
         }
 
         val heart = ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_favorite_48, null)
         val emptyHeart =
             ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_favorite_border_48, null)
-        if (viewModel.isInCache(viewModel.number)) heartHolder.setImageDrawable(heart)
+        if (viewModel.comicListItem!!.isFavourite) heartHolder.setImageDrawable(heart)
+        else {
+            heartHolder.setImageDrawable(emptyHeart)
+        }
         observeComicPostResponse()
-        observeIsRead()
         subscribeToFinishedBitmap()
 
         heartHolder.setOnClickListener {
-            if (requireContext().isInternetAvailable()){
-                if (cachedPostIsInitialized) {
-                    if (!viewModel.isInCache(viewModel.number)) {
+            if (requireContext().isInternetAvailable()) {
+                if (cachedPostIsInitialized || internetPostInitialized) {
+                    if (!GlobalList.globalList[viewModel.index!!].isFavourite) {
                         GlobalList.globalList[viewModel.index!!].isFavourite = true
-                        viewModel.saveComicPostCache(viewModel.cachedPost!!)
+                        viewModel.comicListItem!!.isFavourite = true
                         viewModel.saveComicListItem(viewModel.comicListItem!!)
                         heartHolder.setImageDrawable(heart)
                     } else {
                         GlobalList.globalList[viewModel.index!!].isFavourite = false
                         heartHolder.setImageDrawable(emptyHeart)
-                        viewModel.deleteComicPostCacheById(viewModel.number)
-                        viewModel.deleteComicListItemById(viewModel.number)
+                        viewModel.comicListItem!!.isFavourite = false
+                        viewModel.saveComicListItem(viewModel.comicListItem!!)
                     }
                 }
-            }else{
+            } else {
                 showToast("You can only alter your favorites when there is an internet connection. Please check your connection!")
             }
         }
@@ -114,8 +130,24 @@ class DetailFragment : Fragment() {
                 showToast("You cannot see explanations without internet-connection. Please check your connection!")
             }
         }
-
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val callback: OnBackPressedCallback = object : OnBackPressedCallback(
+            true
+        ) {
+            override fun handleOnBackPressed() {
+               if(internetPostInitialized || cachedPostIsInitialized || activity?.isInternetAvailable() == false) {
+                       Navigation.findNavController(altHolder).popBackStack()
+               }
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            callback
+        )
     }
 
     private fun observeComicPostResponse() {
@@ -141,10 +173,9 @@ class DetailFragment : Fragment() {
                             )
                         }
                     })
-
                 it.body()?.let { post ->
                     viewModel.createBitmap(post.img)
-                    viewModel.postFromInternet = post
+                    viewModel.postDtoFromInternet = post
                     altHolder.text = post.alt
                 }
                 progBarHolder.visibility = View.GONE
@@ -152,23 +183,10 @@ class DetailFragment : Fragment() {
         })
     }
 
-
-    private fun observeIsRead() {
-        viewModel.isReadList.observe(viewLifecycleOwner) {
-            for (item in it) {
-                val comicListIt = GlobalList.globalList.find { searchItem ->
-                    item.id == searchItem.id
-                }
-                comicListIt?.isRead = true
-
-            }
-        }
-    }
-
     private fun cancelNotification() {
         GlobalList.globalList[viewModel.index!!].isNew = false
         val item = GlobalList.globalList.find { it.isNew }
-        //but only if there are no unseen items left
+        //cancel notification, but only if there are no unseen items left
         if (item == null) {
             val notificationManager =
                 activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -176,40 +194,22 @@ class DetailFragment : Fragment() {
         }
     }
 
-    private fun subscribeToComicPostCache() {
-        viewModel.comicPostCache.observe(viewLifecycleOwner) {
-
-            titleHolder.text = it.title
-            val srcBmp = it.imgBitMap!!
-            val dstBmp = Bitmap.createScaledBitmap(
-                srcBmp,
-                srcBmp.width * 3,
-                srcBmp.height * 3,
-                true
-            )
-            (imageHolder as SubsamplingScaleImageView).setImage(ImageSource.bitmap(dstBmp))
-            altHolder.text = it.alt
-            progBarHolder.visibility = View.GONE
-        }
-    }
-
     private fun subscribeToFinishedBitmap() {
         viewModel.bitmap.observe(viewLifecycleOwner) {
-            viewModel.cachedPost = ComicPostCache(
-                //viewModel.postFromInternet!!.month,
-                viewModel.postFromInternet!!.num,
-               /* viewModel.postFromInternet!!.link,
-                viewModel.postFromInternet!!.year,
-                viewModel.postFromInternet!!.news,
-                viewModel.postFromInternet!!.safe_title,*/
-                //viewModel.postFromInternet!!.transcript,
-                viewModel.postFromInternet!!.alt,
-                //viewModel.postFromInternet!!.img,
-                viewModel.postFromInternet!!.title,
-                //viewModel.postFromInternet!!.day,
+
+            viewModel.comicListItem = ComicListItem(
+                viewModel.postDtoFromInternet!!.title,
+                viewModel.postDtoFromInternet!!.num,
+                GlobalList.globalList[viewModel.index!!].date,
+                viewModel.postDtoFromInternet!!.alt,
                 it,
+                GlobalList.globalList[viewModel.index!!].isFavourite,
+                GlobalList.globalList[viewModel.index!!].isNew,
+                GlobalList.globalList[viewModel.index!!].isRead
             )
-            cachedPostIsInitialized = true
+            viewModel.saveComicListItem(viewModel.comicListItem!!)
+            GlobalList.globalList[viewModel.index!!] = viewModel.comicListItem!!
+            internetPostInitialized = true
         }
     }
 
@@ -225,4 +225,5 @@ class DetailFragment : Fragment() {
         val temp = activity as AppCompatActivity
         temp.supportActionBar?.hide()
     }
+
 }
