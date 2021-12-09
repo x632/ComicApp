@@ -115,7 +115,6 @@ class HomeFragment : Fragment(
            if(requireContext().isInternetAvailable()){
                 subscribeToScrapeData()
             }
-            println("!!! OBSERVE KÖRS!")
         })
     }
 
@@ -123,18 +122,17 @@ class HomeFragment : Fragment(
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
 
             globalList = it as MutableList<ComicListItem>
-            prefsClass.saveOldAmount(globalList.size)
             tempSearchList = it
             checkForNewItems(it)
+            setHasRanBefore()
             viewModel.setBitMap()
             viewModel.setFavorite()
-            setHasRanBefore()
+            prefsClass.saveOldAmount(globalList.size)
             progBar.visibility = View.GONE
             comicAdapter?.submitList(globalList)
             if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
-            println("!!! SUBSCRIBETOSCRAPE KÖRS!")
         })
     }
 
@@ -148,7 +146,7 @@ class HomeFragment : Fragment(
     private fun checkForNewItems(list: MutableList<ComicListItem>) {
         //makes sure it does not put a "new-icon" on all 2500 comics the first time app installs
         //once they all have been loaded once, it will create icons for newly created ones.
-        //there is also the less noticeably read/unread - icon that shows which comics are unseen.
+        //
         val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
         val ranBefore = preferences?.getBoolean("RanBefore", false)
         if (!ranBefore!!) {
@@ -157,7 +155,7 @@ class HomeFragment : Fragment(
             editor.apply()
         } else {
             val oldAmountOfPosts = prefsClass.getOldAmount()
-            //println("!!! oldAmount = $oldAmountOfPosts")
+            println("!!! oldAmount = $oldAmountOfPosts")
             val amountOfNewPosts = list.size - oldAmountOfPosts
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {

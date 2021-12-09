@@ -14,7 +14,7 @@ object ScrapingFunctions {
         return extractAll(resultString)
     }
     
-    fun extractArea(
+    private fun extractArea(
         htmlString: String,
         startAfterThis: String,
         stopAfterThis: String
@@ -24,14 +24,14 @@ object ScrapingFunctions {
         return htmlString.slice(startingIndex..endingIndex)
     }
 
-    fun getIndex(htmlString: String, whatToFind: String): Int {
+    private fun getIndex(htmlString: String, whatToFind: String): Int {
         val indexBeforeString = htmlString.indexOf(whatToFind, 0)
         val lengthOfWhatToFind = whatToFind.length
         return indexBeforeString + lengthOfWhatToFind
     }
 
 
-    fun extractAll(resultString: String): MutableList<ComicListItem> {
+    private fun extractAll(resultString: String): MutableList<ComicListItem> {
         val tempList = resultString.split(">").toTypedArray()
         val titleList = mutableListOf<String>()
         for (listItem in tempList) {
