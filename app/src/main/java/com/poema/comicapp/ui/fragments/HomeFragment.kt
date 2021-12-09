@@ -82,8 +82,6 @@ class HomeFragment : Fragment(
         }
     }
 
-
-
     private fun createJobScheduler() {
         val componentName = ComponentName(requireContext(), NewComicsJobService::class.java)
         val info = JobInfo.Builder(Constants.JOB_ID, componentName)
@@ -106,9 +104,8 @@ class HomeFragment : Fragment(
 
     private fun observeCache() {
         viewModel.offlineComicList.observe(viewLifecycleOwner, {
-            //eftersom cachelisten bara består av sådana som man över huvud besökt så kan bara dessa också vara favoriter
             globalList = it as MutableList<ComicListItem>
-            viewModel.cacheList = it as MutableList<ComicListItem>
+            viewModel.cacheList = it
             viewModel.setFavorite()
             comicAdapter?.submitList(globalList)
             if(viewModel.showFavorites) {
@@ -118,7 +115,7 @@ class HomeFragment : Fragment(
            if(requireContext().isInternetAvailable()){
                 subscribeToScrapeData()
             }
-            println("!!! OBSERVECACHE KÖRS")
+            println("!!! OBSERVE KÖRS!")
         })
     }
 
@@ -137,7 +134,7 @@ class HomeFragment : Fragment(
             if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
-            println("!!! SCRAPEDATA KÖRS")
+            println("!!! SUBSCRIBETOSCRAPE KÖRS!")
         })
     }
 
@@ -160,7 +157,7 @@ class HomeFragment : Fragment(
             editor.apply()
         } else {
             val oldAmountOfPosts = prefsClass.getOldAmount()
-            println("!!! oldAmount = $oldAmountOfPosts")
+            //println("!!! oldAmount = $oldAmountOfPosts")
             val amountOfNewPosts = list.size - oldAmountOfPosts
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {

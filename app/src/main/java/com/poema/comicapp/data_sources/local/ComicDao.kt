@@ -21,7 +21,7 @@ interface ComicDao {
     @Query("SELECT * FROM comicListItems")
     fun observeComicListItems(): Flow<List<ComicListItem>>
 
-    @Query("SELECT * FROM comicListItems")
+    @Query("SELECT * FROM comicListItems ORDER BY id DESC")
     suspend fun getComicListItems(): List<ComicListItem>
 
 }

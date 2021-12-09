@@ -14,7 +14,6 @@ class ComicListItem(
     var bitmap: Bitmap? = null,
     var isFavourite: Boolean,
     var isNew: Boolean,
-    var isRead: Boolean,
 )
 
 

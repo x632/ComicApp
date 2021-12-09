@@ -13,21 +13,24 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 import com.poema.comicapp.data_sources.model.GlobalList.globalList
+import kotlinx.coroutines.delay
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     private val _response: MutableLiveData<Response<ComicPostDto>> = MutableLiveData()
-    val response : LiveData<Response<ComicPostDto>> = _response
+    val response: LiveData<Response<ComicPostDto>> = _response
 
     private val _bitmap = MutableLiveData<Bitmap>()
-    val bitmap:LiveData<Bitmap> = _bitmap
+    val bitmap: LiveData<Bitmap> = _bitmap
+
+    //private val _savingListItemFinished: MutableLiveData<Boolean> = MutableLiveData(false)
+    //val savingListItemFinished = _savingListItemFinished
 
     var number = 0
     var comicListItem: ComicListItem? = null
     var postDtoFromInternet: ComicPostDto? = null
     var index: Int? = null
-
 
 
     fun getComicPost(postNumber: Int) {
@@ -40,19 +43,24 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun saveComicListItem(comicListItem: ComicListItem) {
         viewModelScope.launch {
-            repository.saveFavorite(comicListItem)
+            //var returnValue = 0L
+            //_savingListItemFinished.value = false
+            repository.saveComicListItem(comicListItem)
+           // if(returnValue>0){_savingListItemFinished.value = true}
         }
     }
 
+
     fun createBitmap(url: String) {
-        CoroutineScope(IO).launch{
+        CoroutineScope(IO).launch {
             val stream = repository.getBitMap(url)
-            withContext(Main){
+            withContext(Main) {
                 _bitmap.value = stream
             }
         }
 
     }
+
 
     fun indexInList(number: Int): Int {
         var placeInGlobalList = 0
@@ -64,7 +72,6 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         }
         return placeInGlobalList
     }
-
 
 
     fun isInCache(number: Int): Boolean {

@@ -9,9 +9,5 @@ interface PostApi {
     @GET("{id}/info.0.json")
     suspend fun getComicPost(@Path("id") postId:Int): Response<ComicPostDto>
 
-
 }
 
-/*Retrofit retrofit = new Retrofit.Builder()
-.baseUrl(BASE_URL)
-.addConverterFactory(ScalarsConverterFactory.create())*/

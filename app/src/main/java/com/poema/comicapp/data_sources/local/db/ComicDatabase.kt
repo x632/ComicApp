@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import com.poema.comicapp.data_sources.local.ComicDao
 import com.poema.comicapp.data_sources.model.ComicListItem
 
-@Database(entities = [ComicListItem::class], version = 26)
+@Database(entities = [ComicListItem::class], version = 27)
 @TypeConverters(Converters::class)
 abstract class ComicDatabase: RoomDatabase(){
 

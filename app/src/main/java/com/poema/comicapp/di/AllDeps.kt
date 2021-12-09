@@ -37,7 +37,6 @@ object AllDeps {
     fun provideRetrofit(): Retrofit.Builder {
         return Retrofit.Builder()
             .baseUrl("https://xkcd.com/")
-            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
     }
 

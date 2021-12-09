@@ -15,7 +15,6 @@ import com.bumptech.glide.Glide
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.poema.comicapp.R
-import com.poema.comicapp.data_sources.model.GlobalList
 import com.poema.comicapp.databinding.FragmentDetailBinding
 import com.poema.comicapp.other.Constants
 import com.poema.comicapp.other.Utility.isInternetAvailable
@@ -23,10 +22,10 @@ import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import android.graphics.Bitmap
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.addCallback
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.poema.comicapp.data_sources.model.ComicListItem
+import com.poema.comicapp.data_sources.model.GlobalList.globalList
 
 
 @AndroidEntryPoint
@@ -60,16 +59,17 @@ class DetailFragment : Fragment() {
         viewModel.number = args.id
         viewModel.index = viewModel.indexInList(viewModel.number)
 
-        if (GlobalList.globalList[viewModel.index!!].isNew) {
+        if (globalList[viewModel.index!!].isNew) {
             cancelNotification()
         }
 
-        GlobalList.globalList[viewModel.index!!].isNew = false
+        globalList[viewModel.index!!].isNew = false
 
 
         if (viewModel.isInCache(viewModel.number)) {
-            titleHolder.text = GlobalList.globalList[viewModel.index!!].title
-            val srcBmp = GlobalList.globalList[viewModel.index!!].bitmap!!
+            viewModel.comicListItem = globalList[viewModel.index!!]
+            titleHolder.text = globalList[viewModel.index!!].title
+            val srcBmp = globalList[viewModel.index!!].bitmap!!
             val dstBmp = Bitmap.createScaledBitmap(
                 srcBmp,
                 srcBmp.width * 3,
@@ -77,7 +77,7 @@ class DetailFragment : Fragment() {
                 true
             )
             (imageHolder as SubsamplingScaleImageView).setImage(ImageSource.bitmap(dstBmp))
-            altHolder.text = GlobalList.globalList[viewModel.index!!].alt
+            altHolder.text = globalList[viewModel.index!!].alt
             progBarHolder.visibility = View.GONE
             cachedPostIsInitialized = true
         } else {
@@ -101,16 +101,19 @@ class DetailFragment : Fragment() {
         heartHolder.setOnClickListener {
             if (requireContext().isInternetAvailable()) {
                 if (cachedPostIsInitialized || internetPostInitialized) {
-                    if (!GlobalList.globalList[viewModel.index!!].isFavourite) {
-                        GlobalList.globalList[viewModel.index!!].isFavourite = true
-                        viewModel.comicListItem!!.isFavourite = true
-                        viewModel.saveComicListItem(viewModel.comicListItem!!)
+                    if (!globalList[viewModel.index!!].isFavourite) {
+                       globalList[viewModel.index!!].isFavourite = true
+                        val item = createItem(true)
+                        viewModel.saveComicListItem(item)
                         heartHolder.setImageDrawable(heart)
                     } else {
-                        GlobalList.globalList[viewModel.index!!].isFavourite = false
+                        cachedPostIsInitialized = false //så att det är omöjligt att trycka tillbaka knappen innan den har skapats,sparats
+                        val item = createItem(false)
+                        globalList[viewModel.index!!].isFavourite = false
+                        viewModel.saveComicListItem(item)
                         heartHolder.setImageDrawable(emptyHeart)
-                        viewModel.comicListItem!!.isFavourite = false
-                        viewModel.saveComicListItem(viewModel.comicListItem!!)
+                        cachedPostIsInitialized = true
+
                     }
                 }
             } else {
@@ -184,8 +187,8 @@ class DetailFragment : Fragment() {
     }
 
     private fun cancelNotification() {
-        GlobalList.globalList[viewModel.index!!].isNew = false
-        val item = GlobalList.globalList.find { it.isNew }
+        globalList[viewModel.index!!].isNew = false
+        val item = globalList.find { it.isNew }
         //cancel notification, but only if there are no unseen items left
         if (item == null) {
             val notificationManager =
@@ -194,21 +197,33 @@ class DetailFragment : Fragment() {
         }
     }
 
+    private fun createItem(isFav:Boolean): ComicListItem{
+        viewModel.comicListItem = ComicListItem(
+            globalList[viewModel.index!!].title,
+                    globalList[viewModel.index!!].id,
+                    globalList[viewModel.index!!].date,
+                    globalList[viewModel.index!!].alt,
+                    globalList[viewModel.index!!].bitmap,
+                    isFav,
+                    globalList[viewModel.index!!].isNew
+        )
+        return viewModel.comicListItem!!
+    }
+
     private fun subscribeToFinishedBitmap() {
         viewModel.bitmap.observe(viewLifecycleOwner) {
 
             viewModel.comicListItem = ComicListItem(
                 viewModel.postDtoFromInternet!!.title,
                 viewModel.postDtoFromInternet!!.num,
-                GlobalList.globalList[viewModel.index!!].date,
+                globalList[viewModel.index!!].date,
                 viewModel.postDtoFromInternet!!.alt,
                 it,
-                GlobalList.globalList[viewModel.index!!].isFavourite,
-                GlobalList.globalList[viewModel.index!!].isNew,
-                GlobalList.globalList[viewModel.index!!].isRead
+                globalList[viewModel.index!!].isFavourite,
+                globalList[viewModel.index!!].isNew,
             )
             viewModel.saveComicListItem(viewModel.comicListItem!!)
-            GlobalList.globalList[viewModel.index!!] = viewModel.comicListItem!!
+            globalList[viewModel.index!!] = viewModel.comicListItem!!
             internetPostInitialized = true
         }
     }
@@ -225,5 +240,4 @@ class DetailFragment : Fragment() {
         val temp = activity as AppCompatActivity
         temp.supportActionBar?.hide()
     }
-
 }

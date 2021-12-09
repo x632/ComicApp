@@ -89,7 +89,6 @@ object ScrapingFunctions {
                     bitmap = null,
                     isFavourite = false,
                     isNew = false,
-                    isRead = false,
                 )
             finalList.add(listItem)
         }

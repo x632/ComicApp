@@ -19,7 +19,7 @@ class Converters {
     fun fromBitmap(bmp: Bitmap?) : ByteArray?{
         return if(bmp!=null){
             val outputStream = ByteArrayOutputStream()
-            bmp?.compress(Bitmap.CompressFormat.PNG,100, outputStream)
+            bmp.compress(Bitmap.CompressFormat.PNG,100, outputStream)
             outputStream.toByteArray()
         }else null
     }

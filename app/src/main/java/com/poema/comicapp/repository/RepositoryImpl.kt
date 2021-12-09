@@ -23,7 +23,7 @@ class RepositoryImpl @Inject constructor(
 
     override fun observeCache() = localDataSource.comicDao.observeComicListItems()
 
-    override suspend fun saveFavorite(comicListItem: ComicListItem) = localDataSource.comicDao.insert(comicListItem)
+    override suspend fun saveComicListItem(comicListItem: ComicListItem) = localDataSource.comicDao.insert(comicListItem)
 
     override suspend fun getComicPost(id: Int) = remoteDataSource.api.getComicPost(id)
 
@@ -45,4 +45,6 @@ class RepositoryImpl @Inject constructor(
         imageStream.close()
         return bitmap
     }
+
+    override suspend fun findComicListItemById(id:Int): ComicListItem = localDataSource.comicDao.findComicListItemById(id)
 }

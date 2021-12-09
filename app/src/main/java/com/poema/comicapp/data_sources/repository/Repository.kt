@@ -17,9 +17,11 @@ interface Repository {
 
     fun observeCache() : Flow<List<ComicListItem>>
 
-    suspend fun saveFavorite(comicListItem: ComicListItem): Long
+    suspend fun saveComicListItem(comicListItem: ComicListItem): Long
 
     fun getBitMap(url: String): Bitmap
+
+    suspend fun findComicListItemById(id:Int) : ComicListItem
 
 
 }
