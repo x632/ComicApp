@@ -101,20 +101,28 @@ class DetailFragment : Fragment() {
 
         heartHolder.setOnClickListener {
             if (requireContext().isInternetAvailable()) {
-                if (cachedPostIsInitialized || internetPostInitialized) {
-                    if (!globalList[viewModel.index!!].isFavourite) {
-                       globalList[viewModel.index!!].isFavourite = true
-                        val item = createItem(true)
-                        viewModel.saveComicListItem(item)
-                        heartHolder.setImageDrawable(heart)
-                        savingIsDone = true
-                    } else {
-                        savingIsDone = false
-                        val item = createItem(false)
-                        globalList[viewModel.index!!].isFavourite = false
-                        viewModel.saveComicListItem(item)
-                        subscribeToSaveIsDone()
-                        heartHolder.setImageDrawable(emptyHeart)
+                if(savingIsDone) {
+                    if (cachedPostIsInitialized || internetPostInitialized) {
+
+                        if (!globalList[viewModel.index!!].isFavourite) {
+                            heartHolder.setImageDrawable(heart)
+                            progBarHolder.visibility = View.VISIBLE
+                            savingIsDone = false
+                            globalList[viewModel.index!!].isFavourite = true
+                            val item = createItem(true)
+                            viewModel.saveComicListItem(item)
+                            subscribeToSaveIsDone()
+
+                        } else {
+                            heartHolder.setImageDrawable(emptyHeart)
+                            progBarHolder.visibility = View.VISIBLE
+                            savingIsDone = false
+                            val item = createItem(false)
+                            globalList[viewModel.index!!].isFavourite = false
+                            viewModel.saveComicListItem(item)
+                            subscribeToSaveIsDone()
+
+                        }
                     }
                 }
             } else {
@@ -158,6 +166,7 @@ class DetailFragment : Fragment() {
     private fun subscribeToSaveIsDone(){
         viewModel.savingListItemFinished.observe(viewLifecycleOwner,{
             savingIsDone = it
+            if(it)progBarHolder.visibility = View.GONE
         })
     }
 
@@ -215,6 +224,7 @@ class DetailFragment : Fragment() {
                     isFav,
                     globalList[viewModel.index!!].isNew
         )
+        globalList[viewModel.index!!]= viewModel.comicListItem!!
         return viewModel.comicListItem!!
     }
 

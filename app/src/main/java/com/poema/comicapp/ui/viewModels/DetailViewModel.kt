@@ -47,7 +47,7 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
             var returnValue = 0L
             _savingListItemFinished.value = false
             returnValue = repository.saveComicListItem(comicListItem)
-            delay(400)
+            delay(500)
             if(returnValue>0){_savingListItemFinished.value = true}
         }
     }
