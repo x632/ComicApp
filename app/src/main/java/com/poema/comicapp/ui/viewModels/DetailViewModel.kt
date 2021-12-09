@@ -24,11 +24,14 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     private val _bitmap = MutableLiveData<Bitmap>()
     val bitmap: LiveData<Bitmap> = _bitmap
 
+    private val _savingListItemFinished: MutableLiveData<Boolean> = MutableLiveData(false)
+    val savingListItemFinished = _savingListItemFinished
 
     var number = 0
     var comicListItem: ComicListItem? = null
     var postDtoFromInternet: ComicPostDto? = null
     var index: Int? = null
+
 
 
     fun getComicPost(postNumber: Int) {
@@ -41,7 +44,11 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun saveComicListItem(comicListItem: ComicListItem) {
         viewModelScope.launch {
-            repository.saveComicListItem(comicListItem)
+            var returnValue = 0L
+            _savingListItemFinished.value = false
+            returnValue = repository.saveComicListItem(comicListItem)
+            delay(400)
+            if(returnValue>0){_savingListItemFinished.value = true}
         }
     }
 

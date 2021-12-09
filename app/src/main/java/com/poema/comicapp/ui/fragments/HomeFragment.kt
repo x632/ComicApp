@@ -155,7 +155,6 @@ class HomeFragment : Fragment(
             editor.apply()
         } else {
             val oldAmountOfPosts = prefsClass.getOldAmount()
-            println("!!! oldAmount = $oldAmountOfPosts")
             val amountOfNewPosts = list.size - oldAmountOfPosts
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {

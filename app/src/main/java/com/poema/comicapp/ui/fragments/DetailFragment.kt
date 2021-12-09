@@ -40,7 +40,8 @@ class DetailFragment : Fragment() {
     private val args: DetailFragmentArgs by navArgs()
     private var cachedPostIsInitialized = false
     private var internetPostInitialized = false
-
+    private var savingIsDone = true
+    private var letBackButtonPass = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -106,14 +107,14 @@ class DetailFragment : Fragment() {
                         val item = createItem(true)
                         viewModel.saveComicListItem(item)
                         heartHolder.setImageDrawable(heart)
+                        savingIsDone = true
                     } else {
-                        cachedPostIsInitialized = false //så att det är omöjligt att trycka tillbaka knappen innan den har skapats,sparats
+                        savingIsDone = false
                         val item = createItem(false)
                         globalList[viewModel.index!!].isFavourite = false
                         viewModel.saveComicListItem(item)
+                        subscribeToSaveIsDone()
                         heartHolder.setImageDrawable(emptyHeart)
-                        cachedPostIsInitialized = true
-
                     }
                 }
             } else {
@@ -142,7 +143,8 @@ class DetailFragment : Fragment() {
             true
         ) {
             override fun handleOnBackPressed() {
-               if(internetPostInitialized || cachedPostIsInitialized || activity?.isInternetAvailable() == false) {
+                if (cachedPostIsInitialized || internetPostInitialized ||  activity?.isInternetAvailable() == false) letBackButtonPass = true
+               if(savingIsDone && letBackButtonPass) {
                        Navigation.findNavController(altHolder).popBackStack()
                }
             }
@@ -151,6 +153,12 @@ class DetailFragment : Fragment() {
             this,
             callback
         )
+    }
+
+    private fun subscribeToSaveIsDone(){
+        viewModel.savingListItemFinished.observe(viewLifecycleOwner,{
+            savingIsDone = it
+        })
     }
 
     private fun observeComicPostResponse() {
