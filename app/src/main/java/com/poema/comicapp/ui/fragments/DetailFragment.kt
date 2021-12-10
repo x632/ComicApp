@@ -41,7 +41,7 @@ class DetailFragment : Fragment() {
     private var cachedPostIsInitialized = false
     private var internetPostInitialized = false
     private var savingIsDone = true
-    private var letBackButtonPass = false
+    private var notToggled = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,7 +84,7 @@ class DetailFragment : Fragment() {
         } else {
             if (activity?.isInternetAvailable()!!) {
                 viewModel.getComicPost(viewModel.number)
-            }else{
+            } else {
                 showToast("Please check your internet connection! This comic has not yet been cached. ")
             }
         }
@@ -101,26 +101,26 @@ class DetailFragment : Fragment() {
 
         heartHolder.setOnClickListener {
             if (requireContext().isInternetAvailable()) {
-                //if(savingIsDone) {
-                    if (cachedPostIsInitialized || internetPostInitialized) {
-                        if (!globalList[viewModel.index!!].isFavourite) {
-                            savingIsDone = false
-                            progBarHolder.visibility = View.VISIBLE
-                            heartHolder.setImageDrawable(heart)
-                            globalList[viewModel.index!!].isFavourite = true
-                            val item = viewModel.createItem(true)
-                            viewModel.updateComicListItem(item)
+                notToggled = false
+                if (cachedPostIsInitialized || internetPostInitialized) {
+                    if (!globalList[viewModel.index!!].isFavourite) {
+                        savingIsDone = false
+                        progBarHolder.visibility = View.VISIBLE
+                        heartHolder.setImageDrawable(heart)
+                        globalList[viewModel.index!!].isFavourite = true
+                        val item = viewModel.createItem(true)
+                        viewModel.updateComicListItem(item)
 
-                        } else {
-                            savingIsDone = false
-                            progBarHolder.visibility= View.VISIBLE
-                            heartHolder.setImageDrawable(emptyHeart)
-                            globalList[viewModel.index!!].isFavourite = false
-                            val item = viewModel.createItem(false)
-                            viewModel.updateComicListItem(item)
-                        }
+                    } else {
+                        savingIsDone = false
+                        progBarHolder.visibility = View.VISIBLE
+                        heartHolder.setImageDrawable(emptyHeart)
+                        globalList[viewModel.index!!].isFavourite = false
+                        val item = viewModel.createItem(false)
+                        viewModel.updateComicListItem(item)
                     }
-                //}
+                }
+
             } else {
                 showToast("You can only alter your favorites when there is an internet connection. Please check your connection!")
             }
@@ -147,10 +147,10 @@ class DetailFragment : Fragment() {
             true
         ) {
             override fun handleOnBackPressed() {
-                if (cachedPostIsInitialized || internetPostInitialized ||  activity?.isInternetAvailable() == false) letBackButtonPass = true
-               if(savingIsDone && letBackButtonPass) {
-                       Navigation.findNavController(altHolder).popBackStack()
-               }
+                if (cachedPostIsInitialized || internetPostInitialized || activity?.isInternetAvailable() == false)
+                if (savingIsDone || notToggled) {
+                    Navigation.findNavController(altHolder).popBackStack()
+                }
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -159,10 +159,10 @@ class DetailFragment : Fragment() {
         )
     }
 
-    private fun subscribeToSaveIsDone(){
-        viewModel.savingListItemFinished.observe(viewLifecycleOwner,{
+    private fun subscribeToSaveIsDone() {
+        viewModel.savingListItemFinished.observe(viewLifecycleOwner, {
             savingIsDone = it
-            if(it)progBarHolder.visibility = View.GONE
+            if (it) progBarHolder.visibility = View.GONE
         })
     }
 
