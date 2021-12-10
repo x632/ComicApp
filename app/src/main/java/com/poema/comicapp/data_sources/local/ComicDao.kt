@@ -24,4 +24,7 @@ interface ComicDao {
     @Query("SELECT * FROM comicListItems ORDER BY id DESC")
     suspend fun getComicListItems(): List<ComicListItem>
 
+    @Query("UPDATE comicListItems SET isFavourite =:isFav WHERE id = :id")
+    suspend fun update(isFav: Boolean,id: Int ):Int
+
 }

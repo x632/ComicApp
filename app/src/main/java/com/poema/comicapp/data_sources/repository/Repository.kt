@@ -23,6 +23,7 @@ interface Repository {
 
     suspend fun findComicListItemById(id:Int) : ComicListItem
 
+    suspend fun update(isFav:Boolean,id: Int):Int
 
 }
 

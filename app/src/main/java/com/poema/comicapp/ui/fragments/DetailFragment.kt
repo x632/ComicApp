@@ -66,7 +66,7 @@ class DetailFragment : Fragment() {
 
         globalList[viewModel.index!!].isNew = false
 
-
+        subscribeToSaveIsDone()
         if (viewModel.isInCache(viewModel.number)) {
             viewModel.comicListItem = globalList[viewModel.index!!]
             titleHolder.text = globalList[viewModel.index!!].title
@@ -101,30 +101,27 @@ class DetailFragment : Fragment() {
 
         heartHolder.setOnClickListener {
             if (requireContext().isInternetAvailable()) {
-                if(savingIsDone) {
+                //if(savingIsDone) {
                     if (cachedPostIsInitialized || internetPostInitialized) {
-
                         if (!globalList[viewModel.index!!].isFavourite) {
-                            heartHolder.setImageDrawable(heart)
-                            progBarHolder.visibility = View.VISIBLE
                             savingIsDone = false
+                            progBarHolder.visibility = View.VISIBLE
+                            heartHolder.setImageDrawable(heart)
                             globalList[viewModel.index!!].isFavourite = true
-                            val item = createItem(true)
-                            viewModel.saveComicListItem(item)
-                            subscribeToSaveIsDone()
+                            val item = viewModel.createItem(true)
+                            viewModel.updateComicListItem(item)
 
                         } else {
-                            heartHolder.setImageDrawable(emptyHeart)
-                            progBarHolder.visibility = View.VISIBLE
                             savingIsDone = false
-                            val item = createItem(false)
+                            println("!!! BBEEEEENNN HHHEEERREEE!")
+                            progBarHolder.visibility= View.VISIBLE
+                            heartHolder.setImageDrawable(emptyHeart)
                             globalList[viewModel.index!!].isFavourite = false
-                            viewModel.saveComicListItem(item)
-                            subscribeToSaveIsDone()
-
+                            val item = viewModel.createItem(false)
+                            viewModel.updateComicListItem(item)
                         }
                     }
-                }
+                //}
             } else {
                 showToast("You can only alter your favorites when there is an internet connection. Please check your connection!")
             }
@@ -166,6 +163,7 @@ class DetailFragment : Fragment() {
     private fun subscribeToSaveIsDone(){
         viewModel.savingListItemFinished.observe(viewLifecycleOwner,{
             savingIsDone = it
+            println("!!! observer värdet är: $it")
             if(it)progBarHolder.visibility = View.GONE
         })
     }
@@ -214,19 +212,6 @@ class DetailFragment : Fragment() {
         }
     }
 
-    private fun createItem(isFav:Boolean): ComicListItem{
-        viewModel.comicListItem = ComicListItem(
-            globalList[viewModel.index!!].title,
-                    globalList[viewModel.index!!].id,
-                    globalList[viewModel.index!!].date,
-                    globalList[viewModel.index!!].alt,
-                    globalList[viewModel.index!!].bitmap,
-                    isFav,
-                    globalList[viewModel.index!!].isNew
-        )
-        globalList[viewModel.index!!]= viewModel.comicListItem!!
-        return viewModel.comicListItem!!
-    }
 
     private fun subscribeToFinishedBitmap() {
         viewModel.bitmap.observe(viewLifecycleOwner) {

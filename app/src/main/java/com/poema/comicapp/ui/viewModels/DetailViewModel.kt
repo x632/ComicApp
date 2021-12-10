@@ -5,15 +5,12 @@ import androidx.lifecycle.*
 import com.poema.comicapp.data_sources.model.*
 import com.poema.comicapp.data_sources.repository.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 import com.poema.comicapp.data_sources.model.GlobalList.globalList
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
@@ -31,7 +28,7 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     var comicListItem: ComicListItem? = null
     var postDtoFromInternet: ComicPostDto? = null
     var index: Int? = null
-
+    private var job1 : Job? = null
 
 
     fun getComicPost(postNumber: Int) {
@@ -44,10 +41,19 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun saveComicListItem(comicListItem: ComicListItem) {
         viewModelScope.launch {
-            var returnValue = 0L
+            repository.saveComicListItem(comicListItem)
+        }
+    }
+
+    fun updateComicListItem(comicListItem: ComicListItem){
+
+        job1?.cancel()
+        job1 = viewModelScope.launch{
+            var returnValue = 0
             _savingListItemFinished.value = false
-            returnValue = repository.saveComicListItem(comicListItem)
-            delay(500)
+            returnValue = repository.update(comicListItem.isFavourite, comicListItem.id)
+            println("!!! Number of affected posts :$returnValue")
+            delay(700)
             if(returnValue>0){_savingListItemFinished.value = true}
         }
     }
@@ -83,6 +89,20 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
             comicListItem = it
         }
         return temp
+    }
+
+    fun createItem(isFav:Boolean): ComicListItem{
+        comicListItem = ComicListItem(
+            globalList[index!!].title,
+            globalList[index!!].id,
+            globalList[index!!].date,
+            globalList[index!!].alt,
+            globalList[index!!].bitmap,
+            isFav,
+            globalList[index!!].isNew
+        )
+        globalList[index!!]= comicListItem!!
+        return comicListItem!!
     }
 }
 

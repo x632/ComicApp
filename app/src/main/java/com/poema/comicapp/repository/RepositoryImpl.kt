@@ -47,4 +47,7 @@ class RepositoryImpl @Inject constructor(
     }
 
     override suspend fun findComicListItemById(id:Int): ComicListItem = localDataSource.comicDao.findComicListItemById(id)
+
+    override suspend fun update(isFav: Boolean, id: Int) = localDataSource.comicDao.update(isFav, id)
+
 }

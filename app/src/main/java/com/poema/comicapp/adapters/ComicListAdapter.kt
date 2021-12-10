@@ -44,6 +44,11 @@ class ComicListAdapter(private val context: Context) :
         } else {
             holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_24)
         }
+        //upprepning eftersom den ibland inte uppdaterar
+        if(!comicListItem.isFavourite){
+            holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_border_24)
+        }
+
         if (comicListItem.isNew) holder.ivNew.visibility =
             View.VISIBLE
         else holder.ivNew.visibility = View.GONE

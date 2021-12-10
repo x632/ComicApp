@@ -107,7 +107,7 @@ class HomeFragment : Fragment(
             globalList = it as MutableList<ComicListItem>
             viewModel.cacheList = it
             viewModel.setFavorite()
-            comicAdapter?.submitList(globalList)
+            comicAdapter!!.submitList(globalList)
             if(viewModel.showFavorites) {
                     comicAdapter!!.submitList(viewModel.favoritesList)
                 }
@@ -115,24 +115,25 @@ class HomeFragment : Fragment(
            if(requireContext().isInternetAvailable()){
                 subscribeToScrapeData()
             }
+            println("!!! OBSERVE KÖRS!")
         })
     }
 
     private fun subscribeToScrapeData() {
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
-
             globalList = it as MutableList<ComicListItem>
             tempSearchList = it
+            viewModel.setFavorite()
             checkForNewItems(it)
             setHasRanBefore()
             viewModel.setBitMap()
-            viewModel.setFavorite()
             prefsClass.saveOldAmount(globalList.size)
             progBar.visibility = View.GONE
-            comicAdapter?.submitList(globalList)
+            comicAdapter!!.submitList(globalList)
             if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
+            println("!!! SUBSCRIBE KÖRS!")
         })
     }
 
