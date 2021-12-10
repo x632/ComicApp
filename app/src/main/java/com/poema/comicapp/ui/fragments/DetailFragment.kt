@@ -113,7 +113,6 @@ class DetailFragment : Fragment() {
 
                         } else {
                             savingIsDone = false
-                            println("!!! BBEEEEENNN HHHEEERREEE!")
                             progBarHolder.visibility= View.VISIBLE
                             heartHolder.setImageDrawable(emptyHeart)
                             globalList[viewModel.index!!].isFavourite = false
@@ -163,7 +162,6 @@ class DetailFragment : Fragment() {
     private fun subscribeToSaveIsDone(){
         viewModel.savingListItemFinished.observe(viewLifecycleOwner,{
             savingIsDone = it
-            println("!!! observer värdet är: $it")
             if(it)progBarHolder.visibility = View.GONE
         })
     }

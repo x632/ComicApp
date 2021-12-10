@@ -115,7 +115,6 @@ class HomeFragment : Fragment(
            if(requireContext().isInternetAvailable()){
                 subscribeToScrapeData()
             }
-            println("!!! OBSERVE KÖRS!")
         })
     }
 
@@ -133,7 +132,6 @@ class HomeFragment : Fragment(
             if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
-            println("!!! SUBSCRIBE KÖRS!")
         })
     }
 
@@ -160,7 +158,6 @@ class HomeFragment : Fragment(
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {
                     globalList[index].isNew = true
-                    println("!!! Setting item to true")
                 }
                 comicAdapter?.submitList(globalList)
             }

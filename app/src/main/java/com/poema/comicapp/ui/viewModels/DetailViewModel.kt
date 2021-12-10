@@ -52,7 +52,6 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
             var returnValue = 0
             _savingListItemFinished.value = false
             returnValue = repository.update(comicListItem.isFavourite, comicListItem.id)
-            println("!!! Number of affected posts :$returnValue")
             delay(700)
             if(returnValue>0){_savingListItemFinished.value = true}
         }
