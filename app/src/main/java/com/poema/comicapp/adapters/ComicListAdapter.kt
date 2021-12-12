@@ -16,6 +16,7 @@ import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.poema.comicapp.databinding.ComicItemLayoutBinding
 import com.poema.comicapp.ui.fragments.HomeFragmentDirections
 
 
@@ -25,38 +26,14 @@ class ComicListAdapter(private val context: Context) :
     private lateinit var comicList: List<ComicListItem>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComicItemViewHolder {
-        return ComicItemViewHolder(
-            LayoutInflater.from(context).inflate(layout.comic_item_layout, parent, false)
-        )
+
+        val layoutInflater = LayoutInflater.from(context)
+        val comicItemLayoutBinding = ComicItemLayoutBinding.inflate(layoutInflater, parent, false)
+        return ComicItemViewHolder(comicItemLayoutBinding)
     }
 
     override fun onBindViewHolder(holder: ComicItemViewHolder, position: Int) {
-        val comicListItem = comicList[position]
-        holder.tv1.text = comicListItem.title
-        holder.tv2.text = comicListItem.date
-        holder.tv3.text = comicListItem.id.toString()
-        holder.itemView.setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(comicListItem.id)
-            Navigation.findNavController(it).navigate(action)
-        }
-        if (!comicListItem.isFavourite) {
-            holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_border_24)
-        } else {
-            holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_24)
-        }
-        //upprepning eftersom den ibland inte uppdaterar
-        if(!comicListItem.isFavourite){
-            holder.ivHeart.setImageResource(drawable.ic_baseline_favorite_border_24)
-        }
-
-        if (comicListItem.isNew) holder.ivNew.visibility =
-            View.VISIBLE
-        else holder.ivNew.visibility = View.GONE
-        if (comicListItem.bitmap != null){
-          holder.bitmap.setImageBitmap(comicListItem.bitmap)
-        } else {
-            holder.bitmap.setImageResource(drawable.ic_launcher_foreground2)
-        }
+        holder.bind(comicList[position])
     }
 
     override fun getItemCount(): Int {
@@ -68,13 +45,16 @@ class ComicListAdapter(private val context: Context) :
         notifyDataSetChanged()
     }
 
+    inner class ComicItemViewHolder(private val binding: ComicItemLayoutBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: ComicListItem) {
+            binding.comicListItem = item
+            binding.executePendingBindings()
+            binding.root.setOnClickListener {
+                val action = HomeFragmentDirections.actionHomeFragmentToDetailFragment(item.id)
+                Navigation.findNavController(it).navigate(action)
+            }
 
-    inner class ComicItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tv1: TextView = itemView.findViewById(id.tvTitle)
-        val tv2: TextView = itemView.findViewById(id.tvDate)
-        val tv3: TextView = itemView.findViewById(id.tvNumber)
-        val ivHeart: ImageView = itemView.findViewById(id.iv_heart)
-        val ivNew: ImageView = itemView.findViewById(id.ivNew)
-        val bitmap : ImageView = itemView.findViewById(id.bitmap)
+        }
     }
 }

@@ -147,9 +147,10 @@ class DetailFragment : Fragment() {
             true
         ) {
             override fun handleOnBackPressed() {
-                if (cachedPostIsInitialized || internetPostInitialized || activity?.isInternetAvailable() == false)
-                if (savingIsDone || notToggled) {
-                    Navigation.findNavController(altHolder).popBackStack()
+                if (cachedPostIsInitialized || internetPostInitialized || activity?.isInternetAvailable() == false) {
+                    if (savingIsDone || notToggled) {
+                        Navigation.findNavController(altHolder).popBackStack()
+                    }
                 }
             }
         }

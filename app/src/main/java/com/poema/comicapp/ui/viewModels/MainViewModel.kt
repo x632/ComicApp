@@ -67,6 +67,8 @@ constructor(private val repository: Repository) : ViewModel() {
             val list: List<ComicListItem>? = repository.getArchive()
             withContext(Main) {
                 _onlineComicList.value = list!!
+                setBitMap()
+                setFavorite()
             }
         }
     }

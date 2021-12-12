@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+   <data>
+       <variable
+         name="comicListItem"
+         type="com.poema.comicapp.data_sources.model.ComicListItem"
+       />
+    </data>
+
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -20,7 +29,7 @@
             android:layout_width="215dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="TextView"
+            android:text="@{comicListItem.title}"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
             android:textSize="13sp"
@@ -33,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="17dp"
             android:layout_marginEnd="8dp"
-            android:text="TextView"
+            android:text="@{comicListItem.date}"
             android:textColor="#FFFFFF"
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="@+id/bitmap"
@@ -46,13 +55,14 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:text="TextView"
+            android:text="@{String.valueOf(comicListItem.id)}"
             android:textColor="#FFFFFF"
             android:textSize="11sp"
             app:layout_constraintBottom_toTopOf="@+id/tvDate"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <ImageView
+            android:setHeart="@{comicListItem.isFavourite}"
             android:id="@+id/iv_heart"
             android:layout_width="19dp"
             android:layout_height="19dp"
@@ -63,6 +73,7 @@
             app:srcCompat="@drawable/ic_baseline_favorite_24" />
 
         <ImageView
+            android:setIsNew="@{comicListItem.isNew}"
             android:id="@+id/ivNew"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -77,6 +88,7 @@
 
 
         <ImageView
+            android:setBitmap="@{comicListItem}"
             android:id="@+id/bitmap"
             android:layout_width="79dp"
             android:layout_height="84dp"
@@ -94,3 +106,4 @@
 
 </androidx.cardview.widget.CardView>
 
+</layout>

@@ -38,7 +38,8 @@ import javax.inject.Inject
 class HomeFragment : Fragment(
 
 ) {
-@Inject lateinit var prefsClass : UserPreferences
+    @Inject
+    lateinit var prefsClass: UserPreferences
 
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: FragmentHomeBinding
@@ -46,7 +47,7 @@ class HomeFragment : Fragment(
     private lateinit var tempSearchList: MutableList<ComicListItem>
     private lateinit var recycler: RecyclerView
     private lateinit var progBar: ProgressBar
-    private var favButtonView : MenuItem? = null
+    private var favButtonView: MenuItem? = null
 
 
     override fun onCreateView(
@@ -104,16 +105,14 @@ class HomeFragment : Fragment(
 
     private fun observeCache() {
         viewModel.offlineComicList.observe(viewLifecycleOwner, {
-            globalList = it as MutableList<ComicListItem>
-            viewModel.cacheList = it
+            viewModel.cacheList = it as MutableList<ComicListItem>
             viewModel.setFavorite()
+            viewModel.setBitMap()
             comicAdapter!!.submitList(globalList)
-            if(viewModel.showFavorites) {
-                    comicAdapter!!.submitList(viewModel.favoritesList)
-                }
             progBar.visibility = View.GONE
-           if(requireContext().isInternetAvailable()){
-                subscribeToScrapeData()
+            println("!!! Observe körs!")
+            if (viewModel.showFavorites) {
+                comicAdapter!!.submitList(viewModel.favoritesList)
             }
         })
     }
@@ -122,39 +121,45 @@ class HomeFragment : Fragment(
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
             globalList = it as MutableList<ComicListItem>
             tempSearchList = it
-            viewModel.setFavorite()
-            checkForNewItems(it)
-            setHasRanBefore()
             viewModel.setBitMap()
-            prefsClass.saveOldAmount(globalList.size)
+            viewModel.setFavorite()
+            if (context!!.isInternetAvailable()) {
+                prefsClass.saveOldAmount(globalList.size)
+                checkForNewItems()
+                setHasRanBefore()
+            }
             progBar.visibility = View.GONE
             comicAdapter!!.submitList(globalList)
             if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
+            println("!!! Scrape körs!")
         })
     }
 
-    private fun setHasRanBefore(){
+    private fun setHasRanBefore() {
         val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
         val editor = preferences?.edit()
         editor?.putBoolean("RanBefore", true)
         editor?.apply()
     }
 
-    private fun checkForNewItems(list: MutableList<ComicListItem>) {
+    private fun checkForNewItems() {
         //makes sure it does not put a "new-icon" on all 2500 comics the first time app installs
         //once they all have been loaded once, it will create icons for newly created ones.
         //
         val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
         val ranBefore = preferences?.getBoolean("RanBefore", false)
+        //println("!!! RANBEFORE = $ranBefore ")
         if (!ranBefore!!) {
             val editor = preferences.edit()
             editor!!.putBoolean("RanBefore", true)
             editor.apply()
         } else {
             val oldAmountOfPosts = prefsClass.getOldAmount()
-            val amountOfNewPosts = list.size - oldAmountOfPosts
+            //println("!!! Amount of oldPosts = $oldAmountOfPosts ")
+            val amountOfNewPosts = globalList.size - oldAmountOfPosts
+            //println("!!! Amount of new post = $amountOfNewPosts ")
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {
                     globalList[index].isNew = true
@@ -191,8 +196,7 @@ class HomeFragment : Fragment(
                             }
                         }
                         comicAdapter?.submitList(tempSearchList)
-                    }
-                    else if (text.isNotEmpty()) {
+                    } else if (text.isNotEmpty()) {
                         globalList.forEach { item2 ->
                             if (item2.title.lowercase(Locale.getDefault())
                                     .contains(text)
@@ -226,12 +230,12 @@ class HomeFragment : Fragment(
                 }
             }
             R.id.update -> {
-                if(requireContext().isInternetAvailable()){
+                if (requireContext().isInternetAvailable()) {
                     progBar.visibility = View.VISIBLE
                     viewModel.reloadData()
                     viewModel.showFavorites = false
                     favButtonView?.setIcon(R.drawable.grey_border_heart)
-                }else showToast("Currently there is no internet connection. You cannot reload data. Please check your connection!")
+                } else showToast("Currently there is no internet connection. You cannot reload data. Please check your connection!")
             }
         }
         return super.onOptionsItemSelected(item)
@@ -247,7 +251,7 @@ class HomeFragment : Fragment(
     override fun onResume() {
         super.onResume()
         val temp = activity as AppCompatActivity
-        temp.apply{
+        temp.apply {
             supportActionBar?.setDisplayHomeAsUpEnabled(false)
             supportActionBar?.setDisplayShowTitleEnabled(true)
             supportActionBar?.show()

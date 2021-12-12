@@ -16,7 +16,10 @@ import com.poema.comicapp.other.Constants
 import com.poema.comicapp.other.Constants.CHANNEL_ID
 import com.poema.comicapp.other.Constants.NOTIFICATION_ID
 import com.poema.comicapp.other.ScrapingFunctions
+import com.poema.comicapp.other.UserPreferences
+import com.poema.comicapp.other.UserPreferencesImpl
 import com.poema.comicapp.ui.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,9 +27,11 @@ import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class NewComicsJobService : JobService() {
+    @Inject lateinit var prefs: UserPreferences
 
     private var job1: CompletableJob? = null
 
@@ -40,9 +45,7 @@ class NewComicsJobService : JobService() {
         job1 = Job()
         CoroutineScope(Dispatchers.IO + job1!!).launch {
 
-            val prefs = applicationContext.getSharedPreferences("oldAmount",0)
-           // val prefs = PreferenceManager.getDefaultSharedPreferences(this@NewComicsJobService)
-            val oldAmountOfPosts = prefs.getInt("oldAmount", 0)
+            val oldAmountOfPosts = prefs.getOldAmount()
             val request = Request.Builder()
                 .url(Constants.ARCHIVE_URL)
                 .build()
