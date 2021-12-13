@@ -36,26 +36,17 @@ constructor(private val repository: Repository) : ViewModel() {
         }
     }
 
-    fun setFavorite() {
+    fun setBitMapAndFav() {
         favoritesList = mutableListOf()
-        for (index in 0 until cacheList.size) {
-            if (cacheList[index].isFavourite) {
-                for (item in globalList) {
-                    if (item.id == cacheList[index].id) {
-                        item.isFavourite = true
-                        favoritesList.add(item)
-                    }
-                }
-            }
-        }
-    }
-
-    fun setBitMap() {
         for (index in 0 until cacheList.size) {
             for (item in globalList) {
                 if (item.id == cacheList[index].id) {
                     item.bitmap = cacheList[index].bitmap
                     item.alt = cacheList[index].alt
+                    item.isFavourite = cacheList[index].isFavourite
+                    if (cacheList[index].isFavourite) {
+                        favoritesList.add(item)
+                    }
                 }
             }
 
@@ -67,8 +58,7 @@ constructor(private val repository: Repository) : ViewModel() {
             val list: List<ComicListItem>? = repository.getArchive()
             withContext(Main) {
                 _onlineComicList.value = list!!
-                setBitMap()
-                setFavorite()
+                setBitMapAndFav()
             }
         }
     }

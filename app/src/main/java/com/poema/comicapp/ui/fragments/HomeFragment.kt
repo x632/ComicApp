@@ -65,8 +65,8 @@ class HomeFragment : Fragment(
             progBar.visibility = View.VISIBLE
         }
         initializeRecycler()
-        observeCache()
         subscribeToScrapeData()
+        observeCache()
         return binding.root
     }
 
@@ -106,8 +106,7 @@ class HomeFragment : Fragment(
     private fun observeCache() {
         viewModel.offlineComicList.observe(viewLifecycleOwner, {
             viewModel.cacheList = it as MutableList<ComicListItem>
-            viewModel.setFavorite()
-            viewModel.setBitMap()
+            viewModel.setBitMapAndFav()
             comicAdapter!!.submitList(globalList)
             progBar.visibility = View.GONE
             println("!!! Observe körs!")
@@ -121,27 +120,19 @@ class HomeFragment : Fragment(
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
             globalList = it as MutableList<ComicListItem>
             tempSearchList = it
-            viewModel.setBitMap()
-            viewModel.setFavorite()
+            viewModel.setBitMapAndFav()
             if (context!!.isInternetAvailable()) {
-                prefsClass.saveOldAmount(globalList.size)
                 checkForNewItems()
-                setHasRanBefore()
+                prefsClass.saveOldAmount(globalList.size)
+
             }
             progBar.visibility = View.GONE
             comicAdapter!!.submitList(globalList)
-            if (viewModel.showFavorites) {
+           if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
             println("!!! Scrape körs!")
         })
-    }
-
-    private fun setHasRanBefore() {
-        val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
-        val editor = preferences?.edit()
-        editor?.putBoolean("RanBefore", true)
-        editor?.apply()
     }
 
     private fun checkForNewItems() {
@@ -157,9 +148,9 @@ class HomeFragment : Fragment(
             editor.apply()
         } else {
             val oldAmountOfPosts = prefsClass.getOldAmount()
-            //println("!!! Amount of oldPosts = $oldAmountOfPosts ")
+            println("!!! Amount of oldPosts = $oldAmountOfPosts ")
             val amountOfNewPosts = globalList.size - oldAmountOfPosts
-            //println("!!! Amount of new post = $amountOfNewPosts ")
+            println("!!! Amount of new posts = $amountOfNewPosts ")
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {
                     globalList[index].isNew = true

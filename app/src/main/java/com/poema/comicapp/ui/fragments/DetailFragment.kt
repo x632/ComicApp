@@ -107,16 +107,16 @@ class DetailFragment : Fragment() {
                         savingIsDone = false
                         progBarHolder.visibility = View.VISIBLE
                         heartHolder.setImageDrawable(heart)
-                        globalList[viewModel.index!!].isFavourite = true
                         val item = viewModel.createItem(true)
+                        globalList[viewModel.index!!].isFavourite = true
                         viewModel.updateComicListItem(item)
 
                     } else {
                         savingIsDone = false
                         progBarHolder.visibility = View.VISIBLE
                         heartHolder.setImageDrawable(emptyHeart)
-                        globalList[viewModel.index!!].isFavourite = false
                         val item = viewModel.createItem(false)
+                        globalList[viewModel.index!!].isFavourite = false
                         viewModel.updateComicListItem(item)
                     }
                 }
@@ -147,10 +147,10 @@ class DetailFragment : Fragment() {
             true
         ) {
             override fun handleOnBackPressed() {
-                if (cachedPostIsInitialized || internetPostInitialized || activity?.isInternetAvailable() == false) {
+               if (cachedPostIsInitialized || internetPostInitialized || activity?.isInternetAvailable() == false) {
                     if (savingIsDone || notToggled) {
                         Navigation.findNavController(altHolder).popBackStack()
-                    }
+                   }
                 }
             }
         }
@@ -225,7 +225,6 @@ class DetailFragment : Fragment() {
                 globalList[viewModel.index!!].isNew,
             )
             viewModel.saveComicListItem(viewModel.comicListItem!!)
-            globalList[viewModel.index!!] = viewModel.comicListItem!!
             internetPostInitialized = true
         }
     }
