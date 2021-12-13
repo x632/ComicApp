@@ -109,7 +109,6 @@ class HomeFragment : Fragment(
             viewModel.setBitMapAndFav()
             comicAdapter!!.submitList(globalList)
             progBar.visibility = View.GONE
-            println("!!! Observe körs!")
             if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
@@ -131,26 +130,22 @@ class HomeFragment : Fragment(
            if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
-            println("!!! Scrape körs!")
         })
     }
 
     private fun checkForNewItems() {
         //makes sure it does not put a "new-icon" on all 2500 comics the first time app installs
-        //once they all have been loaded once, it will create icons for newly created ones.
+        //once they all have been loaded once, it will create show icons for newly created ones.
         //
         val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
         val ranBefore = preferences?.getBoolean("RanBefore", false)
-        //println("!!! RANBEFORE = $ranBefore ")
         if (!ranBefore!!) {
             val editor = preferences.edit()
             editor!!.putBoolean("RanBefore", true)
             editor.apply()
         } else {
             val oldAmountOfPosts = prefsClass.getOldAmount()
-            println("!!! Amount of oldPosts = $oldAmountOfPosts ")
             val amountOfNewPosts = globalList.size - oldAmountOfPosts
-            println("!!! Amount of new posts = $amountOfNewPosts ")
             if (amountOfNewPosts > 0) {
                 for (index in 0 until amountOfNewPosts) {
                     globalList[index].isNew = true
@@ -247,7 +242,6 @@ class HomeFragment : Fragment(
             supportActionBar?.setDisplayShowTitleEnabled(true)
             supportActionBar?.show()
         }
-
     }
 }
 

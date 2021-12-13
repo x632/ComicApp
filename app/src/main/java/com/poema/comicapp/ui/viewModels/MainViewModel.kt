@@ -1,6 +1,5 @@
 package com.poema.comicapp.ui.viewModels
 
-
 import androidx.lifecycle.*
 import com.poema.comicapp.data_sources.model.ComicListItem
 import com.poema.comicapp.data_sources.model.GlobalList

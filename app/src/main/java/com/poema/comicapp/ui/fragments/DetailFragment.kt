@@ -146,6 +146,7 @@ class DetailFragment : Fragment() {
         val callback: OnBackPressedCallback = object : OnBackPressedCallback(
             true
         ) {
+            //just makes sure everything is handled before you can go back.
             override fun handleOnBackPressed() {
                if (cachedPostIsInitialized || internetPostInitialized || activity?.isInternetAvailable() == false) {
                     if (savingIsDone || notToggled) {
