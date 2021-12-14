@@ -9,7 +9,7 @@ import retrofit2.Response
 
 interface Repository {
 
-    suspend fun getComicPost(id: Int): Response<ComicPostDto>
+    suspend fun getComicPostDto(id: Int): Response<ComicPostDto>
 
     suspend fun getArchive() : List<ComicListItem>?
 

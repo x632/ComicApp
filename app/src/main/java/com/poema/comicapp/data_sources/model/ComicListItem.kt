@@ -8,35 +8,31 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.poema.comicapp.R
 
+@BindingAdapter("android:setBitmap")
+fun setBitmap(imageView: ImageView, item: ComicListItem) {
+    if (item.bitmap != null) {
+        imageView.setImageBitmap(item.bitmap!!)
+    } else {
+        imageView.setImageResource(R.drawable.ic_launcher_foreground2)
+    }
+}
 
-    @BindingAdapter("android:setBitmap")
-    fun setBitmap(imageView: ImageView, item: ComicListItem) {
-        if (item.bitmap != null) {
-            imageView.setImageBitmap(item.bitmap!!)
-        } else {
-            imageView.setImageResource(R.drawable.ic_launcher_foreground2)
-        }
+@BindingAdapter("android:setHeart")
+fun setHeart(imageView: ImageView, isFavourite: Boolean) {
+    if (!isFavourite) {
+        imageView.setImageResource(R.drawable.ic_baseline_favorite_border_24)
+    } else {
+        imageView.setImageResource(R.drawable.ic_baseline_favorite_24)
     }
 
+}
 
-    @BindingAdapter("android:setHeart")
-    fun setHeart(imageView: ImageView, isFavourite: Boolean) {
-        if (!isFavourite) {
-            imageView.setImageResource(R.drawable.ic_baseline_favorite_border_24)
-        } else {
-            imageView.setImageResource(R.drawable.ic_baseline_favorite_24)
-        }
-
-    }
-
-
-    @BindingAdapter("android:setIsNew")
-    fun setIsNew(imageView: ImageView, isNew: Boolean) {
-        if (isNew) imageView.visibility =
-            View.VISIBLE
-        else imageView.visibility = View.GONE
-    }
-
+@BindingAdapter("android:setIsNew")
+fun setIsNew(imageView: ImageView, isNew: Boolean) {
+    if (isNew) imageView.visibility =
+        View.VISIBLE
+    else imageView.visibility = View.GONE
+}
 
 
 @Entity(tableName = "comicListItems")

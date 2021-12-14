@@ -23,7 +23,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -89,7 +88,8 @@ object AllDeps {
         comicDao: ComicDao,
         okHttpClient: OkHttpClient,
         requestBuilder: Request.Builder,
-        api: PostApi,
+        api: PostApi
+
     ): Repository {
         return RepositoryImpl(
             localDataSource = LocalDataSource(comicDao = comicDao),

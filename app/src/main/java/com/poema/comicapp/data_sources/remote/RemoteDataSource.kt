@@ -10,10 +10,11 @@ import javax.inject.Inject
 class RemoteDataSource @Inject constructor(
     private val client: OkHttpClient,
     private val req: Request.Builder,
-    val api: PostApi) {
+    val api: PostApi){
 
 
     fun getArchive(): Response? {
+
         return try {
             client.newCall(req.build()).execute()
 
@@ -22,7 +23,6 @@ class RemoteDataSource @Inject constructor(
             return null
         }
     }
-
 
 }
 

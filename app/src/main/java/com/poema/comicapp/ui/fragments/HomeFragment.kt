@@ -33,6 +33,7 @@ import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
+import kotlin.system.measureTimeMillis
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(
@@ -48,13 +49,14 @@ class HomeFragment : Fragment(
     private lateinit var recycler: RecyclerView
     private lateinit var progBar: ProgressBar
     private var favButtonView: MenuItem? = null
-
+    private var timeItTakes :Long? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
+        timeItTakes=System.currentTimeMillis()
         createNotificationChannel()
         createJobScheduler()
         setHasOptionsMenu(true)
@@ -104,22 +106,36 @@ class HomeFragment : Fragment(
     }
 
     private fun observeCache() {
+
         viewModel.offlineComicList.observe(viewLifecycleOwner, {
             viewModel.cacheList = it as MutableList<ComicListItem>
-            viewModel.setBitMapAndFav()
+            if (context!!.isInternetAvailable()) viewModel.setBitMapAndFav()
+            else {
+                globalList = it
+                for (item in viewModel.cacheList) {
+                    if (item.isFavourite) {
+                        viewModel.favoritesList.add(item)
+                    }
+                }
+            }
             comicAdapter!!.submitList(globalList)
             progBar.visibility = View.GONE
             if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
+            val timeItTook = System.currentTimeMillis()-timeItTakes!!
+            println("!!! OBSERV HAR KÖRTS! Det tog $timeItTook ms!")
         })
     }
 
     private fun subscribeToScrapeData() {
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
+
             globalList = it as MutableList<ComicListItem>
+            //println("!!! globalList pos 0(arr) ${globalList[0].title} och id ${globalList[0].id} och size: ${globalList.size}")
             tempSearchList = it
-            viewModel.setBitMapAndFav()
+            if (context!!.isInternetAvailable()) viewModel.setBitMapAndFav()
+
             if (context!!.isInternetAvailable()) {
                 checkForNewItems()
                 prefsClass.saveOldAmount(globalList.size)
@@ -127,9 +143,10 @@ class HomeFragment : Fragment(
             }
             progBar.visibility = View.GONE
             comicAdapter!!.submitList(globalList)
-           if (viewModel.showFavorites) {
+            if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
+           // println("!!! SUBSCRIBE HAR KÖRTS!")
         })
     }
 

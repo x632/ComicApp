@@ -38,10 +38,7 @@ class DetailFragment : Fragment() {
     private lateinit var progBarHolder: ProgressBar
     private lateinit var binding: FragmentDetailBinding
     private val args: DetailFragmentArgs by navArgs()
-    private var cachedPostIsInitialized = false
-    private var internetPostInitialized = false
-    private var savingIsDone = true
-    private var notToggled = true
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,6 +64,7 @@ class DetailFragment : Fragment() {
         globalList[viewModel.index!!].isNew = false
 
         subscribeToSaveIsDone()
+
         if (viewModel.isInCache(viewModel.number)) {
             viewModel.comicListItem = globalList[viewModel.index!!]
             titleHolder.text = globalList[viewModel.index!!].title
@@ -80,10 +78,10 @@ class DetailFragment : Fragment() {
             (imageHolder as SubsamplingScaleImageView).setImage(ImageSource.bitmap(dstBmp))
             altHolder.text = globalList[viewModel.index!!].alt
             progBarHolder.visibility = View.GONE
-            cachedPostIsInitialized = true
+                viewModel.cachedPostIsInitialized = true
         } else {
             if (activity?.isInternetAvailable()!!) {
-                viewModel.getComicPost(viewModel.number)
+                viewModel.getComicPostDto(viewModel.number)
             } else {
                 showToast("Please check your internet connection! This comic has not yet been cached. ")
             }
@@ -96,28 +94,26 @@ class DetailFragment : Fragment() {
         else {
             heartHolder.setImageDrawable(emptyHeart)
         }
-        observeComicPostResponse()
-        subscribeToFinishedBitmap()
+        subscribeToComicPostDtoResponse()
+        subscribeToFinishedCacheObject()
 
         heartHolder.setOnClickListener {
             if (requireContext().isInternetAvailable()) {
-                notToggled = false
-                if (cachedPostIsInitialized || internetPostInitialized) {
+                viewModel.notToggled = false
+                if (viewModel.cachedPostIsInitialized || viewModel.internetPostInitialized) {
                     if (!globalList[viewModel.index!!].isFavourite) {
-                        savingIsDone = false
+                        viewModel.savingIsDone = false
                         progBarHolder.visibility = View.VISIBLE
                         heartHolder.setImageDrawable(heart)
-                        val item = viewModel.createItem(true)
                         globalList[viewModel.index!!].isFavourite = true
-                        viewModel.updateComicListItem(item)
+                        viewModel.updateComicListItem(true)
 
                     } else {
-                        savingIsDone = false
+                        viewModel.savingIsDone = false
                         progBarHolder.visibility = View.VISIBLE
                         heartHolder.setImageDrawable(emptyHeart)
-                        val item = viewModel.createItem(false)
                         globalList[viewModel.index!!].isFavourite = false
-                        viewModel.updateComicListItem(item)
+                        viewModel.updateComicListItem(false)
                     }
                 }
 
@@ -148,8 +144,8 @@ class DetailFragment : Fragment() {
         ) {
             //just makes sure everything is handled before you can go back.
             override fun handleOnBackPressed() {
-               if (cachedPostIsInitialized || internetPostInitialized || activity?.isInternetAvailable() == false) {
-                    if (savingIsDone || notToggled) {
+               if (viewModel.cachedPostIsInitialized || viewModel.internetPostInitialized || activity?.isInternetAvailable() == false) {
+                    if (viewModel.savingIsDone ||viewModel.notToggled) {
                         Navigation.findNavController(altHolder).popBackStack()
                    }
                 }
@@ -163,12 +159,12 @@ class DetailFragment : Fragment() {
 
     private fun subscribeToSaveIsDone() {
         viewModel.savingListItemFinished.observe(viewLifecycleOwner, {
-            savingIsDone = it
+            viewModel.savingIsDone = it
             if (it) progBarHolder.visibility = View.GONE
         })
     }
 
-    private fun observeComicPostResponse() {
+    private fun subscribeToComicPostDtoResponse() {
         viewModel.response.observe(viewLifecycleOwner, {
 
             if (it.isSuccessful) {
@@ -213,7 +209,7 @@ class DetailFragment : Fragment() {
     }
 
 
-    private fun subscribeToFinishedBitmap() {
+    private fun subscribeToFinishedCacheObject() {
         viewModel.bitmap.observe(viewLifecycleOwner) {
 
             viewModel.comicListItem = ComicListItem(
@@ -226,7 +222,7 @@ class DetailFragment : Fragment() {
                 globalList[viewModel.index!!].isNew,
             )
             viewModel.saveComicListItem(viewModel.comicListItem!!)
-            internetPostInitialized = true
+            viewModel.internetPostInitialized = true
         }
     }
 

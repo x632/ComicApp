@@ -28,12 +28,18 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
     var comicListItem: ComicListItem? = null
     var postDtoFromInternet: ComicPostDto? = null
     var index: Int? = null
+
+    var cachedPostIsInitialized = false
+    var internetPostInitialized = false
+    var savingIsDone = true
+    var notToggled = true
+
     private var job1 : Job? = null
 
 
-    fun getComicPost(postNumber: Int) {
+    fun getComicPostDto(postNumber: Int) {
         viewModelScope.launch {
-            val response = repository.getComicPost(postNumber)
+            val response = repository.getComicPostDto(postNumber)
             _response.value = response
         }
     }
@@ -45,13 +51,13 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         }
     }
 
-    fun updateComicListItem(comicListItem: ComicListItem){
+    fun updateComicListItem(isFav: Boolean){
 
         job1?.cancel()
         job1 = viewModelScope.launch{
             var returnValue = 0
             _savingListItemFinished.value = false
-            returnValue = repository.update(comicListItem.isFavourite, comicListItem.id)
+            returnValue = repository.update(isFav, number)
             if(returnValue>0){_savingListItemFinished.value = true}
         }
     }
@@ -59,9 +65,9 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
 
     fun createBitmap(url: String) {
         CoroutineScope(IO).launch {
-            val stream = repository.getBitMap(url)
+            val bitmap = repository.getBitMap(url)
             withContext(Main) {
-                _bitmap.value = stream
+                _bitmap.value = bitmap
             }
         }
 
@@ -89,17 +95,6 @@ class DetailViewModel @Inject constructor(private val repository: Repository) : 
         return temp
     }
 
-    fun createItem(isFav:Boolean): ComicListItem{
-        comicListItem = ComicListItem(
-            globalList[index!!].title,
-            globalList[index!!].id,
-            globalList[index!!].date,
-            globalList[index!!].alt,
-            globalList[index!!].bitmap,
-            isFav,
-            globalList[index!!].isNew
-        )
-        return comicListItem!!
-    }
+
 }
 
