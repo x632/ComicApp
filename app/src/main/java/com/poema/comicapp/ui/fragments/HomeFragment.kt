@@ -41,7 +41,6 @@ class HomeFragment : Fragment(
 ) {
     @Inject
     lateinit var prefsClass: UserPreferences
-
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: FragmentHomeBinding
     private var comicAdapter: ComicListAdapter? = null
@@ -99,7 +98,7 @@ class HomeFragment : Fragment(
     private fun initializeRecycler() {
         recycler.apply {
             layoutManager = LinearLayoutManager(context)
-            comicAdapter = ComicListAdapter(context)
+            comicAdapter = ComicListAdapter()
             adapter = comicAdapter
             comicAdapter?.submitList(globalList)
         }

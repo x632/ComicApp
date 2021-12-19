@@ -12,13 +12,4 @@ object Utility {
         return netInfo != null && netInfo.isConnected
 
     }
-
-    private fun Context.showErrorToast(message: String?) {
-
-        Toast.makeText(
-            applicationContext, message,
-            Toast.LENGTH_SHORT
-        ).show()
-
-    }
 }

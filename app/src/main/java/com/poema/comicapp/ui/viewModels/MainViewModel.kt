@@ -10,7 +10,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import javax.inject.Inject
-import kotlin.system.measureTimeMillis
 
 
 @HiltViewModel
@@ -57,7 +56,6 @@ constructor(private val repository: Repository) : ViewModel() {
     }*/
 
     fun setBitMapAndFav() {
-        //val timeItTook = measureTimeMillis {
             favoritesList = mutableListOf()
             var position = 0
             for (index in 0 until cacheList.size) {
@@ -74,8 +72,6 @@ constructor(private val repository: Repository) : ViewModel() {
                     favoritesList.add(item)
                 }
             }
-        //}
-        //println("!!! Funktionen tog $timeItTook ms")
     }
 
 
