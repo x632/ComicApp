@@ -35,8 +35,8 @@ constructor(private val repository: Repository) : ViewModel() {
         }
     }
 
-/*    fun setBitMapAndFav() {
-        val timeItTook = measureTimeMillis {
+    fun setBitMapAndFav() {
+
             favoritesList = mutableListOf()
             for (index in 0 until cacheList.size) {
                 for (item in globalList) {
@@ -51,11 +51,11 @@ constructor(private val repository: Repository) : ViewModel() {
                 }
 
             }
-        }
-        println("!!! Funktionen tog $timeItTook ms")
-    }*/
 
-    fun setBitMapAndFav() {
+      
+    }
+
+   /* fun setBitMapAndFav() {
             favoritesList = mutableListOf()
             var position = 0
             for (index in 0 until cacheList.size) {
@@ -72,7 +72,7 @@ constructor(private val repository: Repository) : ViewModel() {
                     favoritesList.add(item)
                 }
             }
-    }
+    }*/
 
 
     fun reloadData() {

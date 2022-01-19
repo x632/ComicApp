@@ -89,7 +89,7 @@ dependencies {
     kapt "androidx.hilt:hilt-compiler:$hilt_viewmodels"
 
     //room
-    def room = "2.3.0"
+    def room = "2.4.0"
     implementation "androidx.room:room-runtime:$room"
     implementation "androidx.room:room-ktx:$room"
     kapt "androidx.room:room-compiler:$room"
