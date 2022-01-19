@@ -12,7 +12,6 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.text.isDigitsOnly
@@ -22,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.poema.comicapp.R
 import com.poema.comicapp.adapters.ComicListAdapter
 import com.poema.comicapp.data_sources.model.ComicListItem
-import com.poema.comicapp.data_sources.model.GlobalList
 import com.poema.comicapp.data_sources.model.GlobalList.globalList
 import com.poema.comicapp.databinding.FragmentHomeBinding
 import com.poema.comicapp.job_scheduler.NewComicsJobService
@@ -33,7 +31,6 @@ import com.poema.comicapp.ui.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
-import kotlin.system.measureTimeMillis
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(
@@ -122,8 +119,7 @@ class HomeFragment : Fragment(
             if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
-            val timeItTook = System.currentTimeMillis()-timeItTakes!!
-            println("!!! OBSERV HAR KÖRTS! Det tog $timeItTook ms!")
+
         })
     }
 

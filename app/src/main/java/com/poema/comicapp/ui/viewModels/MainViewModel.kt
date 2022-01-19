@@ -51,28 +51,9 @@ constructor(private val repository: Repository) : ViewModel() {
                 }
 
             }
-
-      
     }
 
-   /* fun setBitMapAndFav() {
-            favoritesList = mutableListOf()
-            var position = 0
-            for (index in 0 until cacheList.size) {
-                position = if (cacheList[index].id < 404) {
-                    (globalList.size) - cacheList[index].id
-                } else {
-                    (globalList.size + 1) - cacheList[index].id
-                }
-                globalList[position].bitmap = cacheList[index].bitmap
-                globalList[position].alt = cacheList[index].alt
-                globalList[position].isFavourite = cacheList[index].isFavourite
-                if (cacheList[index].isFavourite) {
-                    val item = globalList[position]
-                    favoritesList.add(item)
-                }
-            }
-    }*/
+
 
 
     fun reloadData() {
