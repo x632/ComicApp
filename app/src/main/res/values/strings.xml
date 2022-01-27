@@ -5,4 +5,8 @@
     <string name="search">Search</string>
     <string name="favs">favs</string>
     <string name="update">update</string>
+    <string name="settings">settings</string>
+    <string name="no_filter">notify of new comics</string>
+    <string name="notifications_on">notifications on</string>
+    <string name="notifications_off">notifications off</string>
 </resources>

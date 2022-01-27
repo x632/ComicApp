@@ -45,16 +45,13 @@ class HomeFragment : Fragment(
     private lateinit var recycler: RecyclerView
     private lateinit var progBar: ProgressBar
     private var favButtonView: MenuItem? = null
-    private var timeItTakes :Long? = null
+    private var notificationView: MenuItem? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        timeItTakes=System.currentTimeMillis()
-        createNotificationChannel()
-        createJobScheduler()
         setHasOptionsMenu(true)
 
         recycler = binding.recycler
@@ -62,6 +59,7 @@ class HomeFragment : Fragment(
         if (requireContext().isInternetAvailable()) {
             progBar.visibility = View.VISIBLE
         }
+
         initializeRecycler()
         subscribeToScrapeData()
         observeCache()
@@ -90,6 +88,7 @@ class HomeFragment : Fragment(
         val scheduler =
             activity?.getSystemService(AppCompatActivity.JOB_SCHEDULER_SERVICE) as JobScheduler
         scheduler.schedule(info)
+
     }
 
     private fun initializeRecycler() {
@@ -127,7 +126,6 @@ class HomeFragment : Fragment(
         viewModel.onlineComicList.observe(viewLifecycleOwner, {
 
             globalList = it as MutableList<ComicListItem>
-            //println("!!! globalList pos 0(arr) ${globalList[0].title} och id ${globalList[0].id} och size: ${globalList.size}")
             tempSearchList = it
             if (context!!.isInternetAvailable()) viewModel.setBitMapAndFav()
 
@@ -141,7 +139,7 @@ class HomeFragment : Fragment(
             if (viewModel.showFavorites) {
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
-           // println("!!! SUBSCRIBE HAR KÖRTS!")
+
         })
     }
 
@@ -170,6 +168,16 @@ class HomeFragment : Fragment(
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         activity?.menuInflater!!.inflate(R.menu.menu, menu)
         favButtonView = menu.findItem(R.id.fav)
+        notificationView = menu.findItem(R.id.settings)
+        val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
+        val notificationState = preferences?.getBoolean("Notifications",true)
+        if (notificationState!!){
+            createNotificationChannel()
+            createJobScheduler()
+            notificationView?.setIcon(R.drawable.notifications_on_white_24)
+        }else{
+            notificationView?.setIcon(R.drawable.notifications_off_white_24)
+        }
 
         if (viewModel.showFavorites) {
             comicAdapter!!.submitList(viewModel.favoritesList)
@@ -235,8 +243,31 @@ class HomeFragment : Fragment(
                     favButtonView?.setIcon(R.drawable.grey_border_heart)
                 } else showToast("Currently there is no internet connection. You cannot reload data. Please check your connection!")
             }
+            R.id.notification_on -> {
+                notificationView?.setIcon(R.drawable.notifications_on_white_24)
+                setNotificationState(true)
+                createNotificationChannel()
+                createJobScheduler()
+            }
+            R.id.notification_off -> {
+                notificationView?.setIcon(R.drawable.notifications_off_white_24)
+               setNotificationState(false)
+                val notificationManager =
+                    activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.cancel(Constants.NOTIFICATION_ID)
+                val scheduler =
+                    activity?.getSystemService(AppCompatActivity.JOB_SCHEDULER_SERVICE) as JobScheduler
+                scheduler.cancel(Constants.JOB_ID)
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setNotificationState(notifiers: Boolean){
+        val preferences = activity?.getPreferences(AppCompatActivity.MODE_PRIVATE)
+        val editor = preferences!!.edit()
+        editor!!.putBoolean("Notifications",notifiers)
+        editor.apply()
     }
 
     private fun showToast(message: String) {

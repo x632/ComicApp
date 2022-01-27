@@ -53,9 +53,6 @@ constructor(private val repository: Repository) : ViewModel() {
             }
     }
 
-
-
-
     fun reloadData() {
         CoroutineScope(IO).launch {
             val list: List<ComicListItem>? = repository.getArchive()

@@ -4,21 +4,48 @@
 
     <item
         android:id="@+id/search"
-        android:title="@string/search"
         android:icon="@drawable/ic_action_search"
-        app:showAsAction="always|collapseActionView"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
+        android:title="@string/search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
 
     <item
         android:id="@+id/update"
-        android:title="@string/update"
         android:icon="@drawable/reload"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/update"
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/fav"
-        android:title="@string/favs"
         android:icon="@drawable/grey_border_heart"
-        app:showAsAction="ifRoom"
-        />
+        android:title="@string/favs"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/notifications_on_white_24"
+        android:title="@string/settings"
+        app:showAsAction="always">
+
+        <menu>
+            <item
+                android:id="@+id/notification_on"
+                android:icon="@drawable/notifications_24"
+                android:title="@string/notifications_on"
+                app:showAsAction="never">
+
+            </item>
+
+            <item
+                android:id="@+id/notification_off"
+                android:icon="@drawable/notifications_off_24"
+                android:title="@string/notifications_off"
+                app:showAsAction="never">
+
+            </item>
+
+        </menu>
+    </item>
 </menu>
+
+

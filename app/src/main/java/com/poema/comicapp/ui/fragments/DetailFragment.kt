@@ -1,6 +1,7 @@
 package com.poema.comicapp.ui.fragments
 
 import android.app.NotificationManager
+import android.app.job.JobScheduler
 import android.content.Context
 import android.os.Bundle
 import android.view.*
