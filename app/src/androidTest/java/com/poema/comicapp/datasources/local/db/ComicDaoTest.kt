@@ -37,12 +37,9 @@ class ComicDaoTest {
     private lateinit var testComicListItem : ComicListItem
     private lateinit var testComicListItem2 : ComicListItem
 
-    @ExperimentalCoroutinesApi
-    private val testDispatcher = TestCoroutineDispatcher()
-    @ExperimentalCoroutinesApi
-    private val testScope = TestCoroutineScope(testDispatcher)
 
-    @ExperimentalCoroutinesApi
+
+    
     @Before
     fun setup() {
         database = Room.inMemoryDatabaseBuilder(
@@ -72,9 +69,8 @@ class ComicDaoTest {
         assertThat(result).isTrue()
     }
 
-    @ExperimentalCoroutinesApi
     @Test
-    fun testObserve() = runBlocking {
+    fun testIfObservesTheFlow() = runBlocking {
         var result : List<ComicListItem> = listOf()
         val comicListItems = async {
             comicDao.observeComicListItems().take(1)
