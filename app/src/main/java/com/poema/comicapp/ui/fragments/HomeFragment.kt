@@ -235,7 +235,7 @@ class HomeFragment : Fragment(
                     comicAdapter?.submitList(globalList)
                 }
             }
-            R.id.update -> {
+            R.id.refresh -> {
                 if (requireContext().isInternetAvailable()) {
                     progBar.visibility = View.VISIBLE
                     viewModel.reloadData()

@@ -4,10 +4,7 @@ import android.app.PendingIntent
 import android.app.job.JobParameters
 import kotlinx.coroutines.*
 import android.app.job.JobService
-import android.content.Context
 import android.content.Intent
-import android.preference.PreferenceManager
-import android.provider.Settings.Global.getInt
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -17,7 +14,6 @@ import com.poema.comicapp.other.Constants.CHANNEL_ID
 import com.poema.comicapp.other.Constants.NOTIFICATION_ID
 import com.poema.comicapp.other.ScrapingFunctions
 import com.poema.comicapp.other.UserPreferences
-import com.poema.comicapp.other.UserPreferencesImpl
 import com.poema.comicapp.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CompletableJob

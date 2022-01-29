@@ -9,4 +9,5 @@
     <string name="no_filter">notify of new comics</string>
     <string name="notifications_on">notifications on</string>
     <string name="notifications_off">notifications off</string>
+    <string name="refresh">refresh</string>
 </resources>
