@@ -1,7 +1,6 @@
 package com.poema.comicapp.datasources.local.db
 
-import android.graphics.Bitmap
-import androidx.room.PrimaryKey
+
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -10,16 +9,10 @@ import com.google.common.truth.Truth.assertThat
 import com.poema.comicapp.data_sources.local.ComicDao
 import com.poema.comicapp.data_sources.local.db.ComicDatabase
 import com.poema.comicapp.data_sources.model.ComicListItem
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -38,8 +31,6 @@ class ComicDaoTest {
     private lateinit var testComicListItem2 : ComicListItem
 
 
-
-    
     @Before
     fun setup() {
         database = Room.inMemoryDatabaseBuilder(
@@ -61,7 +52,7 @@ class ComicDaoTest {
     }
 
     @Test
-    fun testIfInsertsComicListItem() = runBlocking {
+    fun testIfInsertsComicListItemAndFindsItemById() = runBlocking {
 
         comicDao.insert(testComicListItem)
         val loadedItem = comicDao.findComicListItemById(3000)

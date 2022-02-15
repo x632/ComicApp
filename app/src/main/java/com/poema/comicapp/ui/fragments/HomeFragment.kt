@@ -102,9 +102,9 @@ class HomeFragment : Fragment(
 
     private fun observeCache() {
 
-        viewModel.offlineComicList.observe(viewLifecycleOwner, {
+        viewModel.offlineComicList.observe(viewLifecycleOwner) {
             viewModel.cacheList = it as MutableList<ComicListItem>
-            if (context!!.isInternetAvailable()) viewModel.setBitMapAndFav()
+            if (requireContext().isInternetAvailable()) viewModel.setBitMapAndFav()
             else {
                 globalList = it
                 for (item in viewModel.cacheList) {
@@ -119,17 +119,17 @@ class HomeFragment : Fragment(
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
 
-        })
+        }
     }
 
     private fun subscribeToScrapeData() {
-        viewModel.onlineComicList.observe(viewLifecycleOwner, {
+        viewModel.onlineComicList.observe(viewLifecycleOwner) {
 
             globalList = it as MutableList<ComicListItem>
             tempSearchList = it
-            if (context!!.isInternetAvailable()) viewModel.setBitMapAndFav()
+            if (requireContext().isInternetAvailable()) viewModel.setBitMapAndFav()
 
-            if (context!!.isInternetAvailable()) {
+            if (requireContext().isInternetAvailable()) {
                 checkForNewItems()
                 prefsClass.saveOldAmount(globalList.size)
 
@@ -140,7 +140,7 @@ class HomeFragment : Fragment(
                 comicAdapter!!.submitList(viewModel.favoritesList)
             }
 
-        })
+        }
     }
 
     private fun checkForNewItems() {

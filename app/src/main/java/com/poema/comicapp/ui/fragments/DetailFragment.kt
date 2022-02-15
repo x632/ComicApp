@@ -1,7 +1,6 @@
 package com.poema.comicapp.ui.fragments
 
 import android.app.NotificationManager
-import android.app.job.JobScheduler
 import android.content.Context
 import android.os.Bundle
 import android.view.*
@@ -22,7 +21,9 @@ import com.poema.comicapp.other.Utility.isInternetAvailable
 import com.poema.comicapp.ui.viewModels.DetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import androidx.activity.OnBackPressedCallback
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.poema.comicapp.data_sources.model.ComicListItem
@@ -159,14 +160,14 @@ class DetailFragment : Fragment() {
     }
 
     private fun subscribeToSaveIsDone() {
-        viewModel.savingListItemFinished.observe(viewLifecycleOwner, {
+        viewModel.savingListItemFinished.observe(viewLifecycleOwner) {
             viewModel.savingIsDone = it
             if (it) progBarHolder.visibility = View.GONE
-        })
+        }
     }
 
     private fun subscribeToComicPostDtoResponse() {
-        viewModel.response.observe(viewLifecycleOwner, {
+        viewModel.response.observe(viewLifecycleOwner) {
 
             if (it.isSuccessful) {
                 titleHolder.text = it.body()?.title
@@ -175,7 +176,7 @@ class DetailFragment : Fragment() {
                     .with(this)
                     .asBitmap()
                     .load(it.body()?.img)
-                    .into(object : SimpleTarget<Bitmap?>(800, 800) {
+                    .into(object : CustomTarget<Bitmap?>(800, 800) {
 
                         override fun onResourceReady(
                             resource: Bitmap,
@@ -187,6 +188,9 @@ class DetailFragment : Fragment() {
                                 )
                             )
                         }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                        }
                     })
                 it.body()?.let { post ->
                     viewModel.createBitmap(post.img)
@@ -195,7 +199,7 @@ class DetailFragment : Fragment() {
                 }
                 progBarHolder.visibility = View.GONE
             }
-        })
+        }
     }
 
     private fun cancelNotification() {
