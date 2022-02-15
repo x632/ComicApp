@@ -8,7 +8,7 @@ import com.poema.comicapp.databinding.ComicItemLayoutBinding
 import com.poema.comicapp.ui.fragments.HomeFragmentDirections
 
 
-class ComicListAdapter() :
+class ComicListAdapter :
     RecyclerView.Adapter<ComicListAdapter.ComicItemViewHolder>() {
 
     private lateinit var comicList: List<ComicListItem>
